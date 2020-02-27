@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{ title }} {% if not title %}Портал{% endif %}</title>
+
+    <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/node_modules/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="/node_modules/select2/dist/css/select2.css" rel="stylesheet">
+    <link href="/node_modules/jquery-ui/themes/base/all.css" rel="stylesheet">
+    <link href="/node_modules/select2-bootstrap-theme/dist/select2-bootstrap.css" rel="stylesheet">
+    <link href="/node_modules/select2-bootstrap-theme/dist/select2-bootstrap.min.css" rel="stylesheet">
+
+    <link href="{% static "core/css/style.css" %}" rel="stylesheet">
+    {% block css %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            {% if user.is_authenticated %}
+                <a class="navbar-brand" href="/">ПОРТАЛ</a>
+                <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+    {#                    <li class="nav-item">#}
+    {#                        <a class="nav-link" href="about.html">About</a>#}
+    {#                    </li>#}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-user"></i> {{ user }}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
+                                {% if user.is_staff %}
+                                    <a class="dropdown-item" href="/admin/">Панель администратора</a>
+                                {% endif %}
+{#                                <a class="dropdown-item" href="{% url 'logout' %}">Выход</a>#}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container page-content">
+        <div class="row">
+            <div class="col-sm-12">
+                {% block breadcrumbs %}
+                    {% if breadcrumbs %}
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            {% for label, url in breadcrumbs %}
+                                {% if not forloop.last and url %}
+                                    <li class="breadcrumb-item"><a href="{{ url }}">{{ label }}</a></li>
+                                {% else %}
+                                    <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ol>
+                    </nav>
+                    {% endif %}
+                {% endblock breadcrumbs %}
+            </div>
+        </div>
+        {% if messages %}
+            <ul class="list-group">
+                {% for message in messages %}
+                    <li class="list-group-item alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+                        {% if message.tags == 'warning' %}<i class="fa fa-warning"></i>{% endif %}
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% block container %}{% endblock %}
+
+        {% block footer %}
+            <footer class="text-right">
+                {% if user.is_authenticated %}
+                <p>{{ BRAND.FOOTER_LINK|safe }}</p>
+                {% endif %}
+            </footer>
+        {% endblock %}
+
+    </div>
+
+    <div id="loading" style="display: none; position: fixed; top:0; min-width: 100%; background-color: rgba(255, 255, 255, 0.76);
+min-height: 100%; z-index: 1000;">
+        <img src="{% static "core/img/load.gif" %}"
+             style="box-shadow: white 0 0 300px 200px; position: fixed; top: 39%; left: 46%">
+    </div>
+
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+    <script src="/node_modules/jquery-ui/ui/i18n/datepicker-ru.js"></script>
+    <script src="/node_modules/jquery.maskedinput/src/jquery.maskedinput.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/node_modules/select2/dist/js/select2.js"></script>
+    <script src="/node_modules/select2/dist/js/i18n/ru.js"></script>
+
+    {% block js %}
+        <script>
+            $(function() {
+                $('.date').datepicker({dateFormat: 'dd.mm.yy'});
+                $('.hasDatepicker').mask('99.99.9999');
+                $('input[type=text]:not(.allow-autocomplete)').prop('autocomplete', 'off');     // отключаю браузреный автокомплит форм
+                $.fn.select2.defaults.set("theme", "bootstrap");
+                $('.need-select2').select2({
+                    width: '100%',
+                    language: "ru",
+                    theme: "bootstrap"
+                });
+
+                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-toggle="popover"]').popover();
+
+                // вешаем на сабмит лоадер
+                $('form').submit(function(e) {
+                    {#console.log(e);#}
+
+                    // пропустим формы, для которых лоадер не нужен
+                    if ($(this).hasClass('no-submit-loader'))
+                        return;
+
+                    $('#loading').show()
+                });
+
+                $('#clearForm').click(function () {
+                    $(':input', 'form')
+                        .not(':button, :submit, :reset, :hidden')
+                        .removeAttr('checked')
+                        .removeAttr('selected')
+                        .not(':radio, .no-clean')
+                        .val('').trigger('change');
+                })
+            })
+        </script>
+    {% endblock %}
+
+</body>
+</html>

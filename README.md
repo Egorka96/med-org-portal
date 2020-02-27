@@ -37,6 +37,11 @@
     python manage.py createsuperuser
     ```
    
+1. Установить статику из package.json
+    ```shell script
+    npm install
+    ```
+   
 1. Запустить django-проект
     ```shell script
     python manage.py runserver 
