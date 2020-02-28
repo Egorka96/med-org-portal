@@ -22,7 +22,7 @@
 1. Перейти в папку с проектом и активировать виртуальное окружение
    ```shell script
    cd med-org-portal
-   python -m venv venv
+   python3.8 -m venv venv
    source venv/bin/activate
    ```
    
