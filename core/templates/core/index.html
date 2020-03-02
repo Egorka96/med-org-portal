@@ -1,1 +1,14 @@
 {% extends 'core/base.html' %}
+
+{% block container %}
+    <div class="row">
+         {% if perms.auth.view_user %}
+             <div class="col-sm-2">
+                 <a class="btn btn-primary btn-block index-btn" href="{% url 'core:user' %}">
+                     <p><i class="fa fa-user"></i></p>
+                     Пользователи
+                </a>
+             </div>
+        {% endif %}
+    </div>
+{% endblock %}
