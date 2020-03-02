@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'bootstrap4',
 
     'core',
 
@@ -122,6 +123,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+LOGIN_REQUIRED_URLS_EXCEPTIONS = (
+    r'/static/',
+    r'/node_modules/',
+    r'/login(.*)$',
+    r'/logout(.*)$',
+)
+
 
 try:
     from project.local_settings import *

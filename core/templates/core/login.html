@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+
+{% block container %}
+    <br>
+    <form action="" method="POST">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-primary btn-block">Войти</button>
+            </div>
+        </div>
+    </form>
+{% endblock container %}
+
+{% block footer %}
+{% endblock footer %}
