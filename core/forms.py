@@ -104,7 +104,7 @@ class UserEdit(OrgsMixin, forms.ModelForm):
 
     class Meta:
         model = User
-        exclude = ['password', 'date_joined', 'last_login']
+        exclude = ['password', 'date_joined', 'last_login', 'is_staff']
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'need-select2'}),
             'user_permissions': forms.SelectMultiple(attrs={'class': 'need-select2'}),
@@ -130,22 +130,16 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         if new_password:
             user.set_password(new_password)
 
+        if perm_groups := self.cleaned_data.get('groups'):
+            user.groups.set(perm_groups)
+
         user.save()
 
         if not hasattr(user, 'core'):
             user.mis = models.User.objects.create(django_user=user)
 
-        if orgs := self.cleaned_data.get('orgs'):
-            user.core.org_ids = json.dumps(orgs)
-
+        user.core.org_ids = json.dumps(self.cleaned_data.get('orgs', []))
         user.core.save()
-
-        if self.fields.get('user_permissions'):
-            user_permissions = self.cleaned_data.get('user_permissions', [])
-            user.user_permissions.clear()
-            user.user_permissions.add(*user_permissions)
-
-        return user
 
 
 class WorkersPastReport(DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):
