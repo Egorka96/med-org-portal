@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block css %}
+    <style>
+        .paginator-row{
+            margin-top: 20px;
+        }
+    </style>
+{% endblock %}
+
+
+{% block container %}
+    {% block form_container %}
+        <form id='searchFrom' action="" method="GET">
+            <fieldset>
+                {% block legend %}
+                    <legend>Параметры</legend>
+                {% endblock %}
+                {% block form %}
+                    {% bootstrap_form_errors form %}
+                    {% bootstrap_form form %}
+                {% endblock form %}
+            </fieldset>
+            <br>
+            {% block buttons %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% block additional_btn %}
+                        {% endblock %}
+                    </div>
+                    <div class="col-md-6 text-right">
+                        {% block right_buttons %}
+                            <button type="button" class="btn btn-default" id="clearForm">
+                                <i class="fa fa-times-circle"></i> Сброс
+                            </button>
+
+                            <button type="submit" class="btn btn-info">
+                                <i class="fa fa-search"></i> Поиск
+                            </button>
+                        {% endblock %}
+                    </div>
+                </div>
+            {% endblock buttons %}
+        </form>
+    {% endblock form_container %}
+
+    {% if object_list %}
+        {% include 'core/paginator.html' %}
+        {% block table %}
+            <table class="report-table table table-striped table-hover">
+                <thead>
+                {% block thead %}
+                <tr class="small">
+                    {% block table_head %}
+                    {% endblock table_head %}
+                </tr>
+                {% endblock %}
+                </thead>
+                <tbody>
+                {% block tbody %}
+                    {% for object in page_obj|default:object_list %}
+                        <tr>
+                            {% block table_body %}
+                            {% endblock table_body %}
+                        </tr>
+                    {% endfor %}
+                {% endblock tbody %}
+                </tbody>
+            </table>
+        {% endblock table %}
+        {% include 'core/paginator.html' %}
+    {% elif form.is_bound and request.GET %}
+        <div class="alert alert-warning">
+            По вашему запросу ничего не найдено.
+        </div>
+    {% endif %}
+{% endblock %}

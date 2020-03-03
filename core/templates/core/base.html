@@ -17,8 +17,22 @@
     <link href="/node_modules/select2-bootstrap-theme/dist/select2-bootstrap.css" rel="stylesheet">
     <link href="/node_modules/select2-bootstrap-theme/dist/select2-bootstrap.min.css" rel="stylesheet">
 
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+    <script src="/node_modules/jquery-ui/ui/i18n/datepicker-ru.js"></script>
+    <script src="/node_modules/jquery.maskedinput/src/jquery.maskedinput.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/node_modules/select2/dist/js/select2.js"></script>
+    <script src="/node_modules/select2/dist/js/i18n/ru.js"></script>
+
     <link href="{% static "core/css/style.css" %}" rel="stylesheet">
     {% block css %}{% endblock %}
+
+    {% block form_media %}
+        {{ form.media }}
+        {{ formset.media }}
+    {% endblock form_media %}
+
 </head>
 
 <body>
@@ -100,14 +114,6 @@ min-height: 100%; z-index: 1000;">
         <img src="{% static "core/img/load.gif" %}"
              style="box-shadow: white 0 0 300px 200px; position: fixed; top: 39%; left: 46%">
     </div>
-
-    <script src="/node_modules/jquery/dist/jquery.js"></script>
-    <script src="/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
-    <script src="/node_modules/jquery-ui/ui/i18n/datepicker-ru.js"></script>
-    <script src="/node_modules/jquery.maskedinput/src/jquery.maskedinput.js"></script>
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/node_modules/select2/dist/js/select2.js"></script>
-    <script src="/node_modules/select2/dist/js/i18n/ru.js"></script>
 
     {% block js %}
         <script>
