@@ -12,7 +12,7 @@ User = get_user_model()
 
 
 class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.views.ListView):
-    template_name = 'core/user/search.html'
+    template_name = 'core/user/list.html'
     model = User
     form_class = forms.UserSearch
     filter_class = filters.User
@@ -37,7 +37,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
     pk = 'pk'
 
     def get_success_url(self):
-        return reverse_lazy('conf:core_user')
+        return reverse_lazy('core:user')
 
     def get_permission_required(self):
         perm = 'auth.add_user'
@@ -70,6 +70,6 @@ class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):
         return [
             ('Главная', reverse('core:index')),
             ('Пользователи', reverse('core:user')),
-            (user, reverse('conf:core_user_edit', kwargs={'pk': user.id})),
+            (user, reverse('core:user_edit', kwargs={'pk': user.id})),
             (self.breadcrumb, ''),
         ]

@@ -1,0 +1,40 @@
+{% extends 'core/base_list.html' %}
+{% load bootstrap4 %}
+
+{% block form %}
+    <div class="row">
+        <div class="col-sm-6">
+            {% bootstrap_field form.username layout='horizontal' %}
+            {% bootstrap_field form.last_name layout='horizontal' %}
+        </div>
+        <div class="col-sm-6">
+            {% bootstrap_field form.is_active layout='horizontal'%}
+        </div>
+    </div>
+{% endblock %}
+
+{% block additional_btn %}
+    <a href="{% url 'core:user_add' %}" class="btn btn-success">
+        <i class="fa fa-plus"></i> Создать
+    </a>
+{% endblock %}
+
+{% block table_head %}
+    <th>№</th>
+    <th>Логин</th>
+    <th>Фамилия</th>
+    <th>Имя</th>
+    <th>Организации</th>
+    <th>Активен</th>
+{% endblock table_head %}
+
+{% block table_body %}
+    <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
+    <td>
+        <a href="{% url 'core:user_edit' object.id %}">{{ object.username }}</a>
+    </td>
+    <td>{{ object.last_name }}</td>
+    <td>{{ object.first_name }}</td>
+    <td></td>  {# todo #}
+    <td>{{ object.is_active|yesno:'да, нет' }}</td>
+{% endblock %}

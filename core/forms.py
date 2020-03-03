@@ -6,8 +6,9 @@ from core import models
 User = get_user_model()
 
 
-class OrgsMixin:
-    orgs = forms.MultipleChoiceField(label='Организации', choices=[], required=False)
+class OrgsMixin(forms.Form):
+    orgs = forms.MultipleChoiceField(label='Организации', choices=[], required=False,
+                                     widget=forms.SelectMultiple(attrs={'class': 'need-select2'}))
 
     class Media:
         js = ['core/js/orgs.js']
@@ -50,7 +51,7 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         user.save()
 
         if not hasattr(user, 'core'):
-            user.mis = models.User.objects.create(user=user)
+            user.mis = models.User.objects.create(django_user=user)
 
         user.core.save()
 

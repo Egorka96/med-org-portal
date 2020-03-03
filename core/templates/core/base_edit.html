@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+{% load bootstrap4 %}
+
+{% block container %}
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row">
+            {% block fields %}
+                {% bootstrap_form form layout='horizontal' %}
+            {% endblock %}
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <a href="./delete/" class="btn btn-danger">
+                    <i class="fa fa-trash"></i> Удалить
+                </a>
+            </div>
+            <div class="col-6 text-right">
+                <button class="btn btn-success">
+                    <i class="fa fa-save"></i> Сохранить
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

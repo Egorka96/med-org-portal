@@ -7,7 +7,7 @@ DjangoUser = get_user_model()
 class User(django_filters.FilterSet):
     username = django_filters.CharFilter(field_name='username', lookup_expr='icontains')
     last_name = django_filters.CharFilter(field_name='last_name', lookup_expr='icontains')
-    is_active = django_filters.Filter(method='filter_is_active')
+    is_active = django_filters.BooleanFilter(method='filter_is_active')
 
     class Meta:
         model = DjangoUser

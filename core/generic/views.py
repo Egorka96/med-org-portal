@@ -85,6 +85,12 @@ class EditView(mixins.BreadcrumbsMixin, mixins.TitleMixin, mixins.FormMixin, Dja
 
         return self.object
 
+    def get_title(self):
+        if obj := self.get_object():
+            return str(obj)
+        else:
+            return 'Создание'
+
     def form_valid(self, form):
         form.save()
         return redirect(self.get_success_url())
