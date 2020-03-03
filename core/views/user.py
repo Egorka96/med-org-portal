@@ -51,6 +51,11 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         kwargs['instance'] = self.get_object()
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        c = super().get_context_data(**kwargs)
+        c['user'] = self.request.user
+        return c
+
     def get_breadcrumbs(self):
         return [
             ('Главная', reverse('core:index')),
