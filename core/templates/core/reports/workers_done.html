@@ -1,5 +1,6 @@
 {% extends 'core/base_list.html' %}
 {% load bootstrap4 %}
+{% load djutils %}
 
 
 {% block form %}
@@ -21,7 +22,7 @@
             {% bootstrap_field form.post layout='horizontal' %}
         </div>
     </div>
-{% endblock %}
+{% endblock %}.
 
 {% block pre_table %}
     {% if page_obj|default:object_list %}
@@ -46,15 +47,15 @@
 
 {% block table_body %}
     <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
-    <td>{{ object.date }}</td>
+    <td>{{ object.date|iso_to_date }}</td>
     <td>{{ object.client.fio }}</td>
-    <td>{{ object.client.birth }}</td>
+    <td>{{ object.client.birth|iso_to_date }}</td>
     <td>{{ object.client.gender }}</td>
-    <td>{{ object.shop }}</td>
-    <td>{{ object.org }}</td>
-    <td>{{ object.exam_type }}</td>
+    <td>{{ object.prof.0.shop }}</td>
+    <td>{{ object.prof.0.org.name }}</td>
+    <td>{{ object.prof.0.exam_type }}</td>
     <td>{{ object.law_items }}</td>
     <td>{{ object.total_cost }}</td>
-    <td>{{ object.note }}</td>
-    <td>{{ object.prof_conclusion.conclusion }}</td>
+    <td>{{ object.prof.0.note }}</td>
+    <td>{{ object.prof.0.prof_conclusion.conclusion }}</td>
 {% endblock %}

@@ -1,5 +1,8 @@
+import json
 from typing import Optional, List, Dict
 
+import requests
+from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse
 
@@ -9,7 +12,8 @@ import core.generic.views
 from core import forms
 
 
-class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.views.ListView):
+class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
+                        core.generic.views.ListView):
     template_name = 'core/reports/workers_done.html'
     title = 'Отчет по прошедшим'
     form_class = forms.WorkersPastReport
@@ -33,4 +37,33 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
             return self.get_objects()
 
     def get_objects(self):
-        return   # todo
+        if self.object_list is None:
+            form = self.get_form()
+            if form.is_valid():
+                filter_params = dict(self.request.GET)
+
+                if self.request.user.core.org_ids and not filter_params.get('orgs'):
+                    filter_params.update({
+                        'orgs': json.loads(self.request.user.core.org_ids)
+                    })
+
+                url = settings.MIS_URL + '/api/orders/by_client_date/'
+
+                if filter_params.get('per_page'):
+                    url += f"?per_page={filter_params['per_page'][0]}"
+
+                headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
+
+                response = requests.post(url=url, data=filter_params, headers=headers)
+                response.raise_for_status()
+
+                response_data = response.json()
+                self.object_list = response_data['results']
+                self.count = response_data['count']
+                self.have_next = bool(response_data['next'])
+                self.have_previous = bool(response_data['previous'])
+            else:
+                self.object_list = []
+                self.count = 0
+
+        return self.object_list
