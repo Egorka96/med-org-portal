@@ -42,7 +42,7 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].label = 'Логин'
 
-        if getattr(self.instance, 'core'):
+        if getattr(self.instance, 'core', None):
             orgs = self.instance.core.get_orgs()
             self.initial['orgs'] = [str(org.id) for org in orgs]
             self.fields['orgs'].widget.choices = [(str(org.id), org.name) for org in orgs]
