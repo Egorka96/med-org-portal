@@ -1,5 +1,10 @@
+import json
+from typing import List
+
 from django.db import models
 from django.contrib.auth.models import User as DjangoUser
+
+from core.mis.org import Org
 
 
 class User(models.Model):
@@ -17,9 +22,11 @@ class User(models.Model):
     def __str__(self):
         return str(self.django_user)
 
-    def get_orgs(self):
-        # todo
-        return
+    def get_orgs(self) -> List[Org]:
+        if not self.org_ids:
+            return []
+
+        return [Org.get(org_id=org_id) for org_id in json.loads(self.org_ids)]
 
     def get_valuable_services(self):
         # todo

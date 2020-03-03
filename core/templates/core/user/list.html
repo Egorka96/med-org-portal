@@ -35,6 +35,6 @@
     </td>
     <td>{{ object.last_name }}</td>
     <td>{{ object.first_name }}</td>
-    <td></td>  {# todo #}
+    <td>{{ object.core.get_orgs|join:', ' }}</td>
     <td>{{ object.is_active|yesno:'да, нет' }}</td>
 {% endblock %}

@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.contrib.auth import get_user_model
 
@@ -6,9 +8,14 @@ from core import models
 User = get_user_model()
 
 
+class ListField(forms.MultipleChoiceField):
+    @staticmethod
+    def valid_value(*args, **kwargs) -> bool:
+        return True
+
+
 class OrgsMixin(forms.Form):
-    orgs = forms.MultipleChoiceField(label='Организации', choices=[], required=False,
-                                     widget=forms.SelectMultiple(attrs={'class': 'need-select2'}))
+    orgs = ListField(label='Организации', choices=[], required=False)
 
     class Media:
         js = ['core/js/orgs.js']
@@ -35,7 +42,10 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].label = 'Логин'
 
-        # todo initial по организациям для существующих пользователей
+        if getattr(self.instance, 'core'):
+            orgs = self.instance.core.get_orgs()
+            self.initial['orgs'] = [str(org.id) for org in orgs]
+            self.fields['orgs'].widget.choices = [(str(org.id), org.name) for org in orgs]
 
     def save(self, *args, **kwargs):
         new_password = self.cleaned_data.get('new_password')
@@ -53,13 +63,14 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         if not hasattr(user, 'core'):
             user.mis = models.User.objects.create(django_user=user)
 
+        if orgs := self.cleaned_data.get('orgs'):
+            user.core.org_ids = json.dumps(orgs)
+
         user.core.save()
 
         if self.fields.get('user_permissions'):
             user_permissions = self.cleaned_data.get('user_permissions', [])
             user.user_permissions.clear()
             user.user_permissions.add(*user_permissions)
-
-        # todo: сохранение организаций и услуг
 
         return user
