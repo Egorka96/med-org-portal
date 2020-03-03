@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from django import forms
@@ -6,6 +7,52 @@ from django.contrib.auth import get_user_model
 from core import models
 
 User = get_user_model()
+
+
+class RusDateField(forms.DateField):
+    def __init__(self, input_format='%d.%m.%Y', *args, **kwargs):
+        kwargs['input_formats'] = [input_format]
+        if 'initial' not in kwargs:
+            kwargs['initial'] = lambda: datetime.date.today().strftime('%d.%m.%Y')
+        if 'widget' not in kwargs:
+            kwargs['widget'] = forms.TextInput(attrs={'class': 'date'})
+        super().__init__(*args, **kwargs)
+        self.input_format = input_format
+
+    def to_python(self, value):
+        if value:
+            # если уже дата вернем как есть
+            if isinstance(value, datetime.datetime):
+                return value.date()
+            if isinstance(value, datetime.date):
+                return value
+            try:
+                return datetime.datetime.strptime(value, self.input_format).date()
+            except ValueError:
+                raise forms.ValidationError(self.error_messages['invalid'])
+        else:
+            return None
+
+    def validate(self, value):
+        super(RusDateField, self).validate(value)
+        if not value:
+            return
+
+        if value.year < 1900:
+            raise forms.ValidationError(u'Год должен быть больше 1900')
+
+        if isinstance(value, datetime.date):
+            return
+
+        try:
+            return datetime.datetime.strptime(value, self.input_format).date()
+        except ValueError:
+            raise forms.ValidationError(u'Используйте формат ДД.ММ.ГГГГ')
+
+    def prepare_value(self, value):
+        if isinstance(value, datetime.date):
+            return value.strftime(self.input_format)
+        return value
 
 
 class ListField(forms.MultipleChoiceField):
@@ -19,6 +66,31 @@ class OrgsMixin(forms.Form):
 
     class Media:
         js = ['core/js/orgs.js']
+
+
+class DateFromTo(forms.Form):
+    date_from = RusDateField(label='С', required=False, initial=None)
+    date_to = RusDateField(label='По', required=False, initial=None)
+
+
+class ExamTypeMixin(forms.Form):
+    EXAM_TYPE_CHOICES = (
+        ('', '---------'),
+        ('Предварительный', 'Предварительный'),
+        ('Периодический', 'Периодический'),
+        ('Внеочередной', 'Внеочередной'),
+    )
+    exam_type = forms.ChoiceField(label='Вид осмотра', required=False, choices=EXAM_TYPE_CHOICES)
+
+
+class PlaceMixin(forms.Form):
+    PLACE_CHOICES = (
+        ('', '---------'),
+        ('Медцентр', 'Медцентр'),
+        ('Выезд', 'Выезд'),
+    )
+    place = forms.ChoiceField(label='Место', help_text='место проведения осмотра', choices=PLACE_CHOICES,
+                              required=False)
 
 
 class UserSearch(forms.Form):
@@ -74,3 +146,12 @@ class UserEdit(OrgsMixin, forms.ModelForm):
             user.user_permissions.add(*user_permissions)
 
         return user
+
+
+class WorkersPastReport(DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):
+    last_name = forms.CharField(label='Фамилия', required=False)
+    first_name = forms.CharField(label='Имя', required=False)
+    middle_name = forms.CharField(label='Отчество', required=False)
+
+    shop = forms.CharField(label='Подразделение', required=False)
+    post = forms.CharField(label='Должность', required=False)

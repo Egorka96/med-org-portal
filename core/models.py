@@ -16,7 +16,7 @@ class User(models.Model):
 
     class Meta:
         permissions = (
-
+            ('view_workers_done_report', 'Просмотр отчета по прошедшим'),
         )
 
     def __str__(self):
