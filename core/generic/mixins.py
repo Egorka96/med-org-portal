@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.utils.functional import cached_property
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormMixin as DjangoFormMixin
@@ -80,3 +81,58 @@ class TitleMixin(ContextMixin):
         context = super().get_context_data(**kwargs)
         context['title'] = self.get_title()
         return context
+
+
+class ExcelMixin:
+    excel_name = None
+    excel_method = 'get'
+    excel_workbook_maker = None
+    excel_params = ['excel']
+
+    def get_workbook_maker(self):
+        return self.excel_workbook_maker
+
+    def get_excel(self) -> HttpResponse:
+        maker = self.get_workbook_maker()
+        workbook_maker_kwargs = self.get_workbook_maker_kwargs()
+
+        maker_instance = maker(**workbook_maker_kwargs)
+        excel_response = maker_instance.create_workbook()
+        return excel_response
+
+    def get_workbook_maker_kwargs(self, **kwargs):
+        kwargs.update({
+            'objects': self.get_queryset(),
+            'title': self.get_excel_title()
+        })
+
+        return kwargs
+
+    def get_excel_title(self):
+        return self.get_title()
+
+    def get_excel_name(self):
+        return self.excel_name or self.get_title()
+
+    def get_excel_method(self):
+        return self.excel_method
+
+    def get(self, *args, **kwargs):
+        if self.get_excel_method().lower() == 'get' and \
+                any([excel_param in self.request.GET for excel_param in self.excel_params]):
+            return self.get_excel()
+
+        return super().get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        if self.get_excel_method().lower() == 'post' and \
+                any([excel_param in self.request.POST for excel_param in self.excel_params]):
+            return self.get_excel()
+
+        return super().post(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        if self.get_workbook_maker():
+            kwargs['add_excel'] = True
+
+        return super().get_context_data(**kwargs)

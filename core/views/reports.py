@@ -10,6 +10,7 @@ import core.generic.mixins
 import core.generic.views
 
 from core import forms
+from core.excel.reports import WorkersDoneExcel
 
 
 class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
@@ -19,6 +20,7 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
     form_class = forms.WorkersPastReport
     paginate_by = 50
     permission_required = 'core.view_workers_done_report'
+    excel_workbook_maker = WorkersDoneExcel
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

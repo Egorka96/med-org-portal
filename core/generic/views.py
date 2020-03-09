@@ -11,7 +11,7 @@ from django.views.generic import (
 from core.generic import mixins
 
 
-class ListView(mixins.BreadcrumbsMixin, mixins.TitleMixin, DjangoListView):
+class ListView(mixins.ExcelMixin, mixins.BreadcrumbsMixin, mixins.TitleMixin, DjangoListView):
     DEFAULT_PAGINATE_BY = 50
 
     def get_paginate_by(self, queryset=None):
