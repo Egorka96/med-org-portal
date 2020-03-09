@@ -1,5 +1,46 @@
+from django.core.paginator import Paginator
+from django.utils.functional import cached_property
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormMixin as DjangoFormMixin
+
+
+class RestPaginator(Paginator):
+    def __init__(self, object_list, per_page, count, *arg, **kwargs):
+        super().__init__(object_list, per_page, *arg, **kwargs)
+        self._count = count
+
+    @cached_property
+    def count(self):
+        return self._count
+
+
+class RestListMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.count = None
+        self.have_next = None
+        self.have_previous = None
+
+    def get_paginator(self, queryset, per_page, **kwargs):
+        return RestPaginator(queryset, per_page, self.count or 0)
+
+    def get_page_numbers(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        numbers = []
+        if queryset:
+            page = int(self.request.GET.get('page', 1))
+            per_page = self.get_paginate_by(queryset)
+
+            pag = self.get_paginator(queryset, per_page)
+            all_numbers = list(pag.page_range)
+
+            start = page - 4 if page - 4 > 1 else 0
+            end = page + 3
+            numbers = all_numbers[start:end]
+
+        return self.have_previous, numbers, self.have_next
 
 
 class FormMixin(DjangoFormMixin):

@@ -1,0 +1,68 @@
+{% extends 'core/base_list.html' %}
+{% load bootstrap4 %}
+{% load djutils %}
+
+{% block form %}
+    <div class="row">
+        <div class="col-sm-4">
+            {% bootstrap_field form.last_name layout='horizontal' %}
+            {% bootstrap_field form.first_name layout='horizontal' %}
+            {% bootstrap_field form.middle_name layout='horizontal' %}
+            {% bootstrap_field form.exam_type layout='horizontal' %}
+        </div>
+        <div class="col-sm-4">
+            {% bootstrap_field form.date_from layout='horizontal' %}
+            {% bootstrap_field form.date_to layout='horizontal' %}
+            {% bootstrap_field form.place layout='horizontal' %}
+        </div>
+        <div class="col-sm-4">
+            {% bootstrap_field form.orgs layout='horizontal' %}
+            {% bootstrap_field form.shop layout='horizontal' %}
+            {% bootstrap_field form.post layout='horizontal' %}
+        </div>
+    </div>
+{% endblock %}.
+
+{% block pre_table %}
+    {% if page_obj|default:object_list %}
+        <span class="label label-info">Всего: {{ page_obj.paginator.count|default:object_list.count }}</span>
+    {% endif %}
+{% endblock pre_table %}
+
+{% block table_head %}
+    <th>№</th>
+    <th>Дата осмотра</th>
+    <th>ФИО</th>
+    <th>Дата рождения</th>
+    <th>Пол</th>
+    <th>Подразделение</th>
+    <th>Организация</th>
+    <th>Вид осмотра</th>
+    <th>Пункты приказа</th>
+    <th>Стоимость</th>
+    <th>Заключение профпатолога</th>
+    <th>Примечание</th>
+{% endblock %}
+
+{% block table_body %}
+    <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
+    <td>{{ object.date|iso_to_date }}</td>
+    <td>{{ object.client.fio }}</td>
+    <td>{{ object.client.birth|iso_to_date }}</td>
+    <td>{{ object.client.gender }}</td>
+    <td>{{ object.prof.0.shop }}</td>
+    <td>
+        {% for org in object.orgs %}
+            {{ org.name }}
+        {% endfor %}
+    </td>
+    <td>{{ object.prof.0.exam_type }}</td>
+    <td>
+        {% for law_item in object.prof.0.law_items %}
+            {{ law_item.name }} прил.{{ law_item.section }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </td>
+    <td>{{ object.total_cost }}</td>
+    <td>{{ object.prof.0.prof_conclusion.conclusion }}</td>
+    <td>{{ object.prof.0.note }}</td>
+{% endblock %}

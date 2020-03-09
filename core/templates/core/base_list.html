@@ -46,6 +46,9 @@
         </form>
     {% endblock form_container %}
 
+    {% block pre_table %}
+    {% endblock pre_table %}
+
     {% if object_list %}
         {% include 'core/paginator.html' %}
         {% block table %}
