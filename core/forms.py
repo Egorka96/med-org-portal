@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 
 from core import models
+from core.mis.org import Org
 
 User = get_user_model()
 
@@ -66,6 +67,19 @@ class OrgsMixin(forms.Form):
 
     class Media:
         js = ['core/js/orgs.js']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        choices = []
+
+        values = self.data.getlist('orgs') if hasattr(self.data, 'getlist') else self.initial.get('orgs', [])
+        if values:
+            for value in values:
+                org = Org.get(org_id=value)
+                choices.append((org.id, org.name))
+
+        self.fields['orgs'].widget.choices = choices
 
 
 class DateFromTo(forms.Form):
