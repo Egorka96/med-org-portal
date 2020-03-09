@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 
 from core import models
 from core.mis.org import Org
+from core.mis.service_client import Mis
 
 User = get_user_model()
 
@@ -105,6 +106,12 @@ class PlaceMixin(forms.Form):
     )
     place = forms.ChoiceField(label='Место', help_text='место проведения осмотра', choices=PLACE_CHOICES,
                               required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if not Mis().is_out_used():
+            self.fields['place'].widget = forms.HiddenInput()
 
 
 class UserSearch(forms.Form):
