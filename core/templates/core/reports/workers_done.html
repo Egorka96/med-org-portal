@@ -2,7 +2,6 @@
 {% load bootstrap4 %}
 {% load djutils %}
 
-
 {% block form %}
     <div class="row">
         <div class="col-sm-4">
@@ -41,8 +40,8 @@
     <th>Вид осмотра</th>
     <th>Пункты приказа</th>
     <th>Стоимость</th>
-    <th>Примечание</th>
     <th>Заключение профпатолога</th>
+    <th>Примечание</th>
 {% endblock %}
 
 {% block table_body %}
@@ -52,10 +51,18 @@
     <td>{{ object.client.birth|iso_to_date }}</td>
     <td>{{ object.client.gender }}</td>
     <td>{{ object.prof.0.shop }}</td>
-    <td>{{ object.prof.0.org.name }}</td>
+    <td>
+        {% for org in object.orgs %}
+            {{ org.name }}
+        {% endfor %}
+    </td>
     <td>{{ object.prof.0.exam_type }}</td>
-    <td>{{ object.law_items }}</td>
+    <td>
+        {% for law_item in object.prof.0.law_items %}
+            {{ law_item.name }} прил.{{ law_item.section }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </td>
     <td>{{ object.total_cost }}</td>
-    <td>{{ object.prof.0.note }}</td>
     <td>{{ object.prof.0.prof_conclusion.conclusion }}</td>
+    <td>{{ object.prof.0.note }}</td>
 {% endblock %}
