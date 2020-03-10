@@ -1,10 +1,24 @@
+from swutils.date import date_to_rus, iso_to_date
+
 from core.excel.base import Excel
 
 
 class WorkersDoneExcel(Excel):
     workbook_name = 'Отчет по прошедшим'
-    headers = ['№', 'Дата осмотра', 'ФИО', 'Дата рождения', 'Пол', 'Подразделение', 'Организация', 'Вид осмотра',
-               'Пункты приказа', 'Стоимость', 'Заключение профпатолога', 'Примечание']
+    head_static_sizes = {
+        '№': 5,
+        'Дата осмотра': 13,
+        'ФИО': 35,
+        'Дата рождения': 13,
+        'Пол': 10,
+        'Подразделение': 30,
+        'Организация': 40,
+        'Вид осмотра': 25,
+        'Пункты приказа': 18,
+        'Стоимость': 10,
+        'Заключение профпатолога': 50,
+        'Примечание': 50,
+    }
 
     def get_object_rows(self):
         object_rows = []
@@ -16,9 +30,9 @@ class WorkersDoneExcel(Excel):
             object_rows.append(
                 [
                     index,
-                    obj['date'],
+                    date_to_rus(iso_to_date(obj['date'])),
                     obj['client']['fio'],
-                    obj['client']['birth'],
+                    date_to_rus(iso_to_date(obj['client']['birth'])),
                     obj['client']['gender'],
                     obj['prof'][0]['shop'] if obj.get('prof') else '', ', '.join([org['name'] for org in obj['orgs']]),
                     obj['prof'][0]['exam_type'] if obj.get('prof') else '',

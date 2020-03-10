@@ -5,6 +5,7 @@ from django.http import HttpResponse
 
 from openpyxl import Workbook
 from openpyxl.worksheet.table import Table
+from openpyxl.styles import Font, Border, Side
 
 from swutils.string import transliterate
 
@@ -14,6 +15,10 @@ class Excel:
 
     workbook_name = 'Отчет'
     headers = []
+
+    head_static_sizes = {
+        '№': 10,
+    }
 
     def __init__(self, title=None, objects: list = None):
         self.title = title
@@ -27,7 +32,6 @@ class Excel:
         workbook = self.get_workbook()
 
         self.write_header()
-        # self.write_table_header()
         self.write_objects()
 
         file_name = transliterate(self.get_workbook_name(), space='_')
@@ -60,7 +64,10 @@ class Excel:
         return self.get_workbook_name()[:30]
 
     def get_headers(self):
-        return self.headers or []
+        return list(self.get_head_static_sizes().keys()) or []
+
+    def get_head_static_sizes(self):
+        return self.head_static_sizes or {}
 
     def get_col_address(self, number: int) -> str:
         second_rank = number % len(self.alphabet)
@@ -90,18 +97,12 @@ class Excel:
             return
 
         title_cell = sheet.cell(self.get_current_row(), 1, self.title)
-        # todo: добавление стилей https://openpyxl.readthedocs.io/en/stable/styles.html#cell-styles
 
-        self.add_current_row()
+        bold_font = self.get_bold_font()
+        self.set_font_size(bold_font, 14)
+        title_cell.font = bold_font
 
-    def write_table_header(self):
-        """ Шапка таблицы """
-        sheet = self.get_sheet()
-        headers = self.get_headers()
-
-        current_row = self.get_current_row()
-        for col, header in enumerate(headers, start=1):
-            sheet.cell(current_row, col, header)
+        sheet.row_dimensions[self.get_current_row()].height = 30
 
         self.add_current_row()
 
@@ -115,6 +116,13 @@ class Excel:
             sheet.append(row)
 
         current_row = self.get_current_row()
+
+        for col_num, header in zip(range(1, len(self.get_headers())), self.get_headers()):
+            cell = sheet[self.get_cell_address(current_row - 1, col_num)]
+            cell.font = self.get_bold_font()
+
+            sheet.column_dimensions[self.get_col_address(col_num - 1)].width = self.head_static_sizes.get(header, 30)
+
         cell_table_start = self.get_cell_address(current_row - 1, 1)
         cell_table_finish = self.get_cell_address(current_row - 1, len(self.get_headers()) - 1)
 
@@ -124,5 +132,27 @@ class Excel:
         )
         sheet.add_table(tab)
 
+        for row in range(current_row, len(self.objects) + current_row + 1):
+            for col in range(1, len(self.get_headers()) + 1):
+                sheet.cell(row=row, column=col).border = self.get_border()
+
     def get_object_rows(self):
         raise NotImplementedError()
+
+    @staticmethod
+    def get_bold_font():
+        return Font(bold=True)
+
+    @staticmethod
+    def get_border():
+        return Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+
+    @staticmethod
+    def set_font_size(font, size):
+        font.sz = size
+        return font
