@@ -4,11 +4,14 @@ import re
 from django.http import HttpResponse
 
 from openpyxl import Workbook
+from openpyxl.worksheet.table import Table
 
 from swutils.string import transliterate
 
 
 class Excel:
+    alphabet = [chr(code) for code in range(65, 91)]
+
     workbook_name = 'Отчет'
     headers = []
 
@@ -24,7 +27,7 @@ class Excel:
         workbook = self.get_workbook()
 
         self.write_header()
-        self.write_table_header()
+        # self.write_table_header()
         self.write_objects()
 
         file_name = transliterate(self.get_workbook_name(), space='_')
@@ -59,6 +62,20 @@ class Excel:
     def get_headers(self):
         return self.headers or []
 
+    def get_col_address(self, number: int) -> str:
+        second_rank = number % len(self.alphabet)
+        first_rank = number // len(self.alphabet)
+
+        address = ''
+        if first_rank:
+            address = self.get_col_address(first_rank - 1)
+
+        return address + self.alphabet[second_rank]
+
+    def get_cell_address(self, row_number: int, col_number: int) -> str:
+        """ Возвращает физический адрес ячейки типа А1 """
+        return '%s%s' % (self.get_col_address(col_number), row_number + 1)
+
     def get_current_row(self):
         return self._row
 
@@ -91,10 +108,21 @@ class Excel:
     def write_objects(self):
         sheet = self.get_sheet()
 
-        for i, obj in enumerate(self.objects, start=1):
-            sheet.cell(self.get_current_row(), 1, i)
-            self.write_object(obj)
-            self.add_current_row()
+        object_rows = self.get_object_rows()
+        sheet.append(self.get_headers())
 
-    def write_object(self, obj):
+        for row in object_rows:
+            sheet.append(row)
+
+        current_row = self.get_current_row()
+        cell_table_start = self.get_cell_address(current_row - 1, 1)
+        cell_table_finish = self.get_cell_address(current_row - 1, len(self.get_headers()) - 1)
+
+        tab = Table(
+            displayName="Table1",
+            ref=f"{cell_table_start}:{cell_table_finish}"
+        )
+        sheet.add_table(tab)
+
+    def get_object_rows(self):
         raise NotImplementedError()
