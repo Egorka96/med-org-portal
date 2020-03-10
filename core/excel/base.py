@@ -121,7 +121,7 @@ class Excel:
             cell = sheet[self.get_cell_address(current_row - 1, col_num)]
             cell.font = self.get_bold_font()
 
-            sheet.column_dimensions[self.get_col_address(col_num - 1)].width = self.head_static_sizes.get(header, 30)
+            sheet.column_dimensions[self.get_col_address(col_num - 1)].width = self.get_head_static_sizes().get(header, 30)
 
         cell_table_start = self.get_cell_address(current_row - 1, 1)
         cell_table_finish = self.get_cell_address(current_row - 1, len(self.get_headers()) - 1)

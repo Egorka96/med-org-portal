@@ -16,7 +16,7 @@
             {% bootstrap_field form.place layout='horizontal' %}
         </div>
         <div class="col-sm-4">
-            {% bootstrap_field form.orgs layout='horizontal' %}
+            {% if show_orgs %}{% bootstrap_field form.orgs layout='horizontal' %}{% endif %}
             {% bootstrap_field form.shop layout='horizontal' %}
             {% bootstrap_field form.post layout='horizontal' %}
         </div>
@@ -36,7 +36,7 @@
     <th>Дата рождения</th>
     <th>Пол</th>
     <th>Подразделение</th>
-    <th>Организация</th>
+    {% if show_orgs %}<th>Организация</th>{% endif %}
     <th>Вид осмотра</th>
     <th>Пункты приказа</th>
     <th>Стоимость</th>
@@ -51,12 +51,14 @@
     <td>{{ object.client.birth|iso_to_date }}</td>
     <td>{{ object.client.gender }}</td>
     <td>{{ object.prof.0.shop }}</td>
-    <td>
-        {% for org in object.orgs %}
-            {{ org.name }}
-        {% endfor %}
-    </td>
-    <td>{{ object.prof.0.exam_type }}</td>
+    {% if show_orgs %}
+        <td>
+            {% for org in object.orgs %}
+                {{ org.name }}
+            {% endfor %}
+        </td>
+    {% endif %}
+    <td>{{ object.main_services|join:', ' }}</td>
     <td>
         {% for law_item in object.prof.0.law_items %}
             {{ law_item.name }} прил.{{ law_item.section }}{% if not forloop.last %}, {% endif %}

@@ -32,6 +32,13 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
             (self.title, ''),
         ]
 
+    def get_workbook_maker_kwargs(self, **kwargs):
+        kwargs = super().get_workbook_maker_kwargs(**kwargs)
+
+        user_orgs = self.request.user.core.get_orgs()
+        kwargs['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
+        return kwargs
+
     def get_queryset(self):
         if self.get_objects() is None:
             return []
@@ -60,7 +67,7 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
                 response.raise_for_status()
 
                 response_data = response.json()
-                self.object_list = response_data['results']
+                self.object_list = self.update_object_list(response_data['results'])
                 self.count = response_data['count']
                 self.have_next = bool(response_data['next'])
                 self.have_previous = bool(response_data['previous'])
@@ -69,3 +76,21 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
                 self.count = 0
 
         return self.object_list
+
+    def update_object_list(self, objects):
+        for obj in objects:
+            obj['main_services'] = []
+
+            for app in ['prof', 'lmk', 'certificate', 'heal']:
+                app_orders = obj[app]
+                for o in app_orders:
+                    obj['main_services'].append(o.get('main_services'))
+
+        return objects
+
+    def get_context_data(self, **kwargs):
+        c = super().get_context_data(**kwargs)
+
+        user_orgs = self.request.user.core.get_orgs()
+        c['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
+        return c
