@@ -20,9 +20,10 @@ class Excel:
         '№': 10,
     }
 
-    def __init__(self, title=None, objects: list = None):
+    def __init__(self, title=None, objects: list = None, page: int = 1):
         self.title = title
         self.objects = objects
+        self.page = page
 
         self._workbook = None
         self._sheet = None
@@ -105,6 +106,15 @@ class Excel:
         sheet.row_dimensions[self.get_current_row()].height = 30
 
         self.add_current_row()
+
+        if self.page:
+            page_cell = sheet.cell(self.get_current_row(), 1, f'Страница {self.page}')
+
+            bold_font = self.get_bold_font()
+            self.set_font_size(bold_font, 14)
+            page_cell.font = bold_font
+
+            self.add_current_row()
 
     def write_objects(self):
         sheet = self.get_sheet()

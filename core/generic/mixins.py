@@ -103,7 +103,8 @@ class ExcelMixin:
     def get_workbook_maker_kwargs(self, **kwargs):
         kwargs.update({
             'objects': self.get_queryset(),
-            'title': self.get_excel_title()
+            'title': self.get_excel_title(),
+            'page': self.request.GET.get('page')
         })
 
         return kwargs

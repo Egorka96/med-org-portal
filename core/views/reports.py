@@ -10,6 +10,7 @@ import core.generic.mixins
 import core.generic.views
 
 from core import forms
+from core.datatools.report import get_report_period
 from core.excel.reports import WorkersDoneExcel
 
 
@@ -38,6 +39,21 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
         user_orgs = self.request.user.core.get_orgs()
         kwargs['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
         return kwargs
+
+    def get_excel_title(self):
+        title = self.get_title()
+
+        form = self.get_form()
+        if form.is_valid():
+            title += get_report_period(
+                date_from=form.cleaned_data.get('date_from'),
+                date_to=form.cleaned_data.get('date_to')
+            )
+
+            if orgs := form.cleaned_data.get('orgs'):
+                title += f'. Организации: {", ".join(str(org) for org in orgs)}'
+
+        return title
 
     def get_queryset(self):
         if self.get_objects() is None:
