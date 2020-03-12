@@ -46,7 +46,11 @@
 
 {% block table_body %}
     <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
-    <td>{{ object.date|iso_to_date }}</td>
+    <td>
+        {% for date in object.dates %}
+            {{ date|iso_to_date }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </td>
     <td>{{ object.client.fio }}</td>
     <td>{{ object.client.birth|iso_to_date }}</td>
     <td>{{ object.client.gender }}</td>

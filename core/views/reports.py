@@ -66,16 +66,19 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
             form = self.get_form()
             if form.is_valid():
                 filter_params = dict(self.request.GET)
+                filter_params['group_clients'] = True
 
                 if self.request.user.core.org_ids and not filter_params.get('orgs'):
                     filter_params.update({
                         'orgs': json.loads(self.request.user.core.org_ids)
                     })
 
-                url = settings.MIS_URL + '/api/orders/by_client_date/'
+                url = settings.MIS_URL + '/api/orders/by_client_date/?'
+                if page := self.request.GET.get('page'):
+                    url += f'page={page}&'
 
                 if filter_params.get('per_page'):
-                    url += f"?per_page={filter_params['per_page'][0]}"
+                    url += f"?per_page={filter_params['per_page'][0]}&"
 
                 headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
@@ -105,8 +108,13 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
         return objects
 
     def get_context_data(self, **kwargs):
+        self.get_objects()
         c = super().get_context_data(**kwargs)
 
         user_orgs = self.request.user.core.get_orgs()
         c['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
+
+        if self.object_list:
+            c['object_list'] = self.object_list
+
         return c

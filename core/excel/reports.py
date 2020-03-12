@@ -41,7 +41,7 @@ class WorkersDoneExcel(Excel):
 
             row = [
                 index,
-                date_to_rus(iso_to_date(obj['date'])),
+                ', '.join([date_to_rus(iso_to_date(date)) for date in obj['dates']]),
                 obj['client']['fio'],
                 date_to_rus(iso_to_date(obj['client']['birth'])),
                 obj['client']['gender'],
