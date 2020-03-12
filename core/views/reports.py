@@ -10,6 +10,8 @@ import core.generic.mixins
 import core.generic.views
 
 from core import forms
+from core.datatools.report import get_report_period
+from core.excel.reports import WorkersDoneExcel
 
 
 class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
@@ -19,6 +21,7 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
     form_class = forms.WorkersPastReport
     paginate_by = 50
     permission_required = 'core.view_workers_done_report'
+    excel_workbook_maker = WorkersDoneExcel
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,6 +32,28 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
             ('Главная', reverse('core:index')),
             (self.title, ''),
         ]
+
+    def get_workbook_maker_kwargs(self, **kwargs):
+        kwargs = super().get_workbook_maker_kwargs(**kwargs)
+
+        user_orgs = self.request.user.core.get_orgs()
+        kwargs['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
+        return kwargs
+
+    def get_excel_title(self):
+        title = self.get_title()
+
+        form = self.get_form()
+        if form.is_valid():
+            title += get_report_period(
+                date_from=form.cleaned_data.get('date_from'),
+                date_to=form.cleaned_data.get('date_to')
+            )
+
+            if orgs := form.cleaned_data.get('orgs'):
+                title += f'. Организации: {", ".join(str(org) for org in orgs)}'
+
+        return title
 
     def get_queryset(self):
         if self.get_objects() is None:
@@ -41,16 +66,19 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
             form = self.get_form()
             if form.is_valid():
                 filter_params = dict(self.request.GET)
+                filter_params['group_clients'] = True
 
                 if self.request.user.core.org_ids and not filter_params.get('orgs'):
                     filter_params.update({
                         'orgs': json.loads(self.request.user.core.org_ids)
                     })
 
-                url = settings.MIS_URL + '/api/orders/by_client_date/'
+                url = settings.MIS_URL + '/api/orders/by_client_date/?'
+                if page := self.request.GET.get('page'):
+                    url += f'page={page}&'
 
                 if filter_params.get('per_page'):
-                    url += f"?per_page={filter_params['per_page'][0]}"
+                    url += f"?per_page={filter_params['per_page'][0]}&"
 
                 headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
@@ -58,7 +86,7 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
                 response.raise_for_status()
 
                 response_data = response.json()
-                self.object_list = response_data['results']
+                self.object_list = self.update_object_list(response_data['results'])
                 self.count = response_data['count']
                 self.have_next = bool(response_data['next'])
                 self.have_previous = bool(response_data['previous'])
@@ -67,3 +95,26 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
                 self.count = 0
 
         return self.object_list
+
+    def update_object_list(self, objects):
+        for obj in objects:
+            obj['main_services'] = []
+
+            for app in ['prof', 'lmk', 'certificate', 'heal']:
+                app_orders = obj[app]
+                for o in app_orders:
+                    obj['main_services'].append(o.get('main_services'))
+
+        return objects
+
+    def get_context_data(self, **kwargs):
+        self.get_objects()
+        c = super().get_context_data(**kwargs)
+
+        user_orgs = self.request.user.core.get_orgs()
+        c['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
+
+        if self.object_list:
+            c['object_list'] = self.object_list
+
+        return c

@@ -151,10 +151,10 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         if new_password:
             user.set_password(new_password)
 
+        user.save()
+
         if perm_groups := self.cleaned_data.get('groups'):
             user.groups.set(perm_groups)
-
-        user.save()
 
         if not hasattr(user, 'core'):
             user.mis = models.User.objects.create(django_user=user)
