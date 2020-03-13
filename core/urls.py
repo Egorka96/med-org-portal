@@ -19,6 +19,8 @@ urlpatterns = [
     path('reports/workers_done_report/', reports.WorkersDoneReport.as_view(), name='workers_done_report'),
 
     path('directions/', directions.Search.as_view(), name='direction_list'),
+    path('directions/add/', directions.Edit.as_view(), name='direction_add'),
+    path('directions/<int:pk>/', directions.Edit.as_view(), name='direction_edit'),
 
     path('rest/orgs/', rest.Orgs.as_view(), name='rest_orgs'),
 ]

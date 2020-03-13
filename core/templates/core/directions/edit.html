@@ -1,0 +1,23 @@
+{% extends 'core/base_edit.html' %}
+{% load bootstrap4 %}
+
+{% block fields %}
+    <div class="row">
+        <div class="col-sm-4">{% bootstrap_field form.last_name %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.first_name %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.middle_name %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.birth %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.gender %}</div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">{% bootstrap_field form.org %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.post %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.shop %}</div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">{% bootstrap_field form.exam_type %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.law_items_section_1 %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.law_items_section_2 %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.pay_method %}</div>
+    </div>
+{% endblock %}

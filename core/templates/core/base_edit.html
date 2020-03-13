@@ -6,11 +6,9 @@
         {% csrf_token %}
         {{ form.media }}
 
-        <div class="row">
-            {% block fields %}
-                {% bootstrap_form form layout='horizontal' %}
-            {% endblock %}
-        </div>
+        {% block fields %}
+            {% bootstrap_form form layout='horizontal' %}
+        {% endblock %}
 
         <div class="row">
             <div class="col-6">

@@ -22,6 +22,12 @@
     </div>
 {% endblock %}.
 
+{% block additional_btn %}
+    <a class="btn btn-success" href="{% url 'core:direction_add' %}">
+        <i class="fa fa-plus"></i> Добавить
+    </a>
+{% endblock %}
+
 {% block pre_table %}
     {% if page_obj|default:object_list %}
         <span class="label label-info">Всего: {{ page_obj.paginator.count|default:object_list.count }}</span>
@@ -30,6 +36,7 @@
 
 {% block table_head %}
     <th>№</th>
+    <th>Номер</th>
     <th>ФИО</th>
     <th>Дата рождения</th>
     <th>Пол</th>
@@ -42,6 +49,9 @@
 
 {% block table_body %}
     <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
+    <td>
+        <a href="{% url 'core:direction_edit' object.id %}">{{ object.id }}</a>
+    </td>
     <td>{{ object.last_name }} {{ object.first_name }} {{ object.middle_name }}</td>
     <td>{{ object.birth|iso_to_date }}</td>
     <td>{{ object.gender }}</td>

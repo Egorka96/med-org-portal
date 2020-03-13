@@ -57,13 +57,26 @@ class RusDateField(forms.DateField):
         return value
 
 
+class ExtraChoiceField(forms.ChoiceField):
+    @staticmethod
+    def valid_value(*args, **kwargs) -> bool:
+        return True
+
+
 class ListField(forms.MultipleChoiceField):
     @staticmethod
     def valid_value(*args, **kwargs) -> bool:
         return True
 
 
+class FIO(forms.Form):
+    last_name = forms.CharField(label='Фамилия', required=False)
+    first_name = forms.CharField(label='Имя', required=False)
+    middle_name = forms.CharField(label='Отчество', required=False)
+
+
 class OrgsMixin(forms.Form):
+    org = ExtraChoiceField(label='Организация', choices=[], required=False)
     orgs = ListField(label='Организации', choices=[], required=False)
 
     class Media:
@@ -72,15 +85,15 @@ class OrgsMixin(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        choices = []
+        for field in ('org', 'orgs'):
+            choices = []
+            values = self.data.getlist(field) if hasattr(self.data, 'getlist') else self.initial.get(field, [])
+            if values:
+                for value in values:
+                    org = Org.get(org_id=value)
+                    choices.append((org.id, org.name))
 
-        values = self.data.getlist('orgs') if hasattr(self.data, 'getlist') else self.initial.get('orgs', [])
-        if values:
-            for value in values:
-                org = Org.get(org_id=value)
-                choices.append((org.id, org.name))
-
-        self.fields['orgs'].widget.choices = choices
+            self.fields[field].widget.choices = choices
 
 
 class DateFromTo(forms.Form):
@@ -163,21 +176,36 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         user.core.save()
 
 
-class WorkersPastReport(DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):
-    last_name = forms.CharField(label='Фамилия', required=False)
-    first_name = forms.CharField(label='Имя', required=False)
-    middle_name = forms.CharField(label='Отчество', required=False)
-
+class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
 
 
-class DirectionSearch(DateFromTo, OrgsMixin, forms.Form):
-    last_name = forms.CharField(label='Фамилия', required=False)
-    first_name = forms.CharField(label='Имя', required=False)
-    middle_name = forms.CharField(label='Отчество', required=False)
-
+class DirectionSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
-
     confirmed = forms.NullBooleanField(label='Подтвержден', required=False)
+
+
+class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, forms.Form):
+    GENDER_CHOICE = (
+        ('Мужской', 'Мужской'),
+        ('Женский', 'Женский'),
+    )
+
+    gender = forms.ChoiceField(label='Пол', choices=GENDER_CHOICE, required=False)
+    birth = RusDateField(label='Дата рождения', initial=None)
+    post = forms.CharField(label='Должность', required=False)
+    shop = forms.CharField(label='Подразделение', required=False)
+    law_items_section_1 = ListField(label='Пункты приказа прил.1', required=False, choices=[])
+    law_items_section_2 = ListField(label='Пункты приказа прил.2', required=False, choices=[])
+    pay_method = forms.ChoiceField(label='Способ оплаты', choices=[])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['last_name'].required = True
+        self.fields['first_name'].required = True
+        self.fields['exam_type'].required = True
+
+        # todo: логика про подтягивание пунктов приказа и способа оплаты
