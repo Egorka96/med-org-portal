@@ -1,0 +1,57 @@
+{% extends 'core/base_list.html' %}
+{% load bootstrap4 %}
+{% load djutils %}
+
+{% block form %}
+    <div class="row">
+        <div class="col-sm-4">
+            {% bootstrap_field form.last_name layout='horizontal' %}
+            {% bootstrap_field form.first_name layout='horizontal' %}
+            {% bootstrap_field form.middle_name layout='horizontal' %}
+        </div>
+        <div class="col-sm-4">
+            {% bootstrap_field form.date_from layout='horizontal' %}
+            {% bootstrap_field form.date_to layout='horizontal' %}
+            {% bootstrap_field form.confirmed layout='horizontal' %}
+        </div>
+        <div class="col-sm-4">
+            {% if show_orgs %}{% bootstrap_field form.orgs layout='horizontal' %}{% endif %}
+            {% bootstrap_field form.shop layout='horizontal' %}
+            {% bootstrap_field form.post layout='horizontal' %}
+        </div>
+    </div>
+{% endblock %}.
+
+{% block pre_table %}
+    {% if page_obj|default:object_list %}
+        <span class="label label-info">Всего: {{ page_obj.paginator.count|default:object_list.count }}</span>
+    {% endif %}
+{% endblock pre_table %}
+
+{% block table_head %}
+    <th>№</th>
+    <th>ФИО</th>
+    <th>Дата рождения</th>
+    <th>Пол</th>
+    {% if show_orgs %}<th>Организация</th>{% endif %}
+    <th>Подразделение</th>
+    <th>Пункты приказа</th>
+    <th>Время действия</th>
+    <th>Дата прохождения</th>
+{% endblock %}
+
+{% block table_body %}
+    <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
+    <td>{{ object.last_name }} {{ object.first_name }} {{ object.middle_name }}</td>
+    <td>{{ object.birth|iso_to_date }}</td>
+    <td>{{ object.gender }}</td>
+    {% if show_orgs %}<td>{{ object.org.legal_name }}</td>{% endif %}
+    <td>{{ object.shop }}</td>
+    <td>
+        {% for law_item in object.law_items %}
+            {{ law_item.display }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </td>
+    <td>{% if object.dt_from %}c {{ object.dt_from|iso_to_date }}{% endif %} {% if object.dt_to %} по {{ object.dt_to|iso_to_date }}{% endif %}</td>
+    <td>{{ object.confirm_dt|iso_to_date|default_if_none:'-' }}</td>
+{% endblock %}

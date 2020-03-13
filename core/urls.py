@@ -3,6 +3,7 @@ from django.urls import path
 from core.views import index
 from core.views import user
 from core.views import reports
+from core.views import directions
 from core.views import rest
 
 app_name = 'core'
@@ -17,5 +18,7 @@ urlpatterns = [
 
     path('reports/workers_done_report/', reports.WorkersDoneReport.as_view(), name='workers_done_report'),
 
-    path('rest/orgs/', rest.Orgs.as_view(), name='rest_orgs')
+    path('directions/', directions.Search.as_view(), name='direction_list'),
+
+    path('rest/orgs/', rest.Orgs.as_view(), name='rest_orgs'),
 ]

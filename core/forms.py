@@ -170,3 +170,14 @@ class WorkersPastReport(DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.
 
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
+
+
+class DirectionSearch(DateFromTo, OrgsMixin, forms.Form):
+    last_name = forms.CharField(label='Фамилия', required=False)
+    first_name = forms.CharField(label='Имя', required=False)
+    middle_name = forms.CharField(label='Отчество', required=False)
+
+    shop = forms.CharField(label='Подразделение', required=False)
+    post = forms.CharField(label='Должность', required=False)
+
+    confirmed = forms.NullBooleanField(label='Подтвержден', required=False)

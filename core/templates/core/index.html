@@ -12,6 +12,16 @@
              </div>
         {% endif %}
 
+        {% if perms.core.view_direction %}
+            <div class="col-sm-2">
+                 <a class="btn btn-primary btn-block index-btn" href="{% url 'core:direction_list' %}"
+                    data-toggle="tooltip" data-placement="bottom" title="Направления сотрудников на ПРОФ осмотр">
+                     <p><i class="fa fa-address-card"></i></p>
+                     Направления
+                </a>
+             </div>
+        {% endif %}
+
          {% if perms.auth.view_user %}
              <div class="col-sm-2">
                  <a class="btn btn-secondary btn-block index-btn" href="{% url 'core:user' %}">
