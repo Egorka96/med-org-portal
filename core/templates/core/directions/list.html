@@ -52,6 +52,6 @@
             {{ law_item.display }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </td>
-    <td>{% if object.dt_from %}c {{ object.dt_from|iso_to_date }}{% endif %} {% if object.dt_to %} по {{ object.dt_to|iso_to_date }}{% endif %}</td>
+    <td>{% if object.date_from %}c {{ object.date_from|iso_to_date }}{% endif %} {% if object.date_to %} по {{ object.date_to|iso_to_date }}{% endif %}</td>
     <td>{{ object.confirm_dt|iso_to_date|default_if_none:'-' }}</td>
 {% endblock %}
