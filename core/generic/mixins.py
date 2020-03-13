@@ -1,8 +1,12 @@
+from typing import Optional, List, Dict
+
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.utils.functional import cached_property
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormMixin as DjangoFormMixin
+
+from core.mis.service_client import Mis
 
 
 class RestPaginator(Paginator):
@@ -18,6 +22,7 @@ class RestPaginator(Paginator):
 class RestListMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.object_list: Optional[List[Dict]] = None
         self.count = None
         self.have_next = None
         self.have_previous = None
@@ -42,6 +47,48 @@ class RestListMixin:
             numbers = all_numbers[start:end]
 
         return self.have_previous, numbers, self.have_next
+
+    def get_filter_params(self):
+        return dict(self.request.GET)
+
+    def get_queryset(self):
+        objects = self.get_objects()
+        if objects is None:
+            return []
+        else:
+            return objects
+
+    def get_objects(self):
+        if self.object_list is None:
+            form = self.get_form()
+            if form.is_valid():
+
+                response_data = Mis().get_response(
+                    path=self.mis_request_path,
+                    request=self.request,
+                    params=self.get_filter_params(),
+                )
+                self.object_list = response_data['results']
+                self.count = response_data['count']
+                self.have_next = bool(response_data['next'])
+                self.have_previous = bool(response_data['previous'])
+            else:
+                self.object_list = []
+                self.count = 0
+
+        return self.object_list
+
+    def get_context_data(self, **kwargs):
+        self.get_objects()
+        c = super().get_context_data(**kwargs)
+
+        user_orgs = self.request.user.core.get_orgs()
+        c['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
+
+        if self.object_list:
+            c['object_list'] = self.object_list
+
+        return c
 
 
 class FormMixin(DjangoFormMixin):

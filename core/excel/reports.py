@@ -49,7 +49,7 @@ class WorkersDoneExcel(Excel):
             ]
 
             if self.show_orgs:
-                row.append(', '.join([org['name'] for org in obj['orgs']]))
+                row.append(', '.join([org['name'] for org in obj['orgs']]) if obj.get('orgs') else '')
 
             row.extend([
                 ', '.join(obj['main_services']),
