@@ -9,7 +9,7 @@ from django.conf import settings
 class Org:
     id: int
     name: str
-    legal_name: str
+    legal_name: str = None
 
     def __str__(self):
         return self.name
