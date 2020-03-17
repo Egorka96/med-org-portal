@@ -19,11 +19,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('org_ids', models.CharField(help_text='список id организаций из внешней системы', max_length=255, verbose_name='ID организаций')),
-                ('valuable_service_ids', models.CharField(blank=True, help_text='список id услуг из внешней системы, которые имеют значения для пользователя.', max_length=255, verbose_name='ID значимых услуг')),
                 ('django_user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='core', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'permissions': (),
+                'permissions': (('view_workers_done_report', 'Просмотр отчета по прошедшим'), ('view_direction', 'Просмотр направлений на осмотр'), ('add_direction', 'Создание направлений на осмотр'), ('change_direction', 'Редактирование направлений на осмотр'), ('delete_direction', 'Удаление направлений на осмотр')),
             },
         ),
     ]
