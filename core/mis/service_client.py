@@ -16,7 +16,7 @@ class Mis:
     def get_status(self) -> Optional[dict]:
         if self._status is None:
             url = self.url + '/api/status/'
-            response = requests.get(url=url, headers={'Authorization': f'Token {settings.MIS_TOKEN}'}, timeout=5)
+            response = requests.get(url=url, headers={'Authorization': f'Token {settings.MIS_TOKEN}'})
             response.raise_for_status()
             self._status = response.json()
 

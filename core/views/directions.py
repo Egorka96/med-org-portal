@@ -1,5 +1,6 @@
 import dataclasses
 
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -60,7 +61,17 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         return self.object
 
     def form_valid(self, form):
-        # todo: отправка запроса на сохранение в МИС
+        if self.kwargs.get(self.pk):
+            success, description = Direction.edit(direction_id=self.kwargs[self.pk], params=form.cleaned_data)
+        else:
+            success, description = Direction.create(params=form.cleaned_data)
+
+        if success:
+            messages.success(self.request, description)
+        else:
+            messages.error(self.request, description)
+            return self.form_invalid(form)
+
         return redirect(self.get_success_url())
 
     def get_breadcrumbs(self):

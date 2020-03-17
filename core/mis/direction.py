@@ -1,9 +1,11 @@
 import datetime
+from dateutil.relativedelta import relativedelta
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import requests
 from django.conf import settings
+from django.utils.timezone import now
 from djutils.date_utils import iso_to_date
 
 from core.mis.org import Org
@@ -90,3 +92,53 @@ class Direction:
             shop=result['shop'],
         )
         return direction
+
+    @classmethod
+    def create(cls, params) -> Tuple[bool, str]:
+        url = settings.MIS_URL + '/api/pre_record/'
+        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
+
+        params['date_from'] = now().date()
+        params['date_to'] = params['date_from'] + relativedelta(months=1)
+        params['order_types'] = [2]  # ПРОФ осмотр
+
+        response = requests.post(url, data=params, headers=headers)
+        response_data = response.json()
+
+        if response.status_code == 201:
+            success = True
+            description = f'Направление создано: Номер {response_data["id"]}'
+        elif response.status_code == 400:
+            success = False
+            description = f'Ошибка создания направления: {response_data["error"]}'
+        elif response.status_code > 499:
+            success = False
+            description = f'Невозможно создать направление в МИС - ошибка на сервере МИС'
+        else:
+            raise Exception('Unexpected status code o_O')
+
+        return success, description
+
+    @classmethod
+    def edit(cls, direction_id, params) -> Tuple[bool, str]:
+        url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
+        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
+
+        params['order_types'] = [2]  # ПРОФ осмотр
+        response = requests.put(url, data=params, headers=headers)
+        response_data = response.json()
+
+        if response.status_code == 200:
+            success = True
+            description = f'Направление успешно изменено.'
+        elif response.status_code == 400:
+            success = False
+            description = f'Ошибка редактирования направления: {response_data["error"]}'
+        elif response.status_code > 499:
+            success = False
+            description = f'Невозможно изменить направление в МИС - ошибка на сервере МИС'
+        else:
+            raise Exception('Unexpected status code o_O')
+
+        return success, description
+

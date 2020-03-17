@@ -199,7 +199,7 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
     law_items_section_1 = ListField(label='Пункты приказа прил.1', required=False, choices=[])
     law_items_section_2 = ListField(label='Пункты приказа прил.2', required=False, choices=[])
-    pay_method = forms.ChoiceField(label='Способ оплаты', choices=[])
+    pay_method = forms.ChoiceField(label='Способ оплаты', choices=[], required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -207,5 +207,6 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, forms.Form):
         self.fields['last_name'].required = True
         self.fields['first_name'].required = True
         self.fields['exam_type'].required = True
+        self.fields['exam_type'].initial = 'Периодический'
 
         # todo: логика про подтягивание пунктов приказа и способа оплаты
