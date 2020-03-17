@@ -6,8 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.mis.law_item import LawItem
-from core.mis.org import Org
+from mis.law_item import LawItem
+from mis.org import Org
 
 
 class Orgs(APIView):

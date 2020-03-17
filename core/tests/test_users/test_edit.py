@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group as AuthGroup
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 
-from core.mis.org import Org
+from mis.org import Org
 from core.tests.base import BaseTestCase
 from core import models
 

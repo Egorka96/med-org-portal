@@ -5,10 +5,10 @@ from django import forms
 from django.contrib.auth import get_user_model
 
 from core import models
-from core.mis.law_item import LawItem
-from core.mis.org import Org
-from core.mis.service_client import Mis
-from core.mis.pay_method import PayMethod as MisPayMethod
+from mis.law_item import LawItem
+from mis.org import Org
+from mis.service_client import Mis
+from mis.pay_method import PayMethod as MisPayMethod
 
 User = get_user_model()
 

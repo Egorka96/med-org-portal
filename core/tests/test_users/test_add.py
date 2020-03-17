@@ -7,8 +7,9 @@ from django.contrib.auth import get_user_model
 
 from django.urls import reverse_lazy
 
+from mis.org import Org
+
 from core import models
-from core.mis.org import Org
 from core.tests.base import BaseTestCase
 
 User = get_user_model()

@@ -6,7 +6,7 @@ from django.utils.functional import cached_property
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormMixin as DjangoFormMixin
 
-from core.mis.service_client import Mis
+from mis.service_client import Mis
 
 
 class RestPaginator(Paginator):

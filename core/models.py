@@ -4,7 +4,7 @@ from typing import List
 from django.db import models
 from django.contrib.auth.models import User as DjangoUser
 
-from core.mis.org import Org
+from mis.org import Org
 
 
 class User(models.Model):
@@ -18,7 +18,7 @@ class User(models.Model):
             ('view_direction', 'Просмотр направлений на осмотр'),
             ('add_direction', 'Создание направлений на осмотр'),
             ('change_direction', 'Редактирование направлений на осмотр'),
-            ('deleter_direction', 'Удаление направлений на осмотр'),
+            ('delete_direction', 'Удаление направлений на осмотр'),
         )
 
     def __str__(self):

@@ -10,8 +10,8 @@ import core.generic.mixins
 import core.generic.views
 
 from core import forms
-from core.mis.direction import Direction
-from core.mis.service_client import Mis
+from mis.direction import Direction
+from mis.service_client import Mis
 
 
 class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,

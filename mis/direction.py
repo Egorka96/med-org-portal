@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils.timezone import now
 from djutils.date_utils import iso_to_date
 
-from core.mis.org import Org
+from mis.org import Org
 
 
 @dataclass

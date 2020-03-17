@@ -7,7 +7,7 @@ import core.generic.views
 from core import forms
 from core.datatools.report import get_report_period
 from core.excel.reports import WorkersDoneExcel
-from core.mis.service_client import Mis
+from mis.service_client import Mis
 
 
 class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
