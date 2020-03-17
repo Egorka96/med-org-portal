@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 
 from core import models
+from core.mis.law_item import LawItem
 from core.mis.org import Org
 from core.mis.service_client import Mis
 
@@ -87,11 +88,44 @@ class OrgsMixin(forms.Form):
 
         for field in ('org', 'orgs'):
             choices = []
-            values = self.data.getlist(field) if hasattr(self.data, 'getlist') else self.initial.get(field, [])
+            values = self.data.getlist(field) if hasattr(self.data, 'getlist') else None
+            if not values:
+                values =  self.initial.get(field, [])
+
+            if not isinstance(values, list):
+                values = [values]
+
             if values:
                 for value in values:
                     org = Org.get(org_id=value)
                     choices.append((org.id, org.name))
+
+            self.fields[field].widget.choices = choices
+
+
+class LawItems(forms.Form):
+    law_items_section_1 = ListField(label='Пункты приказа прил.1', required=False, choices=[])
+    law_items_section_2 = ListField(label='Пункты приказа прил.2', required=False, choices=[])
+
+    class Media:
+        js = ['core/js/law_items.js']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in ('law_items_section_1', 'law_items_section_2'):
+            choices = []
+            values = self.data.getlist(field) if hasattr(self.data, 'getlist') else None
+            if not values:
+                values =  self.initial.get(field, [])
+
+            if values and not isinstance(values, list):
+                values = [values]
+
+            if values:
+                for value in values:
+                    law_item = LawItem.get(law_item_id=value)
+                    choices.append((law_item.id, law_item.name))
 
             self.fields[field].widget.choices = choices
 
@@ -187,7 +221,7 @@ class DirectionSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     confirmed = forms.NullBooleanField(label='Подтвержден', required=False)
 
 
-class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, forms.Form):
+class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, forms.Form):
     GENDER_CHOICE = (
         ('Мужской', 'Мужской'),
         ('Женский', 'Женский'),
@@ -197,8 +231,6 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, forms.Form):
     birth = RusDateField(label='Дата рождения', initial=None)
     post = forms.CharField(label='Должность', required=False)
     shop = forms.CharField(label='Подразделение', required=False)
-    law_items_section_1 = ListField(label='Пункты приказа прил.1', required=False, choices=[])
-    law_items_section_2 = ListField(label='Пункты приказа прил.2', required=False, choices=[])
     pay_method = forms.ChoiceField(label='Способ оплаты', choices=[], required=False)
 
     def __init__(self, *args, **kwargs):

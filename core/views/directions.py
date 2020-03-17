@@ -59,6 +59,14 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         obj = self.get_object()
         if obj:
             initial.update(dataclasses.asdict(obj))
+            if initial.get('org'):
+                initial['org'] = initial['org']['id']
+
+            if initial.get('law_items_section_1'):
+                initial['law_items_section_1'] = [l_i['id'] for l_i in initial['law_items_section_1']]
+
+            if initial.get('law_items_section_2'):
+                initial['law_items_section_2'] = [l_i['id'] for l_i in initial['law_items_section_2']]
 
         return initial
 

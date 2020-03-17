@@ -24,4 +24,5 @@ urlpatterns = [
     path('directions/<int:number>/delete/', directions.Delete.as_view(), name='direction_delete'),
 
     path('rest/orgs/', rest.Orgs.as_view(), name='rest_orgs'),
+    path('rest/law_items/', rest.LawItems.as_view(), name='rest_law_items'),
 ]

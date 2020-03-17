@@ -27,7 +27,8 @@ class Direction:
     org: Org = None
     post: str = None
     shop: str = None
-    law_items: List[Dict] = None
+    law_items_section_1: List[Dict] = None
+    law_items_section_2: List[Dict] = None
     pay_method: dict = None
 
     def __str__(self):
@@ -65,6 +66,8 @@ class Direction:
                 exam_type=item['exam_type'],
                 post=item['post'],
                 shop=item['shop'],
+                law_items_section_1=[l_i for l_i in item.get('law_items', []) if l_i['section'] == 1],
+                law_items_section_2=[l_i for l_i in item.get('law_items', []) if l_i['section'] == 2]
             ))
         return directions
 
@@ -90,6 +93,8 @@ class Direction:
             exam_type=result['exam_type'],
             post=result['post'],
             shop=result['shop'],
+            law_items_section_1=[l_i for l_i in result.get('law_items', []) if l_i['section'] == '1'],
+            law_items_section_2=[l_i for l_i in result.get('law_items', []) if l_i['section'] == '2']
         )
         return direction
 
@@ -101,6 +106,9 @@ class Direction:
         params['date_from'] = now().date()
         params['date_to'] = params['date_from'] + relativedelta(months=1)
         params['order_types'] = [2]  # ПРОФ осмотр
+
+        if params.get('law_items_section_1') or params.get('law_items_section_2'):
+            params['law_items'] = [*params.get('law_items_section_1', []), *params.get('law_items_section_2', [])]
 
         response = requests.post(url, data=params, headers=headers)
         response_data = response.json()
@@ -125,6 +133,10 @@ class Direction:
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
         params['order_types'] = [2]  # ПРОФ осмотр
+
+        if params.get('law_items_section_1') or params.get('law_items_section_2'):
+            params['law_items'] = [*params.get('law_items_section_1', []), *params.get('law_items_section_2', [])]
+
         response = requests.put(url, data=params, headers=headers)
         response_data = response.json()
 
