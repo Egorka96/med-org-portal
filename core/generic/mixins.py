@@ -61,12 +61,13 @@ class RestListMixin:
     def get_objects(self):
         if self.object_list is None:
             form = self.get_form()
-            if form.is_valid():
+            filter_params = self.get_filter_params()
+            if form.is_valid() or filter_params:
 
                 response_data = Mis().get_response(
                     path=self.mis_request_path,
                     request=self.request,
-                    params=self.get_filter_params(),
+                    params=filter_params,
                 )
                 self.object_list = response_data['results']
                 self.count = response_data['count']

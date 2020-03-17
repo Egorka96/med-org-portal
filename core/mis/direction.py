@@ -142,3 +142,23 @@ class Direction:
 
         return success, description
 
+    @classmethod
+    def delete(cls, direction_id) -> Tuple[bool, str]:
+        url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
+        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
+
+        response = requests.delete(url, headers=headers)
+
+        if response.status_code == 204:
+            success = True
+            description = f'Направление успешно удалено.'
+        elif 399 < response.status_code < 500:
+            success = False
+            description = f'Ошибка удаления направления: Ошибка запроса'
+        elif response.status_code > 499:
+            success = False
+            description = f'Невозможно удалить направление в МИС - ошибка на сервере МИС'
+        else:
+            raise Exception('Unexpected status code o_O')
+
+        return success, description

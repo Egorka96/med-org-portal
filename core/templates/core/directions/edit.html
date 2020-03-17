@@ -21,3 +21,21 @@
         <div class="col-sm-4">{% bootstrap_field form.pay_method %}</div>
     </div>
 {% endblock %}
+
+{% block buttons %}
+    <div class="row">
+        <div class="col-6">
+            {% if object.number %}
+                <a href="./delete/" class="btn btn-danger">
+                    <i class="fa fa-trash"></i> Удалить
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="col-6 text-right">
+            <button class="btn btn-success">
+                <i class="fa fa-save"></i> Сохранить
+            </button>
+        </div>
+    </div>
+{% endblock %}

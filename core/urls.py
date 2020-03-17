@@ -20,7 +20,8 @@ urlpatterns = [
 
     path('directions/', directions.Search.as_view(), name='direction_list'),
     path('directions/add/', directions.Edit.as_view(), name='direction_add'),
-    path('directions/<int:pk>/', directions.Edit.as_view(), name='direction_edit'),
+    path('directions/<int:number>/', directions.Edit.as_view(), name='direction_edit'),
+    path('directions/<int:number>/delete/', directions.Delete.as_view(), name='direction_delete'),
 
     path('rest/orgs/', rest.Orgs.as_view(), name='rest_orgs'),
 ]

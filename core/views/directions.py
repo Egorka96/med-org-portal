@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -28,12 +29,20 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
             (self.title, ''),
         ]
 
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['date_from'] = datetime.date.today()
+        return initial
+
+    def get_filter_params(self):
+        return dict(self.request.GET) or self.get_initial()
+
 
 class Edit(PermissionRequiredMixin, core.generic.views.EditView):
     template_name = 'core/directions/edit.html'
     form_class = forms.DirectionEdit
     data_method = 'post'
-    pk = 'pk'
+    pk_url_kwarg = 'number'
 
     def get_success_url(self):
         return reverse_lazy('core:direction_list')
@@ -61,8 +70,8 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         return self.object
 
     def form_valid(self, form):
-        if self.kwargs.get(self.pk):
-            success, description = Direction.edit(direction_id=self.kwargs[self.pk], params=form.cleaned_data)
+        if self.kwargs.get(self.pk_url_kwarg):
+            success, description = Direction.edit(direction_id=self.kwargs[self.pk_url_kwarg], params=form.cleaned_data)
         else:
             success, description = Direction.create(params=form.cleaned_data)
 
@@ -80,3 +89,36 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             ('Направления', reverse('core:direction_list')),
             (self.get_title(), ''),
         ]
+
+
+class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):
+    success_url = reverse_lazy('core:direction_list')
+    breadcrumb = 'Удалить'
+    permission_required = 'core.delete_direction'
+    pk_url_kwarg = 'number'
+
+    def get_object(self, *args, **kwargs):
+        object_pk = self.kwargs.get(self.pk_url_kwarg)
+        self.object = Direction.get(direction_id=object_pk)
+
+        return self.object
+
+    def get_breadcrumbs(self):
+        direction = self.get_object()
+        return [
+            ('Главная', reverse('core:index')),
+            ('Направления', reverse('core:direction_list')),
+            (direction, reverse('core:direction_edit', kwargs={'number': direction.number})),
+            (self.breadcrumb, ''),
+        ]
+
+    def delete(self, *args, **kwargs):
+        success, description = Direction.delete(direction_id=self.kwargs.get(self.pk_url_kwarg))
+
+        if success:
+            messages.success(self.request, description)
+        else:
+            messages.error(self.request, description)
+            return self.render_to_response(self.get_context_data())
+
+        return redirect(self.success_url)
