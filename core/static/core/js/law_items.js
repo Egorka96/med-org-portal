@@ -1,18 +1,12 @@
 (function () {
-    let prepareOrgs;
-    let ORG_REST_URL = "/rest/orgs/";
-
     $(function () {
-        prepareOrgs();
-    });
 
-    prepareOrgs = function () {
-        let initialSelect2 = function () {
-            $('#id_org, #id_orgs').not(':hidden').select2({
+        let initialLawItemSelect2 = function (section) {
+            $("#id_law_items_section_" + section).select2({
                 language: "ru",
                 theme: "bootstrap",
                 ajax: {
-                    url: ORG_REST_URL,
+                    url: "/rest/law_items/?section=" + section,
                     dataType: 'json',
                     cache: true,
                     traditional: true,
@@ -32,9 +26,13 @@
                 escapeMarkup: function (markup) {
                     return markup
                 }
-            })
+            });
         };
-        initialSelect2();
-    }
+
+        initialLawItemSelect2(1);
+        initialLawItemSelect2(2);
+    });
+
 
 }).call(this);
+

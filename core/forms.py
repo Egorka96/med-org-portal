@@ -5,8 +5,10 @@ from django import forms
 from django.contrib.auth import get_user_model
 
 from core import models
+from core.mis.law_item import LawItem
 from core.mis.org import Org
 from core.mis.service_client import Mis
+from core.mis.pay_method import PayMethod as MisPayMethod
 
 User = get_user_model()
 
@@ -57,13 +59,35 @@ class RusDateField(forms.DateField):
         return value
 
 
+class ExtraChoiceField(forms.ChoiceField):
+    @staticmethod
+    def valid_value(*args, **kwargs) -> bool:
+        return True
+
+
 class ListField(forms.MultipleChoiceField):
     @staticmethod
     def valid_value(*args, **kwargs) -> bool:
         return True
 
 
+class FIO(forms.Form):
+    last_name = forms.CharField(label='Фамилия', required=False)
+    first_name = forms.CharField(label='Имя', required=False)
+    middle_name = forms.CharField(label='Отчество', required=False)
+
+
+class PayMethod(forms.Form):
+    pay_method = ExtraChoiceField(label='Способ оплаты', choices=[], required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['pay_method'].widget.choices = [('', '----------')] + \
+                                                   [(p_m.id, p_m.name) for p_m in MisPayMethod.filter()]
+
+
 class OrgsMixin(forms.Form):
+    org = ExtraChoiceField(label='Организация', choices=[], required=False)
     orgs = ListField(label='Организации', choices=[], required=False)
 
     class Media:
@@ -72,15 +96,48 @@ class OrgsMixin(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        choices = []
+        for field in ('org', 'orgs'):
+            choices = []
+            values = self.data.getlist(field) if hasattr(self.data, 'getlist') else None
+            if not values:
+                values =  self.initial.get(field, [])
 
-        values = self.data.getlist('orgs') if hasattr(self.data, 'getlist') else self.initial.get('orgs', [])
-        if values:
-            for value in values:
-                org = Org.get(org_id=value)
-                choices.append((org.id, org.name))
+            if not isinstance(values, list):
+                values = [values]
 
-        self.fields['orgs'].widget.choices = choices
+            if values:
+                for value in values:
+                    org = Org.get(org_id=value)
+                    choices.append((org.id, org.name))
+
+            self.fields[field].widget.choices = choices
+
+
+class LawItems(forms.Form):
+    law_items_section_1 = ListField(label='Пункты приказа прил.1', required=False, choices=[])
+    law_items_section_2 = ListField(label='Пункты приказа прил.2', required=False, choices=[])
+
+    class Media:
+        js = ['core/js/law_items.js']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in ('law_items_section_1', 'law_items_section_2'):
+            choices = []
+            values = self.data.getlist(field) if hasattr(self.data, 'getlist') else None
+            if not values:
+                values =  self.initial.get(field, [])
+
+            if values and not isinstance(values, list):
+                values = [values]
+
+            if values:
+                for value in values:
+                    law_item = LawItem.get(law_item_id=value)
+                    choices.append((law_item.id, law_item.name))
+
+            self.fields[field].widget.choices = choices
 
 
 class DateFromTo(forms.Form):
@@ -163,21 +220,32 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         user.core.save()
 
 
-class WorkersPastReport(DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):
-    last_name = forms.CharField(label='Фамилия', required=False)
-    first_name = forms.CharField(label='Имя', required=False)
-    middle_name = forms.CharField(label='Отчество', required=False)
-
+class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
 
 
-class DirectionSearch(DateFromTo, OrgsMixin, forms.Form):
-    last_name = forms.CharField(label='Фамилия', required=False)
-    first_name = forms.CharField(label='Имя', required=False)
-    middle_name = forms.CharField(label='Отчество', required=False)
-
+class DirectionSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
-
     confirmed = forms.NullBooleanField(label='Подтвержден', required=False)
+
+
+class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Form):
+    GENDER_CHOICE = (
+        ('Мужской', 'Мужской'),
+        ('Женский', 'Женский'),
+    )
+
+    gender = forms.ChoiceField(label='Пол', choices=GENDER_CHOICE, required=False)
+    birth = RusDateField(label='Дата рождения', initial=None)
+    post = forms.CharField(label='Должность', required=False)
+    shop = forms.CharField(label='Подразделение', required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['last_name'].required = True
+        self.fields['first_name'].required = True
+        self.fields['exam_type'].required = True
+        self.fields['exam_type'].initial = 'Периодический'

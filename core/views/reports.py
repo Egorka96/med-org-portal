@@ -50,7 +50,9 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
 
     def get_filter_params(self):
         filter_params = super().get_filter_params()
-        filter_params['group_clients'] = True
+
+        if self.request.GET:
+            filter_params['group_clients'] = True
         return filter_params
 
     def get_objects(self):

@@ -9,3 +9,4 @@ requests==2.23.0
 psycopg2-binary==2.8.4
 sw-django-utils==0.0.49
 openpyxl==3.0.3
+python-dateutil==2.5.3
