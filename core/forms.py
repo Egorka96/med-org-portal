@@ -8,6 +8,7 @@ from core import models
 from core.mis.law_item import LawItem
 from core.mis.org import Org
 from core.mis.service_client import Mis
+from core.mis.pay_method import PayMethod as MisPayMethod
 
 User = get_user_model()
 
@@ -74,6 +75,15 @@ class FIO(forms.Form):
     last_name = forms.CharField(label='Фамилия', required=False)
     first_name = forms.CharField(label='Имя', required=False)
     middle_name = forms.CharField(label='Отчество', required=False)
+
+
+class PayMethod(forms.Form):
+    pay_method = ExtraChoiceField(label='Способ оплаты', choices=[], required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['pay_method'].widget.choices = [('', '----------')] + \
+                                                   [(p_m.id, p_m.name) for p_m in MisPayMethod.filter()]
 
 
 class OrgsMixin(forms.Form):
@@ -221,7 +231,7 @@ class DirectionSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     confirmed = forms.NullBooleanField(label='Подтвержден', required=False)
 
 
-class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, forms.Form):
+class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Form):
     GENDER_CHOICE = (
         ('Мужской', 'Мужской'),
         ('Женский', 'Женский'),
@@ -231,7 +241,6 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, forms.Form):
     birth = RusDateField(label='Дата рождения', initial=None)
     post = forms.CharField(label='Должность', required=False)
     shop = forms.CharField(label='Подразделение', required=False)
-    pay_method = forms.ChoiceField(label='Способ оплаты', choices=[], required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -240,5 +249,3 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, forms.Form):
         self.fields['first_name'].required = True
         self.fields['exam_type'].required = True
         self.fields['exam_type'].initial = 'Периодический'
-
-        # todo: логика про подтягивание пунктов приказа и способа оплаты

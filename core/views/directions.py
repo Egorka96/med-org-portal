@@ -68,6 +68,9 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             if initial.get('law_items_section_2'):
                 initial['law_items_section_2'] = [l_i['id'] for l_i in initial['law_items_section_2']]
 
+            if initial.get('pay_method'):
+                initial['pay_method'] = initial['pay_method']['id']
+
         return initial
 
     def get_object(self):
