@@ -125,6 +125,8 @@ DATE_FORMAT = 'd.m.Y'
 DATETIME_FORMAT = 'd.m.Y H:i'
 SHORT_DATETIME_FORMAT = 'd.m.Y H:i'
 
+DIR_FOR_TMP_FILES = '/tmp/org-portal/'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/

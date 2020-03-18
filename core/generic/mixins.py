@@ -1,10 +1,15 @@
+import os
+import shutil
+import tempfile
 from typing import Optional, List, Dict
 
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.utils.functional import cached_property
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormMixin as DjangoFormMixin
+from docxtpl import DocxTemplate, InlineImage
 
 from mis.service_client import Mis
 
@@ -184,3 +189,69 @@ class ExcelMixin:
             kwargs['add_excel'] = True
 
         return super().get_context_data(**kwargs)
+
+
+class DocxImage:
+    def __init__(self, path, width=None, height=None):
+        self.path = path
+        self.width = width
+        self.height = height
+
+
+class DocxMixin:
+    print_template_name = None
+    file_name = None
+    print_message = 'Распечатан docx-документ'
+
+    def get_print_template(self):
+        return self.print_template_name
+
+    def get_file_name(self):
+        return self.file_name
+
+    def get_print_context_data(self, **kwargs):
+        return {}
+
+    def get_object(self):
+        return
+
+    def get_objects(self):
+        return []
+
+    def get(self, request, *args, **kwargs):
+        return self.printed()
+
+    def printed(self):
+        file_name = self.get_file_name()
+        file_name = file_name.replace("ъ", '').replace("ь", '').replace('"', '').replace('«', '').replace('»', '')
+
+        filename = os.path.split('/')[-1].split('.')[0]
+
+        if not os.path.exists(settings.DIR_FOR_TMP_FILES):
+            os.makedirs(settings.DIR_FOR_TMP_FILES)
+        tmp_path = tempfile.mkdtemp(dir=settings.DIR_FOR_TMP_FILES)
+        docx_path = '%s/%s.docx' % (tmp_path, filename)
+
+        try:
+            docx = DocxTemplate(self.get_print_template())
+
+            context = self.get_print_context_data(docx_tpl=docx)
+            if images := context.get('images'):
+                for key, image_params in images.items():
+                    context[key] = InlineImage(
+                        docx, image_params.path, width=image_params.width, height=image_params.height
+                    )
+
+            docx.render(context)
+            docx.save(docx_path)
+
+            with open(docx_path, mode='rb') as file:
+                # сгенерируем HttpResponse-объект с pdf
+                response = HttpResponse(
+                    file.read(),
+                    content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                response['Content-Disposition'] = 'filename=%s.docx' % file_name
+
+            return response
+        finally:
+            shutil.rmtree(tmp_path)

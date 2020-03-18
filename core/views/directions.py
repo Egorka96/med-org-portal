@@ -1,17 +1,24 @@
 import dataclasses
 import datetime
+import os
+import tempfile
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
+from django.views.generic.base import View
+from docx.shared import Mm
+
+from mis.direction import Direction
+from mis.service_client import Mis
 
 import core.generic.mixins
 import core.generic.views
+import core.datatools.barcode
 
-from core import forms
-from mis.direction import Direction
-from mis.service_client import Mis
+from core import forms, models
 
 
 class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
@@ -109,9 +116,9 @@ class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):
     pk_url_kwarg = 'number'
 
     def get_object(self, *args, **kwargs):
-        object_pk = self.kwargs.get(self.pk_url_kwarg)
-        self.object = Direction.get(direction_id=object_pk)
-
+        if self.object is None:
+            object_pk = self.kwargs.get(self.pk_url_kwarg)
+            self.object = Direction.get(direction_id=object_pk)
         return self.object
 
     def get_breadcrumbs(self):
@@ -133,3 +140,53 @@ class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):
             return self.render_to_response(self.get_context_data())
 
         return redirect(self.success_url)
+
+
+class Print(PermissionRequiredMixin, core.generic.mixins.DocxMixin, View):
+    permission_required = 'core.view_direction'
+    print_message = 'Печать направления'
+    pk_url_kwarg = 'number'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.object = None
+
+    def get_file_name(self):
+        return str(self.get_object())
+
+    def get_print_template(self):
+        obj = self.get_object()
+
+        docx_template = models.DirectionDocxTemplate.objects.filter(
+            org_ids=obj.org.id
+        ).first()
+
+        if docx_template:
+            docx_template_file = docx_template.file.path
+        else:
+            docx_template_file = os.path.join(settings.BASE_DIR, 'core/templates/core/directions/print.docx')
+
+        return docx_template_file
+
+    def get_object(self, *args, **kwargs):
+        if self.object is None:
+            object_pk = self.kwargs.get(self.pk_url_kwarg)
+            self.object = Direction.get(direction_id=object_pk)
+        return self.object
+
+    def get_print_context_data(self, **kwargs):
+        context = super().get_print_context_data(**kwargs)
+        context['object'] = self.get_object()
+
+        # добавим штрих-код заявки
+        direction_barcode_path = core.datatools.barcode.create_jpg(
+            context['object'].number,
+            tmp_dir=tempfile.mkdtemp(dir=settings.DIR_FOR_TMP_FILES),
+            module_height=5
+        )
+        context['images'] = {
+            'direction_barcode': core.generic.mixins.DocxImage(
+                direction_barcode_path, width=Mm(40), height=Mm(30)
+            )
+        }
+        return context

@@ -10,3 +10,6 @@ psycopg2-binary==2.8.4
 sw-django-utils==0.0.49
 openpyxl==3.0.3
 python-dateutil==2.5.3
+docxtpl==0.5.17
+pillow==5.4.0
+python-barcode==0.9.0
