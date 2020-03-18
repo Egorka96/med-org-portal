@@ -10,6 +10,7 @@ from django.utils.functional import cached_property
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormMixin as DjangoFormMixin
 from docxtpl import DocxTemplate, InlineImage
+from swutils.string import transliterate
 
 from mis.service_client import Mis
 
@@ -224,6 +225,7 @@ class DocxMixin:
     def printed(self):
         file_name = self.get_file_name()
         file_name = file_name.replace("ъ", '').replace("ь", '').replace('"', '').replace('«', '').replace('»', '')
+        file_name = transliterate(file_name, space='_')
 
         filename = os.path.split('/')[-1].split('.')[0]
 
@@ -249,9 +251,9 @@ class DocxMixin:
                 # сгенерируем HttpResponse-объект с pdf
                 response = HttpResponse(
                     file.read(),
-                    content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                    content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
                 response['Content-Disposition'] = 'filename=%s.docx' % file_name
-
-            return response
+                return response
         finally:
             shutil.rmtree(tmp_path)

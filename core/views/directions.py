@@ -1,5 +1,6 @@
 import dataclasses
 import datetime
+import json
 import os
 import tempfile
 
@@ -157,13 +158,14 @@ class Print(PermissionRequiredMixin, core.generic.mixins.DocxMixin, View):
     def get_print_template(self):
         obj = self.get_object()
 
-        docx_template = models.DirectionDocxTemplate.objects.filter(
-            org_ids=obj.org.id
-        ).first()
+        docx_template_file = None
+        docx_templates = models.DirectionDocxTemplate.objects.exclude(org_ids='')
+        for template in docx_templates:
+            if obj.org.id in json.loads(template.org_ids):
+                docx_template_file = template.file.path
+                break
 
-        if docx_template:
-            docx_template_file = docx_template.file.path
-        else:
+        if not docx_template_file:
             docx_template_file = os.path.join(settings.BASE_DIR, 'core/templates/core/directions/print.docx')
 
         return docx_template_file

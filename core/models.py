@@ -45,8 +45,8 @@ class User(models.Model):
 class DirectionDocxTemplate(models.Model):
     name = models.CharField('Название', max_length=255, unique=True)
     description = models.TextField('Описание', blank=True)
-    org_ids = JSONField('Список ID организаций', max_length=255, help_text='список id организаций из внешней системы',
-                        blank=True)
+    org_ids = models.CharField('Список ID организаций', max_length=255,
+                               help_text='список id организаций из внешней системы', blank=True)
     file = models.FileField('Файл шаблона', upload_to='core/direction_docx_templates/',
                             validators=[docx_file_extension])
 
@@ -57,3 +57,9 @@ class DirectionDocxTemplate(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_orgs(self) -> List[Org]:
+        if not self.org_ids:
+            return []
+
+        return [Org.get(org_id=org_id) for org_id in json.loads(self.org_ids)]
