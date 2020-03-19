@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.base_templates',
             ],
         },
     },
@@ -144,6 +145,13 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
 
 MIS_URL = ''
 MIS_TOKEN = ''
+
+# TEMPLATES_DICT = {
+#     "base": '',
+#     "index": '',
+#     "workers_done_report": '',
+#     "direction_list": '',
+# }
 
 
 try:

@@ -8,3 +8,4 @@ media
 /static
 .coverage
 package-lock.json
+custom
