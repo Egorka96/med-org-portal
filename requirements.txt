@@ -7,9 +7,9 @@ django_filter==2.0.0
 django-bootstrap4==1.1.1
 requests==2.23.0
 psycopg2-binary==2.8.4
-sw-django-utils==0.0.49
+sw-django-utils==0.0.50
 openpyxl==3.0.3
-python-dateutil==2.5.3
-docxtpl==0.5.17
-pillow==5.4.0
-python-barcode==0.9.0
+python-dateutil==2.8.1
+docxtpl==0.6.3
+pillow==7.0.0
+python-barcode==0.11.0
