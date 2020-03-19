@@ -45,6 +45,7 @@
     <th>Пункты приказа</th>
     <th>Время действия</th>
     <th>Дата прохождения</th>
+    <th></th>
 {% endblock %}
 
 {% block table_body %}
@@ -64,4 +65,9 @@
     </td>
     <td>{% if object.date_from %}c {{ object.date_from|iso_to_date }}{% endif %} {% if object.date_to %} по {{ object.date_to|iso_to_date }}{% endif %}</td>
     <td>{{ object.confirm_dt|iso_to_date|default_if_none:'-' }}</td>
+    <td>
+        <a class="btn btn-outline-secondary" href="{% url 'core:direction_print' object.id %}" data-toggle="tooltip" title="Распечатать направление на осмотр">
+            <i class="fa fa-print"></i>
+        </a>
+    </td>
 {% endblock %}

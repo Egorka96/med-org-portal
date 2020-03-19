@@ -184,11 +184,12 @@ class Print(PermissionRequiredMixin, core.generic.mixins.DocxMixin, View):
         direction_barcode_path = core.datatools.barcode.create_jpg(
             context['object'].number,
             tmp_dir=tempfile.mkdtemp(dir=settings.DIR_FOR_TMP_FILES),
-            module_height=5
+            module_height=5,
+            write_text=False
         )
         context['images'] = {
             'direction_barcode': core.generic.mixins.DocxImage(
-                direction_barcode_path, width=Mm(40), height=Mm(30)
+                direction_barcode_path, width=Mm(40), height=Mm(15)
             )
         }
         return context
