@@ -1,12 +1,12 @@
-{% if settings is defined and settings.DEBUG is defined %}
-DEBUG = {{ settings.DEBUG }}
+{% if DEBUG is defined %}
+DEBUG = {{ DEBUG }}
 {% else %}
 DEBUG = True
 {% endif %}
 
 
-{% if settings is defined and settings.SECRET_KEY is defined %}
-SECRET_KEY = '{{ settings.SECRET_KEY }}'
+{% if SECRET_KEY is defined  %}
+SECRET_KEY = '{{ SECRET_KEY }}'
 {% else %}
 SECRET_KEY = 'fixme'
 {% endif %}
@@ -31,3 +31,11 @@ DATABASES = {
         'NAME': '/data/db.sqlite3',
     }
 }
+
+{% if MIS_URL is defined %}
+MIS_URL = "{{ MIS_URL }}"
+{% endif %}
+
+{% if MIS_TOKEN is defined %}
+MIS_TOKEN = "{{ MIS_TOKEN }}"
+{% endif %}

@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -28,3 +27,9 @@ jobs:
     - name: Run Tests
       run: |
         coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report
+
+  deploy:
+    name: deploy stage
+    run: |
+      ansible-playbook -i ansible/inventory -u root -v ansible/install.yml -e "web_server_name=med-org-portal service_port=8030 dockerhub_login=${{ secrets.dockerhub_login }} dockerhub_password=${{ secrets.dockerhub_password }} dockerhub_email=${{ secrets.dockerhub_email }} MIS_URL=${{ secrets.mis_url }} MIS_TOKEN=${{ secrets.mis_token }} SECRET_KEY=${{ secrets.SECRET_KEY }} DEBUG=${{ secrets.DEBUG }}"
+

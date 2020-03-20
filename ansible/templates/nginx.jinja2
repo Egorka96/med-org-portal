@@ -17,4 +17,8 @@ server {
         alias /var/www/{{ web_server_name }}/static;
     }
 
+    location /node_modules {
+        alias /var/www/{{ web_server_name }}/static/node_modules;
+    }
+
 }
