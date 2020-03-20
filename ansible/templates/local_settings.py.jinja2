@@ -1,0 +1,33 @@
+{% if settings is defined and settings.DEBUG is defined %}
+DEBUG = {{ settings.DEBUG }}
+{% else %}
+DEBUG = True
+{% endif %}
+
+
+{% if settings is defined and settings.SECRET_KEY is defined %}
+SECRET_KEY = '{{ settings.SECRET_KEY }}'
+{% else %}
+SECRET_KEY = 'fixme'
+{% endif %}
+
+{#DATABASES = {#}
+{#    'default': {#}
+{#        'ENGINE': 'django.db.backends.postgresql_psycopg2',#}
+{#        'NAME': '{{ service }}',#}
+{#        'USER': '{{ service }}',#}
+{#        'PASSWORD': '{{ settings.DATABASES.default.PASSWORD }}',#}
+{#        'HOST': '{% if settings.DATABASES.default.HOST is defined %}{{ settings.DATABASES.default.HOST }}{% else %}db{% endif %}',#}
+{#        'PORT': '',#}
+{#    }#}
+
+ALLOWED_HOSTS = ['{{ web_server_name }}', '*'] # FIXME
+LANGUAGE_CODE = 'ru-RU'
+TIME_ZONE = 'Europe/Moscow'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/data/db.sqlite3',
+    }
+}

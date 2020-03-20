@@ -21,7 +21,7 @@
 
     - name: remove old med-org-portal instance
       docker_container:
-        name: sonm-cms
+        name: med-org-portal
         image: egorkaraz/med-org-portal
         state: absent
 
@@ -47,13 +47,19 @@
     - name: create settings
       template:
         src: local_settings.py.jinja2
-        dest: "/conf/sonm-cms/local_settings.py"
+        dest: "/conf/med-org-portal/local_settings.py"
         mode: 0600
+
+    - name: Log into DockerHub
+      docker_login:
+        username: "{{ dockerhub_login }}"
+        email: "{{ dockerhub_email }}"
+        password: "{{ dockerhub_password }}"
 
     - name: start med-org-portal
       docker_container:
         image: egorkaraz/med-org-portal
-        name: med0org-portal
+        name: med-org-portal
         pull: yes
         ports:
           - 127.0.0.1:{{ service_port }}:80
