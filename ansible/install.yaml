@@ -1,0 +1,78 @@
+# ansible-playbook -i ansible/inventory -u root -v ansible/install.yml
+
+- name: Install MED ORG PORTAL
+  hosts: all
+
+  tasks:
+    - name: install packages
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+        cache_valid_time: 3600
+      with_items:
+        - docker.io
+        - python-pip
+        - nginx
+
+    - name: install docker-py
+      pip:
+        name: docker-py
+        version: 1.10.6
+
+    - name: remove old med-org-portal instance
+      docker_container:
+        name: sonm-cms
+        image: egorkaraz/med-org-portal
+        state: absent
+
+    - name: create web directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: www-data
+        group: www-data
+        recurse: yes
+      with_items:
+        - /var/www/med-org-portal/static
+        - "/var/log/www/{{ web_server_name }}"
+
+    - name: create conf directory
+      file:
+        path: "/conf/med-org-portal"
+        state: directory
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: create settings
+      template:
+        src: local_settings.py.jinja2
+        dest: "/conf/sonm-cms/local_settings.py"
+        mode: 0600
+
+    - name: start med-org-portal
+      docker_container:
+        image: egorkaraz/med-org-portal
+        name: med0org-portal
+        pull: yes
+        ports:
+          - 127.0.0.1:{{ service_port }}:80
+        volumes:
+          - "/data/med-org-portal:/data"
+          - "/conf/med-org-portal:/conf"
+          - "/var/www/med-org-portal/static:/static"
+
+    - name: remove nginx default
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: create nginx config
+      template:
+        src: nginx.jinja2
+        dest: "/etc/nginx/sites-enabled/med-org-portal"
+
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
