@@ -50,7 +50,7 @@
         dest: "/conf/med-org-portal/local_settings.py"
         mode: 0600
 
-    - name: Log into DockerHub
+    - name: login DockerHub
       docker_login:
         username: "{{ dockerhub_login }}"
         email: "{{ dockerhub_email }}"
