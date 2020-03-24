@@ -25,12 +25,18 @@ from core import forms, models
 
 class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
              core.generic.views.ListView):
-    template_name = 'core/directions/list.html'
     form_class = forms.DirectionSearch
     title = 'Направления'
     permission_required = 'core.view_direction'
     paginate_by = 50
     mis_request_path = Mis.DIRECTIONS_LIST_URL
+
+    def get_template_names(self):
+        template_name = settings.TEMPLATES_DICT.get("direction_list") if hasattr(settings, "TEMPLATES_DICT") else None
+        if not template_name:
+            template_name = 'core/directions/list.html'
+
+        return [template_name]
 
     def get_breadcrumbs(self):
         return [

@@ -35,6 +35,28 @@ class User(models.Model):
     def __str__(self):
         return str(self.django_user)
 
+    def get_fio(self):
+        return ' '.join(filter(bool, [self.django_user.last_name, self.django_user.first_name]))
+
+    def get_short_fio(self):
+        if self.django_user.first_name.strip():
+            return f'{self.django_user.last_name} {self.get_initials()}'
+        else:
+            return self.get_fio()
+
+    def get_initials(self):
+        if not self.django_user.first_name.strip():
+            return ''
+
+        parts = self.django_user.first_name.split(' ')
+        if not parts:
+            return ''
+
+        initials = '%s.' % parts[0][0]
+        if len(parts) > 1:
+            initials += '%s.' % parts[1][0]
+        return initials
+
     def get_orgs(self) -> List[Org]:
         if not self.org_ids:
             return []
