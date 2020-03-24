@@ -134,6 +134,9 @@ DIR_FOR_TMP_FILES = '/tmp/org-portal/'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/static/',

@@ -7,6 +7,7 @@ import tempfile
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.files import File
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
@@ -166,7 +167,17 @@ class Print(PermissionRequiredMixin, core.generic.mixins.DocxMixin, View):
                 break
 
         if not docx_template_file:
-            docx_template_file = os.path.join(settings.BASE_DIR, 'core/templates/core/directions/print.docx')
+            docx_template = models.DirectionDocxTemplate.objects.filter(org_ids='').first()
+            if not docx_template:
+                docx_template = models.DirectionDocxTemplate.objects.create(
+                    name='Основной шаблон',
+                )
+                with open(os.path.join(settings.BASE_DIR, 'core/templates/core/directions/print.docx'), 'rb') as f:
+                    docx_template.file.save(
+                        name='direction_print.docx',
+                        content=File(f)
+                    )
+            docx_template_file = docx_template.file.path
 
         return docx_template_file
 
