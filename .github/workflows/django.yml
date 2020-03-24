@@ -20,6 +20,11 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Build Docker Image
+      run: |
+        docker login -u ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_TOKEN }}
+        docker build --pull -t ${{ secrets.DOCKER_REGISTRY }} .
+        docker push ${{ secrets.DOCKER_REGISTRY }}
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
