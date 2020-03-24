@@ -8,4 +8,5 @@ media
 /static
 .coverage
 package-lock.json
+Dockerfile
 custom/
