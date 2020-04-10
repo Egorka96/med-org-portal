@@ -19,13 +19,7 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
     permission_required = 'core.view_workers_done_report'
     excel_workbook_maker = WorkersDoneExcel
     mis_request_path = Mis.WORKERS_DONE_REPORT_URL
-
-    def get_template_names(self):
-        template_name = settings.TEMPLATES_DICT.get("workers_done_report") if hasattr(settings, "TEMPLATES_DICT") else None
-        if not template_name:
-            template_name = 'core/reports/workers_done.html'
-
-        return [template_name]
+    template_name = settings.TEMPLATES_DICT.get("workers_done_report")
 
     def get_breadcrumbs(self):
         return [

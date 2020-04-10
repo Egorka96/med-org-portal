@@ -149,12 +149,12 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
 MIS_URL = ''
 MIS_TOKEN = ''
 
-# TEMPLATES_DICT = {
-#     "base": '',
-#     "index": '',
-#     "workers_done_report": '',
-#     "direction_list": '',
-# }
+TEMPLATES_DICT = {
+    "base": 'core/base.html',
+    "index": 'core/index.html',
+    "workers_done_report": 'core/reports/workers_done.html',
+    "direction_list": 'core/directions/list.html',
+}
 
 
 try:

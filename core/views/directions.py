@@ -29,14 +29,8 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
     title = 'Направления'
     permission_required = 'core.view_direction'
     paginate_by = 50
+    template_name = settings.TEMPLATES_DICT.get("direction_list")
     mis_request_path = Mis.DIRECTIONS_LIST_URL
-
-    def get_template_names(self):
-        template_name = settings.TEMPLATES_DICT.get("direction_list") if hasattr(settings, "TEMPLATES_DICT") else None
-        if not template_name:
-            template_name = 'core/directions/list.html'
-
-        return [template_name]
 
     def get_breadcrumbs(self):
         return [
