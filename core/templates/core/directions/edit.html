@@ -1,20 +1,6 @@
 {% extends 'core/base_edit.html' %}
 {% load bootstrap4 %}
 
-{% block container %}
-    {% if object.number %}
-        <div class="row">
-        <div class="col-sm-10"></div>
-            <div class="col-sm-2 text-right">
-                <a class="btn btn-outline-secondary" href="{% url 'core:direction_print' object.number %}" data-toggle="tooltip" title="Распечатать направление на осмотр">
-                    <i class="fa fa-print"></i> Печать
-                </a>
-            </div>
-        </div>
-    {% endif %}
-    {{ block.super }}
-{% endblock %}
-
 {% block fields %}
     <div class="row">
         <div class="col-sm-4">{% bootstrap_field form.last_name %}</div>
@@ -47,6 +33,11 @@
         </div>
 
         <div class="col-6 text-right">
+            {% if object.number %}
+                <a class="btn btn-outline-secondary" href="{% url 'core:direction_print' object.number %}" data-toggle="tooltip" title="Распечатать направление на осмотр">
+                    <i class="fa fa-print"></i> Печать
+                </a>
+            {% endif %}
             <button class="btn btn-success">
                 <i class="fa fa-save"></i> Сохранить
             </button>
