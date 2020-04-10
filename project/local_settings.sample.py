@@ -3,7 +3,7 @@ import os
 from project.settings import TEMPLATES, BASE_DIR
 
 # добавляем в DIRS директории с кастомными шаблонами (в примере, новые шаблоны находятся в директории custom)
-# TEMPLATES['DIRS'] = [os.path.join(BASE_DIR, 'custom/templates')]
+# TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'custom/templates')]
 
 # определяем путь к статическим файлам (css, js, картинки и т.л.)
 # (в примере, статические файлы находятся в директории custom)
