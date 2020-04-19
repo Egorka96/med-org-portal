@@ -3,7 +3,8 @@ FROM python:3.8-slim-buster
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get clean && apt-get update && apt-get install -y \
-        vim curl supervisor locales tzdata qrencode postgresql-client npm \
+        vim curl supervisor locales tzdata libpq-dev postgresql-client \
+        libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev python3-lxml npm \
     && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen ru_RU.UTF-8
