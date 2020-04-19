@@ -9,29 +9,17 @@ on:
 jobs:
   build:
     runs-on: self-hosted
-#    runs-on: ubuntu-18.04-amd64
-#    strategy:
-#      max-parallel: 4
-#      matrix:
-#        python-version: [3.8]
-
     steps:
     - uses: actions/checkout@v2
-#    - name: Set up Python ${{ matrix.python-version }}
-#      uses: actions/setup-python@v1
-#      with:
-#        python-version: ${{ matrix.python-version }}
-    - name: Build Docker ARM Image
+    - name: Build Docker Image
       run: |
         docker build . --file Dockerfile --pull -t ${{ secrets.DOCKER_REGISTRY }}
         docker push ${{ secrets.DOCKER_REGISTRY }}
-#    - name: Install Dependencies
-#      run: |
-#        python -m pip install --upgrade pip
-#        pip install -r requirements.txt
-#    - name: Run Tests
-#      run: |
-#        coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report
+    - name: Run Tests
+      run: |
+        docker pull ${{ secrets.DOCKER_REGISTRY }}
+        docker run --rm ${{ secrets.DOCKER_REGISTRY }} bash -c "coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report"
+
 #    - uses: webfactory/ssh-agent@v0.2.0
 #      with:
 #        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
