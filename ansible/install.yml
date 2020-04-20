@@ -1,7 +1,9 @@
-# ansible-playbook -i ansible/inventory -u root -v ansible/install.yml
+# ansible-playbook -i ansible/inventory -u ansible -v ansible/install.yml
 
 - name: Install MED ORG PORTAL
-  hosts: all
+  hosts: "{{ host }}"
+  become: yes
+  become_method: sudo
 
   tasks:
     - name: install packages
@@ -21,8 +23,8 @@
 
     - name: remove old med-org-portal instance
       docker_container:
-        name: med-org-portal
-        image: egorkaraz/med-org-portal
+        name: "{{ image_name }}"
+        image: "{{ image }}"
         state: absent
 
     - name: create web directories
@@ -33,12 +35,12 @@
         group: www-data
         recurse: yes
       with_items:
-        - /var/www/med-org-portal/static
+        - "/var/www/{{ web_server_name }}/static"
         - "/var/log/www/{{ web_server_name }}"
 
     - name: create conf directory
       file:
-        path: "/conf/med-org-portal"
+        path: "/conf/{{ web_server_name }}"
         state: directory
         owner: www-data
         group: www-data
@@ -47,7 +49,7 @@
     - name: create settings
       template:
         src: local_settings.py.jinja2
-        dest: "/conf/med-org-portal/local_settings.py"
+        dest: "/conf/{{ web_server_name }}/local_settings.py"
         mode: 0600
 
     - name: login DockerHub
@@ -56,17 +58,38 @@
         email: "{{ dockerhub_email }}"
         password: "{{ dockerhub_password }}"
 
-    - name: start med-org-portal
+    - name: Start container db
       docker_container:
-        image: egorkaraz/med-org-portal
-        name: med-org-portal
-        pull: yes
+        image: postgres:11
+        name: "{{ web_server_name }}-db"
+        ports:
+          - 127.0.0.1:5432:5432
+        volumes:
+          - "/var/docker/{{ web_server_name }}/db:/var/lib/postgresql/data/"
+        restart_policy: always
+        state: started
+        env:
+          POSTGRES_PASSWORD: "{{ PASSWORD }}"
+          POSTGRES_USER: "{{ service_name }}"
+          POSTGRES_NAME: "{{ service_name }}"
+
+    - name: Start container portal
+      docker_container:
+        image: "{{ image }}"
+        name: "{{ image_name }}"
+        volumes:
+          - "/data/{{ web_server_name }}:/data"
+          - "/conf/{{ web_server_name }}:/conf"
+          - "/var/www/{{ web_server_name }}/static:/static"
+        restart_policy: always
+        state: started
+        etc_hosts: {"db": "{{ db_host }}"}
         ports:
           - 127.0.0.1:{{ service_port }}:80
-        volumes:
-          - "/data/med-org-portal:/data"
-          - "/conf/med-org-portal:/conf"
-          - "/var/www/med-org-portal/static:/static"
+        links:
+          - "{{ web_server_name }}-db:db"
+        env:
+          SERVICE_NAME: "{{ service_name }}"
 
     - name: remove nginx default
       file:
@@ -76,7 +99,7 @@
     - name: create nginx config
       template:
         src: nginx.jinja2
-        dest: "/etc/nginx/sites-enabled/med-org-portal"
+        dest: "/etc/nginx/sites-enabled/{{ web_server_name }}"
 
     - name: reload nginx
       service:

@@ -11,26 +11,27 @@ SECRET_KEY = '{{ SECRET_KEY }}'
 SECRET_KEY = 'fixme'
 {% endif %}
 
-{#DATABASES = {#}
-{#    'default': {#}
-{#        'ENGINE': 'django.db.backends.postgresql_psycopg2',#}
-{#        'NAME': '{{ service }}',#}
-{#        'USER': '{{ service }}',#}
-{#        'PASSWORD': '{{ settings.DATABASES.default.PASSWORD }}',#}
-{#        'HOST': '{% if settings.DATABASES.default.HOST is defined %}{{ settings.DATABASES.default.HOST }}{% else %}db{% endif %}',#}
-{#        'PORT': '',#}
-{#    }#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': "{{ service_name }}",
+        'USER': "{{ service_name }}",
+        'PASSWORD': '{{ PASSWORD }}',
+        'HOST': 'db',
+        'PORT': '5432',
+    }
+}
 
-ALLOWED_HOSTS = ['{{ web_server_name }}', '*'] # FIXME
+ALLOWED_HOSTS = ['{{ web_server_name }}', '*']
 LANGUAGE_CODE = 'ru-RU'
 TIME_ZONE = 'Europe/Moscow'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/data/db.sqlite3',
-    }
-}
+{#DATABASES = {#}
+{#    'default': {#}
+{#        'ENGINE': 'django.db.backends.sqlite3',#}
+{#        'NAME': '/data/db.sqlite3',#}
+{#    }#}
+{#}#}
 
 {% if MIS_URL is defined %}
 MIS_URL = "{{ MIS_URL }}"
@@ -38,4 +39,33 @@ MIS_URL = "{{ MIS_URL }}"
 
 {% if MIS_TOKEN is defined %}
 MIS_TOKEN = "{{ MIS_TOKEN }}"
+{% endif %}
+
+import os
+
+from project.settings import TEMPLATES, BASE_DIR, TEMPLATES_DICT
+
+{% if custom_apps is defined %}
+
+TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, f'{app}/templates') for app in {{ custom_apps }}]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, f"{app}/static") for app in {{ custom_apps }}
+]
+
+{% endif %}
+
+{% if base_template is defined %}
+TEMPLATES_DICT["base"] = '{{ base_template }}'
+{% endif %}
+
+{% if index_template is defined %}
+TEMPLATES_DICT["index"] = '{{ index_template }}'
+{% endif %}
+
+{% if workers_done_report_template is defined %}
+TEMPLATES_DICT["workers_done_report"] = '{{ workers_done_report_template }}'
+{% endif %}
+
+{% if direction_list_template is defined %}
+TEMPLATES_DICT["direction_list"] = '{{ direction_list_template }}'
 {% endif %}
