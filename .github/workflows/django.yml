@@ -15,14 +15,22 @@ jobs:
       run: |
         docker build . --file Dockerfile --pull -t ${{ secrets.DOCKER_REGISTRY }}
         docker push ${{ secrets.DOCKER_REGISTRY }}
+
+  test:
+    runs-on: self-hosted
+    needs: build
+    steps:
     - name: Run Tests
       run: |
         docker pull ${{ secrets.DOCKER_REGISTRY }}
         docker run --rm ${{ secrets.DOCKER_REGISTRY }} bash -c "coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report"
 
-#    - uses: webfactory/ssh-agent@v0.2.0
-#      with:
-#        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-#    - name: Deploy Stage
-#      run: |
-#          ansible-playbook -i ansible/inventory -u root -v ansible/install.yml -e "web_server_name=med-org-portal service_port=8030 dockerhub_login=${{ secrets.dockerhub_login }} dockerhub_password=${{ secrets.dockerhub_password }} dockerhub_email=${{ secrets.dockerhub_email }} MIS_URL=${{ secrets.mis_url }} MIS_TOKEN=${{ secrets.mis_token }} SECRET_KEY=${{ secrets.SECRET_KEY }} DEBUG=${{ secrets.DEBUG }}"
+    deploy:
+      runs-on: self-hosted
+      needs: [build, test]
+      steps:
+        - name: Deploy Stage
+          run: |
+            docker pull ${{ secrets.DOCKER_REGISTRY }}
+            docker run --rm ${{ secrets.DOCKER_REGISTRY }} bash -c 'mkdir /root/.ssh/ && echo "${{ secrets.SSH_PRIVATE_KEY }}" > /root/.ssh/id_rsa && echo "${{ secrets.SSH_PUBLIC_KEY }}" > /root/.ssh/id_rsa.pub && chmod =600 ~/.ssh/id_rsa &&
+                                                                    pip install -r ansible/requirements.txt && ansible-playbook -i ansible/inventory -u ansible -v ansible/install.yml -e "web_server_name=${{ secrets.web_server_name }} host=${{ secrets.host }} image_name=${{ secrets.image_name }} image=${{ secrets.DOCKER_REGISTRY }} service_name=${{ secrets.service_name }} service_port=${{ secrets.service_port }} db_host=${{ secrets.db_host }} MIS_URL=${{ secrets.MIS_URL }} MIS_TOKEN=${{ secrets.MIS_TOKEN }} PASSWORD=${{ secrets.DB_PASSWORD }} sentry_url=${{ secrets.sentry_url }}"'

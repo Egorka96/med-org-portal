@@ -52,11 +52,11 @@
         dest: "/conf/{{ web_server_name }}/local_settings.py"
         mode: 0600
 
-    - name: login DockerHub
-      docker_login:
-        username: "{{ dockerhub_login }}"
-        email: "{{ dockerhub_email }}"
-        password: "{{ dockerhub_password }}"
+#    - name: login DockerHub
+#      docker_login:
+#        username: "{{ dockerhub_login }}"
+#        email: "{{ dockerhub_email }}"
+#        password: "{{ dockerhub_password }}"
 
     - name: Start container db
       docker_container:
