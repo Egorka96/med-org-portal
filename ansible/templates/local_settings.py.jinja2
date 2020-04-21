@@ -69,3 +69,13 @@ TEMPLATES_DICT["workers_done_report"] = '{{ workers_done_report_template }}'
 {% if direction_list_template is defined %}
 TEMPLATES_DICT["direction_list"] = '{{ direction_list_template }}'
 {% endif %}
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="{{ sentry_url }}",
+    integrations=[DjangoIntegration()],
+    send_default_pii=True,
+    request_bodies='medium',
+)
