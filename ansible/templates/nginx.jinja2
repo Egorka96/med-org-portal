@@ -1,6 +1,6 @@
 server {
-    server_name {{ web_server_name }};
-    listen {{ web_server_name }}:443 ssl;
+    server_name {{ ALLOWED_HOSTS }};
+    listen 443 ssl;
 
     access_log  /var/log/www/{{ web_server_name }}/access.log;
     error_log   /var/log/www/{{ web_server_name }}/error.log;
@@ -42,7 +42,7 @@ server {
     } # managed by Certbot
 
 
-    listen      {{ ALLOWED_HOSTS }}:80;
+    listen      80;
     server_name {{ ALLOWED_HOSTS }};
     return 404; # managed by Certbot
 }

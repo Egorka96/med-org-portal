@@ -41,7 +41,7 @@
 
     - name: create conf directory
       file:
-        path: "var/docker/conf/{{ web_server_name }}"
+        path: "/var/docker/conf/{{ web_server_name }}"
         state: directory
         owner: www-data
         group: www-data
@@ -57,8 +57,6 @@
       docker_container:
         image: postgres:11
         name: "{{ web_server_name }}-db"
-        ports:
-          - 127.0.0.1:5432:5432
         volumes:
           - "/var/docker/{{ web_server_name }}/db:/var/lib/postgresql/data/"
         restart_policy: always
