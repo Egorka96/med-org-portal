@@ -1,0 +1,35 @@
+# ansible-playbook -i ansible/inventory -u ansible -v ansible/install_certbot.yml
+
+- name: Install CERTBOT
+  hosts: "{{ host }}"
+  become: yes
+  become_method: sudo
+
+  tasks:
+#    - name: Install software-properties-common
+#      apt:
+#        name: software-properties-common
+#        cache_valid_time: 1000
+
+#    - name: add-apt-repository universe
+#        shell: add-apt-repository universe
+#
+#    - name: add certbot ppa
+#      shell: add-apt-repository ppa:certbot/certbot
+#
+#    - name: update apt
+#      apt: update_cache=true
+
+    - name: Install certbot
+      apt: name={{ item }}
+      with_items:
+        - certbot
+        - python-certbot-nginx
+
+    - name: Add renew to crontab
+      cron:
+        name: "renew certbot"
+        minute: "0"
+        hour: "3"
+        weekday: "2,6"
+        job: "certbot renew"

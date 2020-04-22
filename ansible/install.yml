@@ -36,11 +36,12 @@
         recurse: yes
       with_items:
         - "/var/www/{{ web_server_name }}/static"
+        - "/var/www/{{ web_server_name }}/media"
         - "/var/log/www/{{ web_server_name }}"
 
     - name: create conf directory
       file:
-        path: "/conf/{{ web_server_name }}"
+        path: "var/docker/conf/{{ web_server_name }}"
         state: directory
         owner: www-data
         group: www-data
@@ -49,14 +50,8 @@
     - name: create settings
       template:
         src: local_settings.py.jinja2
-        dest: "/conf/{{ web_server_name }}/local_settings.py"
+        dest: "/var/docker/conf/{{ web_server_name }}/local_settings.py"
         mode: 0600
-
-#    - name: login DockerHub
-#      docker_login:
-#        username: "{{ dockerhub_login }}"
-#        email: "{{ dockerhub_email }}"
-#        password: "{{ dockerhub_password }}"
 
     - name: Start container db
       docker_container:
