@@ -36,6 +36,7 @@
     <th>Дата рождения</th>
     <th>Пол</th>
     <th>Подразделение</th>
+    <th>Должность</th>
     {% if show_orgs %}<th>Организация</th>{% endif %}
     <th>Вид осмотра</th>
     <th>Пункты приказа</th>
@@ -55,6 +56,11 @@
     <td>{{ object.client.birth|iso_to_date }}</td>
     <td>{{ object.client.gender }}</td>
     <td>{{ object.prof.0.shop }}</td>
+    <td>
+        {% for post in object.posts %}
+            {{ post }} {% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </td>
     {% if show_orgs %}
         <td>
             {% for org in object.orgs %}
