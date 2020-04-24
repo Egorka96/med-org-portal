@@ -3,6 +3,7 @@ import shutil
 import tempfile
 from typing import Optional, List, Dict
 
+import jinja2
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.http import HttpResponse
@@ -12,6 +13,7 @@ from django.views.generic.edit import FormMixin as DjangoFormMixin
 from docxtpl import DocxTemplate, InlineImage
 from swutils.string import transliterate
 
+from core.templatetags.custom_tags import get_jinja_filters
 from mis.service_client import Mis
 
 
@@ -244,7 +246,10 @@ class DocxMixin:
                         docx, image_params.path, width=image_params.width, height=image_params.height
                     )
 
-            docx.render(context)
+            jinja_env = jinja2.Environment()
+            jinja_env.filters.update(get_jinja_filters())
+
+            docx.render(context, jinja_env=jinja_env)
             docx.save(docx_path)
 
             with open(docx_path, mode='rb') as file:

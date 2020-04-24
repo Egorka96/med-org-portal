@@ -8,6 +8,7 @@ from django.conf import settings
 from django.utils.timezone import now
 from djutils.date_utils import iso_to_date
 
+from mis.law_item import LawItem
 from mis.org import Org
 
 
@@ -27,8 +28,8 @@ class Direction:
     org: Org = None
     post: str = None
     shop: str = None
-    law_items_section_1: List[Dict] = None
-    law_items_section_2: List[Dict] = None
+    law_items_section_1: List[LawItem] = None
+    law_items_section_2: List[LawItem] = None
     pay_method: dict = None
 
     def __str__(self):
@@ -66,8 +67,8 @@ class Direction:
                 exam_type=item['exam_type'],
                 post=item['post'],
                 shop=item['shop'],
-                law_items_section_1=[l_i for l_i in item.get('law_items', []) if l_i['section'] == 1],
-                law_items_section_2=[l_i for l_i in item.get('law_items', []) if l_i['section'] == 2]
+                law_items_section_1=[LawItem.get(law_item_id=l_i['id']) for l_i in item.get('law_items', []) if l_i['section'] == 1],
+                law_items_section_2=[LawItem.get(law_item_id=l_i['id']) for l_i in item.get('law_items', []) if l_i['section'] == 2]
             ))
         return directions
 
@@ -93,8 +94,8 @@ class Direction:
             exam_type=result['exam_type'],
             post=result['post'],
             shop=result['shop'],
-            law_items_section_1=[l_i for l_i in result.get('law_items', []) if l_i['section'] == '1'],
-            law_items_section_2=[l_i for l_i in result.get('law_items', []) if l_i['section'] == '2']
+            law_items_section_1=[LawItem.get(law_item_id=l_i['id']) for l_i in result.get('law_items', []) if l_i['section'] == '1'],
+            law_items_section_2=[LawItem.get(law_item_id=l_i['id']) for l_i in result.get('law_items', []) if l_i['section'] == '2']
         )
         return direction
 

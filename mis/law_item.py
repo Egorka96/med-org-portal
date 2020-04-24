@@ -10,6 +10,7 @@ class LawItem:
     id: int
     name: str
     section: str
+    description: str
 
     def __str__(self):
         return f'{self.name} прил.{self.section}'
@@ -28,6 +29,7 @@ class LawItem:
                 id=item['id'],
                 name=item['name'],
                 section=item['section'],
+                description=item['description'],
             ))
         return law_items
 
@@ -44,4 +46,5 @@ class LawItem:
             id=law_item_data['id'],
             name=law_item_data['name'],
             section=law_item_data['section'],
+            description=law_item_data['description'],
         )
