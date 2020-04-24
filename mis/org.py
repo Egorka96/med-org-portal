@@ -12,7 +12,7 @@ class Org:
     legal_name: str = None
 
     def __str__(self):
-        return self.name
+        return self.legal_name or self.name
 
     @classmethod
     def filter(cls, params: Dict = None) -> List['Org']:
@@ -24,11 +24,7 @@ class Org:
 
         orgs = []
         for item in response.json()['results']:
-            orgs.append(cls(
-                id=item['id'],
-                name=item['name'],
-                legal_name=item['legal_name'],
-            ))
+            orgs.append(cls.get_from_dict(item))
         return orgs
 
     @classmethod
@@ -39,9 +35,13 @@ class Org:
         response.raise_for_status()
 
         result = response.json()
+        return cls.get_from_dict(result)
+
+    @classmethod
+    def get_from_dict(cls, data) -> 'Org':
         org = cls(
-            id=result['id'],
-            name=result['name'],
-            legal_name=result['legal_name'],
+            id=data['id'],
+            name=data.get('name'),
+            legal_name=data['legal_name'],
         )
         return org

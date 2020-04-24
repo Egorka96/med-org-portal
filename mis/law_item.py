@@ -25,12 +25,7 @@ class LawItem:
 
         law_items = []
         for item in response.json()['results']:
-            law_items.append(cls(
-                id=item['id'],
-                name=item['name'],
-                section=item['section'],
-                description=item['description'],
-            ))
+            law_items.append(cls.get_from_dict(item))
         return law_items
 
     @classmethod
@@ -42,9 +37,13 @@ class LawItem:
         response.raise_for_status()
 
         law_item_data = response.json()
+        return cls.get_from_dict(law_item_data)
+
+    @classmethod
+    def get_from_dict(cls, data: dict) -> 'LawItem':
         return cls(
-            id=law_item_data['id'],
-            name=law_item_data['name'],
-            section=law_item_data['section'],
-            description=law_item_data['description'],
+            id=data['id'],
+            name=data['name'],
+            section=data['section'],
+            description=data.get('description'),
         )

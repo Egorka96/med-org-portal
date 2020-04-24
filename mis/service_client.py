@@ -25,18 +25,18 @@ class Mis:
     def is_out_used(self) -> bool:
         return self.get_status()['is_out_used']
 
-    def get_response(self, path, request, params = None, method='get'):
+    def request(self, path, user=None, params=None, data=None, method='get'):
         assert method in ('get', 'post')
 
-        if params and request.user.core.org_ids and not params.get('orgs'):
+        if params and user and user.core.org_ids and not params.get('orgs'):
             params.update({
-                'orgs': json.loads(request.user.core.org_ids)
+                'orgs': json.loads(user.core.org_ids)
             })
 
         url = settings.MIS_URL + path
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
-        response = requests.request(method, url=url, headers=headers, params=params)
+        response = requests.request(method, url=url, headers=headers, params=params, data=data)
         response.raise_for_status()
 
         return response.json()

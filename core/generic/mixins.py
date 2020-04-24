@@ -71,9 +71,9 @@ class RestListMixin:
             form = self.get_form()
             filter_params = self.get_filter_params()
             if form.is_valid() or (not form.is_bound and filter_params):
-                response_data = Mis().get_response(
+                response_data = Mis().request(
                     path=self.mis_request_path,
-                    request=self.request,
+                    user=self.request.user,
                     params=filter_params,
                 )
                 self.object_list = response_data['results']

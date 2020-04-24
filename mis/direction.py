@@ -10,6 +10,7 @@ from djutils.date_utils import iso_to_date
 
 from mis.law_item import LawItem
 from mis.org import Org
+from mis.service_client import Mis
 
 
 @dataclass
@@ -45,14 +46,8 @@ class Direction:
 
     @classmethod
     def filter(cls, params: Dict = None) -> List['Direction']:
-        url = settings.MIS_URL + f'/api/pre_record/'
-        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-
-        response = requests.get(url, params=params, headers=headers)
-        response.raise_for_status()
-
         directions = []
-        for item in response.json()['results']:
+        for item in Mis().request(path='/api/pre_record/', params=params)['results']:
             directions.append(cls(
                 number=item['id'],
                 last_name=item['last_name'],
@@ -62,24 +57,19 @@ class Direction:
                 gender=item['gender'],
                 from_date=iso_to_date(item['date_from']),
                 to_date=iso_to_date(item['date_to']),
-                org=Org.get(org_id=item['org']['id']) if item.get('org') else None,
+                org=Org.get_from_dict(data=item['org']) if item.get('org') else None,
                 pay_method=item['pay_method'],
                 exam_type=item['exam_type'],
                 post=item['post'],
                 shop=item['shop'],
-                law_items_section_1=[LawItem.get(law_item_id=l_i['id']) for l_i in item.get('law_items', []) if l_i['section'] == 1],
-                law_items_section_2=[LawItem.get(law_item_id=l_i['id']) for l_i in item.get('law_items', []) if l_i['section'] == 2]
+                law_items_section_1=[LawItem.get_from_dict(l_i) for l_i in item.get('law_items', []) if l_i['section'] == '1'],
+                law_items_section_2=[LawItem.get_from_dict(l_i) for l_i in item.get('law_items', []) if l_i['section'] == '2']
             ))
         return directions
 
     @classmethod
     def get(cls, direction_id) -> 'Direction':
-        url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
-        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-
-        result = response.json()
+        result = Mis().request(path=f'/api/pre_record/{direction_id}/')
         direction = cls(
             number=result['id'],
             last_name=result['last_name'],
@@ -89,13 +79,13 @@ class Direction:
             gender=result['gender'],
             from_date=iso_to_date(result['date_from']),
             to_date=iso_to_date(result['date_to']),
-            org=Org.get(org_id=result['org']['id']) if result.get('org') else None,
+            org=Org.get_from_dict(data=result['org']) if result.get('org') else None,
             pay_method=result['pay_method'],
             exam_type=result['exam_type'],
             post=result['post'],
             shop=result['shop'],
-            law_items_section_1=[LawItem.get(law_item_id=l_i['id']) for l_i in result.get('law_items', []) if l_i['section'] == '1'],
-            law_items_section_2=[LawItem.get(law_item_id=l_i['id']) for l_i in result.get('law_items', []) if l_i['section'] == '2']
+            law_items_section_1=[LawItem.get_from_dict(l_i) for l_i in result.get('law_items', []) if l_i['section'] == '1'],
+            law_items_section_2=[LawItem.get_from_dict(l_i) for l_i in result.get('law_items', []) if l_i['section'] == '2']
         )
         return direction
 
@@ -105,7 +95,7 @@ class Direction:
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
         params['date_from'] = now().date()
-        params['date_to'] = params['date_from'] + relativedelta(months=1)
+        params['date_to'] = params['date_from'] + relativedelta(days=settings.DIRECTION_ACTION_DAYS)
         params['order_types'] = [2]  # ПРОФ осмотр
 
         if params.get('law_items_section_1') or params.get('law_items_section_2'):
