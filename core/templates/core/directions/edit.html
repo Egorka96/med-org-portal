@@ -2,23 +2,24 @@
 {% load bootstrap4 %}
 
 {% block fields %}
+    <legend>Направление на осмотр {% if object.number %}№{{ object.number }}{% endif %}</legend>
     <div class="row">
-        <div class="col-sm-4">{% bootstrap_field form.last_name %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.first_name %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.middle_name %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.birth %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.gender %}</div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4">{% bootstrap_field form.org %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.post %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.shop %}</div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4">{% bootstrap_field form.exam_type %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.law_items_section_1 %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.law_items_section_2 %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.pay_method %}</div>
+        <div class="col-sm-5 border-right">
+            {% bootstrap_field form.last_name layout='horizontal' %}
+            {% bootstrap_field form.first_name layout='horizontal' %}
+            {% bootstrap_field form.middle_name layout='horizontal' %}
+            {% bootstrap_field form.birth layout='horizontal' %}
+            {% bootstrap_field form.gender layout='horizontal' %}
+        </div>
+        <div class="col-sm-7">
+            {% bootstrap_field form.org layout='horizontal' %}
+            {% bootstrap_field form.post layout='horizontal' %}
+            {% bootstrap_field form.shop layout='horizontal' %}
+            {% bootstrap_field form.exam_type layout='horizontal' %}
+            {% bootstrap_field form.law_items_section_1 layout='horizontal' %}
+            {% bootstrap_field form.law_items_section_2 layout='horizontal' %}
+            {% bootstrap_field form.pay_method layout='horizontal' %}
+        </div>
     </div>
 {% endblock %}
 
@@ -34,7 +35,8 @@
 
         <div class="col-6 text-right">
             {% if object.number %}
-                <a class="btn btn-outline-secondary" href="{% url 'core:direction_print' object.number %}" data-toggle="tooltip" title="Распечатать направление на осмотр">
+                <a class="btn btn-outline-secondary" href="{% url 'core:direction_print' object.number %}"
+                   data-toggle="tooltip" title="Распечатать направление на осмотр">
                     <i class="fa fa-print"></i> Печать
                 </a>
             {% endif %}

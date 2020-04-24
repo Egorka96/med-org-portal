@@ -242,10 +242,17 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Fo
     post = forms.CharField(label='Должность', required=False)
     shop = forms.CharField(label='Подразделение', required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, current_user, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['last_name'].required = True
         self.fields['first_name'].required = True
         self.fields['exam_type'].required = True
         self.fields['exam_type'].initial = 'Периодический'
+
+        user_orgs = current_user.core.get_orgs()
+        if user_orgs and len(user_orgs) < 2:
+            org = user_orgs[0]
+            self.fields['org'].initial = org.id
+            self.fields['org'].choices = [(org.id, str(org))]
+            self.fields['org'].widget = forms.HiddenInput()

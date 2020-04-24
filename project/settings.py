@@ -156,6 +156,9 @@ TEMPLATES_DICT = {
     "direction_list": 'core/directions/list.html',
 }
 
+# время лейсвия направления (в днях)
+DIRECTION_ACTION_DAYS = 30
+
 
 try:
     from project.local_settings import *

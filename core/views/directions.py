@@ -82,6 +82,11 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
 
         return initial
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['current_user'] = self.request.user
+        return kwargs
+
     def get_object(self):
         object_pk = self.kwargs.get(self.pk_url_kwarg)
         if object_pk:
