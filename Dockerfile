@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get clean && apt-get update && apt-get install -y \
         vim curl supervisor locales tzdata libpq-dev postgresql-client \
-        libjpeg-dev zlib1g-dev python3-dev python3-lxml npm \
+        libxml2-dev libjpeg-dev zlib1g-dev python3-dev python3-lxml npm \
     && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen ru_RU.UTF-8
