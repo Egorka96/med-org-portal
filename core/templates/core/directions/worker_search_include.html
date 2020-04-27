@@ -1,0 +1,38 @@
+{% load static %}
+
+<div class="worker-search-result-modal" style="display: none">
+    <button type="button" class="close close-worker-search-result" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+
+
+    <legend>Похожие сотрудники в базе МИС</legend>
+    <div id="workersSearch" class="worker-search">
+        <div v-if="workers.length">
+            <div class="row" v-for="worker in workers">
+                <div class="col-sm-12 text-left">
+                    <button type="button" class="btn btn-light btn-block text-left" @click="choiceWorker(worker)">
+                        [[ worker.last_name ]] [[ worker.first_name ]] [[ worker.middle_name ]] ([[ worker.birth_rus ]])
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <div class="alert alert-warning">Похожих сотрудников не найдено</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .worker-search-result-modal {
+        background-color: #d0cfcf;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 9;
+        top: -30px;
+        left: 0;
+    }
+</style>
+
+<script src="{% static 'core/js/workers_search_include.js' %}"></script>

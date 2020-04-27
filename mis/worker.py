@@ -27,9 +27,9 @@ class Worker:
         return ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
 
     @classmethod
-    def filter(cls, params: Dict = None) -> List['Worker']:
+    def filter(cls, params: Dict = None, user = None) -> List['Worker']:
         workers = []
-        for item in Mis().request(path='/api/workers/', params=params)['results']:
+        for item in Mis().request(path='/api/workers/', params=params, user=user)['results']:
             workers.append(cls.get_from_dict(item))
         return workers
 

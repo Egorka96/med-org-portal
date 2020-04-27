@@ -11,6 +11,7 @@
             {% bootstrap_field form.birth layout='horizontal' %}
             {% bootstrap_field form.gender layout='horizontal' %}
         </div>
+
         <div class="col-sm-7">
             {% bootstrap_field form.org layout='horizontal' %}
             {% bootstrap_field form.post layout='horizontal' %}
@@ -19,6 +20,8 @@
             {% bootstrap_field form.law_items_section_1 layout='horizontal' %}
             {% bootstrap_field form.law_items_section_2 layout='horizontal' %}
             {% bootstrap_field form.pay_method layout='horizontal' %}
+
+            {% include 'core/directions/worker_search_include.html' %}
         </div>
     </div>
 {% endblock %}

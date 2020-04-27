@@ -107,6 +107,9 @@ class OrgsMixin(forms.Form):
 
             if values:
                 for value in values:
+                    if not value:
+                        continue
+
                     org = Org.get(org_id=value)
                     choices.append((org.id, org.name))
 

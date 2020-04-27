@@ -6,6 +6,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from swutils.date import date_to_rus
 
 from mis.law_item import LawItem
 from mis.org import Org
@@ -54,5 +55,8 @@ class Workers(APIView):
     def get(self, request, *args, **kwargs):
         filter_params = copy(self.request.GET)
 
-        workers = Worker.filter(params=filter_params)
-        return Response({'results': [dataclasses.asdict(w) for w in workers]})
+        workers = Worker.filter(params=filter_params, user=self.request.user)
+        workers_dict = [dataclasses.asdict(w) for w in workers]
+        for w in workers_dict:
+            w['birth_rus'] = date_to_rus(w['birth'])
+        return Response({'results': workers_dict})
