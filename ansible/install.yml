@@ -75,6 +75,7 @@
           - "/conf/{{ web_server_name }}:/conf"
           - "/var/www/{{ web_server_name }}/static:/static"
         restart_policy: always
+        pull: yes
         state: started
         etc_hosts: {"db": "{{ db_host }}"}
         ports:

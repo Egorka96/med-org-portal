@@ -1,6 +1,6 @@
 server {
     server_name {{ ALLOWED_HOSTS }};
-    listen 443 ssl;
+    {% if not without_ssl is defined %}listen 443 ssl;{% endif %}
 
     access_log  /var/log/www/{{ web_server_name }}/access.log;
     error_log   /var/log/www/{{ web_server_name }}/error.log;
@@ -29,13 +29,16 @@ server {
         client_max_body_size  10m;
     }
 
-
+    {% if not without_ssl is defined %}
     ssl_certificate /etc/letsencrypt/live/{{ ALLOWED_HOSTS }}/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/{{ ALLOWED_HOSTS }}/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+    {% endif %}
 
 }
+
+{% if not without_ssl is defined %}
 server {
     if ($host = {{ ALLOWED_HOSTS }}) {
         return 301 https://$host$request_uri;
@@ -46,3 +49,4 @@ server {
     server_name {{ ALLOWED_HOSTS }};
     return 404; # managed by Certbot
 }
+{% endif %}
