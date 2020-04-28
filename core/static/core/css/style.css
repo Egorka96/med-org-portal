@@ -61,3 +61,8 @@ a:not([href]):not([tabindex]):hover {
 label {
     word-wrap: break-word; /* Перенос слов */
 }
+
+/* убираю bootstrapовские галочки в поле */
+.form-control.is-valid {
+    background-image: none;
+}
