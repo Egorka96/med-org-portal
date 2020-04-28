@@ -49,35 +49,49 @@
 
 <body>
     {% block body %}
-        {% block navbar %}
-            <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
-                <div class="container">
-                    {% if user.is_authenticated %}
-                        <a class="navbar-brand" href="/">ПОРТАЛ</a>
-                        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse" id="navbarResponsive">
-                            <ul class="navbar-nav ml-auto">
-            {#                    <li class="nav-item">#}
-            {#                        <a class="nav-link" href="about.html">About</a>#}
-            {#                    </li>#}
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fa fa-user"></i> {{ user }}
+        {% block pre_navbar %}
+            <div class="container med-center-detail">
+                <div class="row">
+                    <div class="col-sm-3">
+                        {% block pre_navbar_logo %}
+                            <a class="navbar-brand" href="{% url 'core:index' %}">
+                                ЛИЧНЫЙ КАБИНЕТ
+                            </a>
+                        {% endblock %}
+                    </div>
+                    {% block pre_navbar_additional %}
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-2"></div>
+                    {% endblock %}
+                    {% block pre_navbar_user %}
+                        <div class="col-sm-5 text-right">
+                            {% if user.is_authenticated %}
+                                <li class="dropdown dropdown-user">
+                                    <a class="dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-user"></i> {{ user.core.get_fio|default:user.username }}
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
                                         {% if user.is_staff %}
-                                            <a class="dropdown-item" href="/admin/">Панель администратора</a>
+                                            <a class="dropdown-item" href="/admin/">
+                                                <i class="fa fa-cogs"></i> Панель администратора
+                                            </a>
                                         {% endif %}
-                                        <a class="dropdown-item" href="{% url 'logout' %}">Выход</a>
+                                        <a class="dropdown-item" href="{% url 'logout' %}">
+                                            <i class="fa fa-sign-out"></i> Выход
+                                        </a>
                                     </div>
                                 </li>
-                            </ul>
+                            {% endif %}
                         </div>
-                    {% endif %}
+                    {% endblock %}
                 </div>
-            </nav>
+            </div>
+        {% endblock %}
+
+        {% block navbar %}
+            <span class="navbar">
+                <div class="container"></div>
+            </span>
         {% endblock %}
 
         {% block page_content %}

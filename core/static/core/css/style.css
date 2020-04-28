@@ -3,12 +3,13 @@
  * Copyright 2013-2019 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-logomodern-business-nav/blob/master/LICENSE)
  */
-body {
-    padding-top: 56px;
-}
 
 footer {
     padding-top: 30px;
+}
+
+body {
+    background: linear-gradient(90deg, rgba(185,212,238,0.6839110644257703) 5%, rgba(191,214,226,0.14049369747899154) 44%, rgba(177,213,233,0.7651435574229692) 89%);
 }
 
 .carousel-item {
@@ -29,17 +30,45 @@ footer {
     margin-bottom: 5px;
 }
 
-.index-btn{
-    height: 125px;
+.index-btn {
+    width: 200px;
+    height: 200px;
     font-size: 20px;
+    margin-left: 10px;
+}
+
+.index-btn-small-text {
+  font-size: 16px
 }
 
 .index-btn i{
-    margin-top: 10px;
-    font-size: 25px;
-    border: 2px solid #ffffff;
+    margin-top: 25px;
+    font-size: 45px;
     padding: 10px;
-    border-radius: 5px;
+}
+
+.btn-index-info {
+    background-color: #459cf0;
+    border-color: #459cf0;
+    color: white;
+}
+
+.btn-index-info:hover {
+    background-color: #4077c6;
+    border-color: #4077c6;
+    color: white;
+}
+
+.btn-index-primary {
+    background-color: #3765ab;
+    border-color: #3765ab;
+    color: white;
+}
+
+.btn-index-primary:hover {
+    background-color: #4988e1;
+    border-color: #3f69b7;
+    color: white;
 }
 
 .report-table{
@@ -62,7 +91,40 @@ label {
     word-wrap: break-word; /* Перенос слов */
 }
 
-/* убираю bootstrapовские галочки в поле */
+.med-center-detail {
+    margin-bottom: 25px;
+}
+
+.navbar {
+    background-color: #2781ee;
+    color: white;
+    min-height: 35px;
+}
+
+.navbar-brand {
+    color: rgba(29, 67, 157, 0.84);
+}
+
+.dropdown-user {
+    margin-top: 10px;
+    list-style: none;
+    padding-left: 0;
+}
+
+.dropdown-user > a {
+    font-size: 16px;
+    color: rgba(29, 67, 157, 0.84);
+}
+
+.dropdown-menu-right > a {
+    color: #2472c4;
+}
+
+.index-content {
+    margin-top: 50px;
+}
+
+/* убирал bootstrapовские галочки в поле */
 .form-control.is-valid {
     background-image: none;
 }
