@@ -98,11 +98,30 @@ label {
 .navbar {
     background-color: #2781ee;
     color: white;
-    min-height: 35px;
+    min-height: 45px;
 }
 
 .navbar-brand {
-    color: rgba(29, 67, 157, 0.84);
+    color: white;
+    margin-top: -5px;
+    margin-bottom: -5px;
+}
+
+.navbar-brand:hover {
+    background-color: #2781ee;
+}
+
+.nav-link {
+    color: white;
+    background-color: #2472c4;
+    font-size: 14px;
+    margin-top: -5px;
+    margin-bottom: -5px;
+}
+
+.nav-link:hover, .nav-link-active {
+    color: white;
+    background-color: #2699f3;
 }
 
 .dropdown-user {

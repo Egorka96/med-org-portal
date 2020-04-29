@@ -54,9 +54,6 @@
                 <div class="row">
                     <div class="col-sm-3">
                         {% block pre_navbar_logo %}
-                            <a class="navbar-brand" href="{% url 'core:index' %}">
-                                ЛИЧНЫЙ КАБИНЕТ
-                            </a>
                         {% endblock %}
                     </div>
                     {% block pre_navbar_additional %}
@@ -89,33 +86,59 @@
         {% endblock %}
 
         {% block navbar %}
-            <span class="navbar">
-                <div class="container"></div>
-            </span>
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    <a class="navbar-brand" href="/">Личный кабинет</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarText">
+                        <ul class="navbar-nav navbar-center">
+                            {% if user.is_authenticated and request.path != '/' %}
+                                {% if perms.core.view_workers_done_report %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'core:workers_done_report' %}">Отчет по прошедшим</a>
+                                    </li>
+                                {% endif %}
+                                {% if perms.core.view_direction %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'core:direction_list' %}">Направления</a>
+                                    </li>
+                                {% endif %}
+                                {% if perms.auth.view_user %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'core:user' %}">Пользователи</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
         {% endblock %}
 
         {% block page_content %}
             <!-- Page Content -->
             <div class="container page-content">
-                <div class="row">
-                    <div class="col-sm-12">
-                        {% block breadcrumbs %}
-                            {% if breadcrumbs %}
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    {% for label, url in breadcrumbs %}
-                                        {% if not forloop.last and url %}
-                                            <li class="breadcrumb-item"><a href="{{ url }}">{{ label }}</a></li>
-                                        {% else %}
-                                            <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ol>
-                            </nav>
-                            {% endif %}
-                        {% endblock breadcrumbs %}
-                    </div>
-                </div>
+{#                <div class="row">#}
+{#                    <div class="col-sm-12">#}
+{#                        {% block breadcrumbs %}#}
+{#                            {% if breadcrumbs %}#}
+{#                            <nav aria-label="breadcrumb">#}
+{#                                <ol class="breadcrumb">#}
+{#                                    {% for label, url in breadcrumbs %}#}
+{#                                        {% if not forloop.last and url %}#}
+{#                                            <li class="breadcrumb-item"><a href="{{ url }}">{{ label }}</a></li>#}
+{#                                        {% else %}#}
+{#                                            <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>#}
+{#                                        {% endif %}#}
+{#                                    {% endfor %}#}
+{#                                </ol>#}
+{#                            </nav>#}
+{#                            {% endif %}#}
+{#                        {% endblock breadcrumbs %}#}
+{#                    </div>#}
+{#                </div>#}
 
                 {# django-messages (используются, например, при сообщении о сохранении, ошибках формы и т.п.) #}
                 {% block messages %}
@@ -185,6 +208,15 @@
                             .removeAttr('selected')
                             .not(':radio, .no-clean')
                             .val('').trigger('change');
+                    });
+
+                    let current = location.pathname;
+                    $('.navbar-nav li a').each(function(){
+                        let $this = $(this);
+                        // if the current path is like this link, make it active
+                        if (current.indexOf($this.attr('href')) !== -1){
+                            $this.addClass('nav-link-active');
+                        }
                     })
                 })
             </script>

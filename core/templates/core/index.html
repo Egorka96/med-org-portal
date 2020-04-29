@@ -5,8 +5,7 @@
         <div class="row">
             <div class="col-sm-12 text-center">
                 {% if perms.core.view_workers_done_report %}
-                    <a class="btn btn-index-primary index-btn" href="{% url 'core:workers_done_report' %}"
-                        data-toggle="tooltip" data-placement="bottom" title="Отчет по прошедшим">
+                    <a class="btn btn-index-primary index-btn" href="{% url 'core:workers_done_report' %}">
                          <p><i class="fa fa-list"></i></p>
                             Прошедшие
                             <p class="index-btn-small-text">отчет по прошедшим</p>
@@ -14,8 +13,7 @@
                 {% endif %}
 
                 {% if perms.core.view_direction %}
-                     <a class="btn btn-index-info index-btn" href="{% url 'core:direction_list' %}"
-                        data-toggle="tooltip" data-placement="bottom" title="Направления сотрудников на ПРОФ осмотр">
+                     <a class="btn btn-index-info index-btn" href="{% url 'core:direction_list' %}">
                          <p><i class="fa fa-address-card"></i></p>
                          Направления
                          <p class="index-btn-small-text">сотрудников на осмотр</p>
