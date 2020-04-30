@@ -18,6 +18,7 @@ class WorkersDoneExcel(Excel):
             'Дата рождения': 13,
             'Пол': 10,
             'Подразделение': 30,
+            'Должность': 30,
         }
 
         if self.show_orgs:
@@ -46,6 +47,7 @@ class WorkersDoneExcel(Excel):
                 date_to_rus(iso_to_date(obj['client']['birth'])),
                 obj['client']['gender'],
                 obj['prof'][0]['shop'] if obj.get('prof') else '',
+                ', '.join(obj['posts']),
             ]
 
             if self.show_orgs:
