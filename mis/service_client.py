@@ -28,15 +28,19 @@ class Mis:
     def request(self, path, user=None, params=None, data=None, method='get'):
         assert method in ('get', 'post')
 
-        if params and user and user.core.org_ids and not params.get('orgs'):
-            params.update({
-                'orgs': json.loads(user.core.org_ids)
-            })
+        if user and user.core.org_ids:
+            if not params:
+                params = dict()
+
+            if not params.get('orgs'):
+                params.update({
+                    'orgs': json.loads(user.core.org_ids)
+                })
 
         url = settings.MIS_URL + path
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
-        response = requests.request(method, url=url, headers=headers, params=params, data=data)
+        response = requests.request(method=method, url=url, headers=headers, params=params, data=data)
         response.raise_for_status()
 
         return response.json()
