@@ -141,9 +141,7 @@
 
         {% block footer %}
             <footer class="text-center">
-                {% if user.is_authenticated %}
-                    {{ BRAND|safe }}
-                {% endif %}
+                {{ BRAND|safe }}
             </footer>
         {% endblock %}
 
