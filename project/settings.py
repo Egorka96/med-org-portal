@@ -160,9 +160,6 @@ TEMPLATES_DICT = {
 # время лейсвия направления (в днях)
 DIRECTION_ACTION_DAYS = 30
 
-BRAND = "<a href='https://github.com/Egorka96/med-org-portal' target='_blank'>&copy; Egor Razzhivkin 2020</a>"
-
-
 try:
     from project.local_settings import *
 except ImportError:
