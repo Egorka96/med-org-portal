@@ -7,3 +7,7 @@ def base_templates(request):
     return {
         'BASE_TEMPLATE': base_template
     }
+
+
+def brand(request):
+    return {'BRAND': settings.BRAND}

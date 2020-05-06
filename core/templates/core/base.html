@@ -121,26 +121,6 @@
         {% block page_content %}
             <!-- Page Content -->
             <div class="container page-content">
-{#                <div class="row">#}
-{#                    <div class="col-sm-12">#}
-{#                        {% block breadcrumbs %}#}
-{#                            {% if breadcrumbs %}#}
-{#                            <nav aria-label="breadcrumb">#}
-{#                                <ol class="breadcrumb">#}
-{#                                    {% for label, url in breadcrumbs %}#}
-{#                                        {% if not forloop.last and url %}#}
-{#                                            <li class="breadcrumb-item"><a href="{{ url }}">{{ label }}</a></li>#}
-{#                                        {% else %}#}
-{#                                            <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>#}
-{#                                        {% endif %}#}
-{#                                    {% endfor %}#}
-{#                                </ol>#}
-{#                            </nav>#}
-{#                            {% endif %}#}
-{#                        {% endblock breadcrumbs %}#}
-{#                    </div>#}
-{#                </div>#}
-
                 {# django-messages (используются, например, при сообщении о сохранении, ошибках формы и т.п.) #}
                 {% block messages %}
                     {% if messages %}
@@ -156,15 +136,15 @@
                 {% endblock %}
 
                 {% block container %}{% endblock %}
-
-                {% block footer %}
-                    <footer class="text-right">
-                        {% if user.is_authenticated %}
-                            <p>{{ BRAND.FOOTER_LINK|safe }}</p>
-                        {% endif %}
-                    </footer>
-                {% endblock %}
             </div>
+        {% endblock %}
+
+        {% block footer %}
+            <footer class="text-center">
+                {% if user.is_authenticated %}
+                    {{ BRAND|safe }}
+                {% endif %}
+            </footer>
         {% endblock %}
 
         {% block loader %}

@@ -72,6 +72,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.base_templates',
+                'core.context_processors.brand',
             ],
         },
     },
@@ -158,6 +159,8 @@ TEMPLATES_DICT = {
 
 # время лейсвия направления (в днях)
 DIRECTION_ACTION_DAYS = 30
+
+BRAND = "<a href='https://github.com/Egorka96/med-org-portal' target='_blank'>&copy; Egor Razzhivkin 2020</a>"
 
 
 try:
