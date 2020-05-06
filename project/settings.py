@@ -72,7 +72,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.base_templates',
-                'core.context_processors.brand',
             ],
         },
     },

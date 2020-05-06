@@ -8,6 +8,3 @@ def base_templates(request):
         'BASE_TEMPLATE': base_template
     }
 
-
-def brand(request):
-    return {'BRAND': settings.BRAND}
