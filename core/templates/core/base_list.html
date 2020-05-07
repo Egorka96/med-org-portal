@@ -8,6 +8,12 @@
         .paginator-row{
             margin-top: 20px;
         }
+
+        .table-container {
+            max-width: 100%;
+            max-height: 1080px;
+            overflow: auto;
+        }
     </style>
 {% endblock %}
 
@@ -61,6 +67,7 @@
     {% if object_list %}
         {% include 'core/paginator.html' %}
         {% block table %}
+            <div class="table-container">
             <table class="report-table table table-striped table-hover">
                 <thead>
                 {% block thead %}
@@ -81,6 +88,7 @@
                 {% endblock tbody %}
                 </tbody>
             </table>
+            </div>
         {% endblock table %}
         {% include 'core/paginator.html' %}
     {% elif form.is_bound and request.GET %}
