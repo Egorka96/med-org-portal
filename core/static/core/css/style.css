@@ -166,6 +166,11 @@ label {
     margin-top: 50px;
 }
 
+.alert {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 /* убирал bootstrapовские галочки в поле */
 .form-control.is-valid {
     background-image: none;
