@@ -1,1 +1,1 @@
-157.245.240.50 ansible_python_interpreter=/usr/bin/python2
+157.245.240.50 ansible_python_interpreter=/usr/bin/python2 web_server_name=portal deploy=stage ALLOWED_HOSTS=157.245.240.50 portal_port=8030

@@ -1,29 +1,29 @@
 server {
     server_name {{ ALLOWED_HOSTS }};
-    {% if not without_ssl is defined %}listen 443 ssl;{% endif %}
+    {% if not without_ssl is defined %}listen {{ ALLOWED_HOSTS }}:443 ssl;{% endif %}
 
-    access_log  /var/log/www/{{ web_server_name }}/access.log;
-    error_log   /var/log/www/{{ web_server_name }}/error.log;
+    access_log  /var/log/www/{{ ALLOWED_HOSTS }}/access.log;
+    error_log   /var/log/www/{{ ALLOWED_HOSTS }}/error.log;
 
     client_header_buffer_size 64k;
     large_client_header_buffers 4 64k;
 
     location /node_modules {
-        alias /var/www/{{ web_server_name }}/static/node_modules;
+        alias {{ static_path }}/node_modules;
     }
 
     location /static {
-        alias /var/www/{{ web_server_name }}/static;
+        alias {{ static_path }};
     }
 
     location /media {
-        alias /var/www/{{ web_server_name }}/media;
+        alias {{ media_path }};
     }
 
     location / {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Host $http_host;
-        proxy_pass http://127.0.0.1:{{ service_port }}/;
+        proxy_pass http://127.0.0.1:{{ portal_port }}/;
         proxy_connect_timeout 600s;
         proxy_read_timeout 600s;
         client_max_body_size  10m;
@@ -35,7 +35,6 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
     {% endif %}
-
 }
 
 {% if not without_ssl is defined %}
@@ -45,7 +44,7 @@ server {
     } # managed by Certbot
 
 
-    listen      80;
+    listen      {{ ALLOWED_HOSTS }}:80;
     server_name {{ ALLOWED_HOSTS }};
     return 404; # managed by Certbot
 }

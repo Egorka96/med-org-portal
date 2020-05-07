@@ -1,94 +1,127 @@
-# ansible-playbook -i ansible/inventory -u ansible -v ansible/install.yml
+# ansible-playbook -i inventories/med_org_portal -u ansible -v playbooks/install_med_org_portal.yml -e 'hosts= docker_password= db_password= secret_key= mis_token='
 
 - name: Install MED ORG PORTAL
-  hosts: "{{ host }}"
+  hosts: "{% if hosts is defined %}{{ hosts }}{% else %}med_org_portal{% endif %}"
   become: yes
   become_method: sudo
 
+  vars:
+    container_name: "med-org-portal-{{ deploy }}"
+    static_path: "/var/docker/{{ container_name }}/static"
+    media_path: "/var/docker/{{ container_name }}/media"
+    conf_path: "/var/docker/{{ container_name }}/conf"
+    data_path: "/var/docker/{{ container_name }}/data"
+    use_certbot: true
+
+  pre_tasks:
+    - name: Set container path permission
+      file: path="/var/docker/{{ container_name }}" state=directory owner=root group=www-data mode=0750
+
   tasks:
-    - name: install packages
-      apt:
-        name: "{{ item }}"
-        update_cache: yes
-        cache_valid_time: 3600
-      with_items:
-        - docker.io
-        - python-pip
-        - nginx
+    - name: Install nginx
+      apt: name=nginx
 
-    - name: install docker-py
+    - name: Docker-PY
       pip:
-        name: docker-py
-        version: 1.10.6
-
-    - name: remove old med-org-portal instance
-      docker_container:
-        name: "{{ image_name }}"
-        image: "{{ image }}"
-        state: absent
-
-    - name: create web directories
-      file:
-        path: "{{ item }}"
-        state: directory
-        owner: www-data
-        group: www-data
-        recurse: yes
+        name: "{{ item }}"
       with_items:
-        - "/var/www/{{ web_server_name }}/static"
-        - "/var/www/{{ web_server_name }}/media"
-        - "/var/log/www/{{ web_server_name }}"
+        - docker-py==1.10.6
 
-    - name: create conf directory
-      file:
-        path: "/var/docker/conf/{{ web_server_name }}"
-        state: directory
-        owner: www-data
-        group: www-data
-        recurse: yes
+    - name: Pull image
+      shell: "docker pull egorkaraz/med-org-portal"
 
-    - name: create settings
-      template:
-        src: local_settings.py.jinja2
-        dest: "/var/docker/conf/{{ web_server_name }}/local_settings.py"
-        mode: 0600
+    - name: Stop container portal
+      shell: "docker stop med-org-portal; docker rm med-org-portal"
+#      shell: "docker stop {{ container_name }}; docker rm {{ container_name }}"
+      ignore_errors: true
+
+    - name: Create directories
+      file: path={{ item }} state=directory mode=0700
+      with_items:
+        - "{{ conf_path }}"
+        - "{{ data_path }}/db"
+
+    - name: Create www directories
+      file: path={{ item }} state=directory owner=www-data
+      with_items:
+        - "{{ static_path }}"
+        - "{{ media_path }}"
+
+    - name: Create log directory
+      file: path=/var/log/www/{{ web_server_name }} state=directory owner=www-data
+
+    - name: Create settings
+      template: src=local_settings.py.jinja2 dest={{ conf_path }}/local_settings.py mode=0600
+
 
     - name: Start container db
       docker_container:
         image: postgres:11
-        name: "{{ web_server_name }}-db"
-        volumes:
-          - "/var/docker/{{ web_server_name }}/db:/var/lib/postgresql/data/"
+        name: "{{ container_name }}-db"
+        volumes: "{{ data_path }}/db:/var/lib/postgresql/data/"
         restart_policy: always
         state: started
+        hostname: "{{ container_name }}_{{ ansible_hostname }}"
         env:
-          POSTGRES_PASSWORD: "{{ PASSWORD }}"
-          POSTGRES_USER: "{{ service_name }}"
-          POSTGRES_NAME: "{{ service_name }}"
+          POSTGRES_PASSWORD: "{{ db_password }}"
+          POSTGRES_USER: portal
+          POSTGRES_NAME: portal
+
+
+    - name: Start container redis
+      docker_container:
+        image: redis:5.0.1
+        name: "{{ container_name }}-redis"
+        restart_policy: always
+        state: started
+        hostname: "{{ container_name }}_{{ ansible_hostname }}"
+
 
     - name: Start container portal
       docker_container:
-        image: "{{ image }}"
-        name: "{{ image_name }}"
-        volumes:
-          - "/data/{{ web_server_name }}:/data"
-          - "/conf/{{ web_server_name }}:/conf"
-          - "/var/www/{{ web_server_name }}/static:/static"
-        restart_policy: always
-        pull: yes
-        state: started
-        etc_hosts: {"db": "{{ db_host }}"}
+        image: "egorkaraz/med-org-portal"
         ports:
-          - 127.0.0.1:{{ service_port }}:80
+          - "127.0.0.1:{{ portal_port }}:80"
+        name: "{{ container_name }}"
+        volumes:
+          - "{{ conf_path }}:/conf"
+          - "{{ data_path }}:/data"
+          - "{{ static_path }}:/static"
+          - "{{ media_path }}:/media"
+        restart_policy: always
+        state: started
+        hostname: "{{ container_name }}_{{ ansible_hostname }}"
         links:
-          - "{{ web_server_name }}-db:db"
+          - "{{ container_name }}-db:db"
+          - "{{ container_name }}-redis:redis"
         env:
-          SERVICE_NAME: "{{ service_name }}"
+          SERVICE_NAME: "{{ container_name }}"
+        command: /usr/bin/supervisord -c /etc/supervisor/supervisord.conf --nodaemon
 
     - name: remove nginx default
       file:
         path: /etc/nginx/sites-enabled/default
         state: absent
+
+
+    - name: Local Settings
+      shell: docker exec -i {{ container_name }} bash -c "rm project/local_settings.py;  ln -s /conf/local_settings.py project/local_settings.py"
+
+    - name: Restart supervisor
+      shell: docker exec -i {{ container_name }} bash -c "supervisorctl restart all"
+
+    - name: Prepare static and media path
+      shell: docker exec -i {{ container_name }} bash -c "rm -rf static; ln -s /static static; rm -rf media; ln -s /media media"
+
+    - name: Install npm
+      shell: docker exec -i {{ container_name }} bash -c "npm install & sleep 15"
+
+    - name: Collect static
+      shell: docker exec -i {{ container_name }} bash -c "python3 ./manage.py collectstatic --noinput"
+
+    - name: Copy npm packegs
+      shell: docker exec -i {{ container_name }} bash -c "rm -rf static/node_modules; mv node_modules static/"
+
 
     - name: create nginx config
       template:
@@ -99,3 +132,24 @@
       service:
         name: nginx
         state: reloaded
+
+
+    - name: Set web static permissions
+      file: path={{ static_path }} state=directory owner=www-data recurse=yes
+
+
+    - name: Migrate db
+      shell: docker exec -i {{ container_name }} bash -c "python3 ./manage.py migrate"
+
+
+    - name: Load fixtures
+      shell: docker exec -i {{ container_name }} bash -c "python3 ./manage.py loaddata {{ item }}"
+      with_items:
+        - "auth_groups.json"
+#  roles:
+#    - role: ../roles/med_org_portal
+#      container_ports:
+#        - "127.0.0.1:{{ portal_port }}:80"
+#      media_path: "/var/docker/{{ container_name }}/media"
+#      conf_path: "/var/docker/{{ container_name }}/conf"
+#      data_path: "/var/docker/{{ container_name }}/data"

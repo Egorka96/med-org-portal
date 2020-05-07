@@ -14,9 +14,9 @@ SECRET_KEY = 'fixme'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': "{{ service_name }}",
-        'USER': "{{ service_name }}",
-        'PASSWORD': '{{ PASSWORD }}',
+        'NAME': "portal",
+        'USER': "portal",
+        'PASSWORD': '{{ db_password }}',
         'HOST': 'db',
         'PORT': '5432',
     }
@@ -33,12 +33,12 @@ TIME_ZONE = 'Europe/Moscow'
 {#    }#}
 {#}#}
 
-{% if MIS_URL is defined %}
-MIS_URL = "{{ MIS_URL }}"
+{% if mis_url is defined %}
+MIS_URL = "{{ mis_url }}"
 {% endif %}
 
-{% if MIS_TOKEN is defined %}
-MIS_TOKEN = "{{ MIS_TOKEN }}"
+{% if mis_token is defined %}
+MIS_TOKEN = "{{ mis_token }}"
 {% endif %}
 
 import os
