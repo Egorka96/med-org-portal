@@ -57,14 +57,10 @@
                         {% block pre_navbar_logo %}
                         {% endblock %}
                     </div>
-                    {% block pre_navbar_additional %}
-                        <div class="col-sm-2"></div>
-                        <div class="col-sm-2"></div>
-                    {% endblock %}
                     {% block pre_navbar_user %}
-                        <div class="col-sm-5 text-right">
+                        <div class="col-sm-9 text-right">
                             {% if user.is_authenticated %}
-                                <li class="dropdown dropdown-user">
+                                <div class="dropdown dropdown-user">
                                     <a class="dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fa fa-user"></i> {{ user.core.get_fio|default:user.username }}
                                     </a>
@@ -78,7 +74,7 @@
                                             <i class="fa fa-sign-out"></i> Выход
                                         </a>
                                     </div>
-                                </li>
+                                </div>
                             {% endif %}
                         </div>
                     {% endblock %}
@@ -95,7 +91,7 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav navbar-center">
-                            {% if user.is_authenticated and request.path != '/' %}
+{#                            {% if user.is_authenticated and request.path != '/' %}#}
                                 {% if perms.core.view_workers_done_report %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="{% url 'core:workers_done_report' %}">Отчет по прошедшим</a>
@@ -111,7 +107,14 @@
                                         <a class="nav-link" href="{% url 'core:user' %}">Пользователи</a>
                                     </li>
                                 {% endif %}
-                            {% endif %}
+                                {% if user_background_tasks.count or user.is_superuser%}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'background_tasks:task_search' %}">
+                                            Фоновые задачи
+                                        </a>
+                                    </li>
+                                {% endif %}
+{#                            {% endif %}#}
                         </ul>
                     </div>
                 </div>

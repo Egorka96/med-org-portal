@@ -1,0 +1,170 @@
+{% extends 'core/base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+{% load custom_tags %}
+
+{% block css %}
+    <style>
+        input[type='checkbox'] {
+          display: none;
+        }
+
+        .collapsible-content {
+          display: none;
+          overflow: hidden;
+          transition: max-height .25s ease-in-out;
+        }
+
+        .toggle:checked + .lbl-toggle + .collapsible-content {
+          display: block;
+        }
+    </style>
+{% endblock %}
+
+
+{% block container %}
+    <p class="row">
+        <span class="col-xs-2 text-right"><strong>Название</strong></span>
+        <span class="col-xs-10">{{ object.name }}</span>
+    </p>
+
+    <p class="row">
+        <span class="col-xs-2 text-right"><strong>Описание</strong></span>
+        <span class="col-xs-10">{{ object.description }}</span>
+    </p>
+
+
+    {% if request.user.is_superuser %}
+        <p class="row">
+            <span class="col-xs-2 text-right"><strong>Пользователь</strong></span>
+            <span class="col-xs-10">{{ object.user.mis|default:'' }}</span>
+        </p>
+
+        <p class="row">
+            <span class="col-xs-2 text-right"><strong>Функция для вызова</strong></span>
+            <span class="col-xs-10">{{ object.func_path }}</span>
+        </p>
+
+        <div class="row">
+            <div class="col-xs-2 text-right"><strong>Параметры</strong></div>
+            <div class="col-xs-10">
+                {% if object.params %}
+                    <a href="{{ object.params.url }}">{{ object.params.name }}</a>
+
+                    <input id="collapsible" class="toggle" type="checkbox">
+                    <label for="collapsible" class="lbl-toggle btn btn-default btn-sm">
+                        <i class="fa fa-eye"></i>
+                        Показать параметры
+                    </label>
+                    <div class="collapsible-content">
+                        <div class="content-inner">
+                            <pre>{{ object.get_params|pretty_value }}</pre>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <p class="row">
+        <span class="col-xs-2 text-right"><strong>Статус выполнения</strong></span>
+        <span class="col-xs-10 task-status">{{ object.status }}</span>
+    </p>
+
+    <p class="row">
+        <span class="col-xs-2 text-right"><strong>Создана</strong></span>
+        <span class="col-xs-10">{{ object.created_dt|default:'' }}</span>
+    </p>
+
+    <p class="row">
+        <span class="col-xs-2 text-right"><strong>Время начала выполнения задачи</strong></span>
+        <span class="col-xs-10 start-dt">{{ object.start_dt|default:'' }}</span>
+    </p>
+
+    <p class="row">
+        <span class="col-xs-2 text-right"><strong>Время окончания выполнения задачи</strong></span>
+        <span class="col-xs-10 finish-dt">{{ object.finish_dt|default:'' }}</span>
+    </p>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="progress" style="{% if not object.in_progress %}display: none{% endif %}">
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{ object.percent }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ object.percent }}%;">
+                    {{ object.percent }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-xs-2">
+            <form method="post" action="{% url 'background_tasks:task_cancel' object.id %}">
+                {% csrf_token %}
+                <button type="submit" name="cancel" class="btn btn-danger btn-block"
+                    {% if object.start_dt %}disabled{% endif %}>
+                    <i class="fa fa-remove"></i>
+                    Отменить
+                </button>
+            </form>
+        </div>
+
+        <div class="col-xs-2">
+            <form method="post" action="{% url 'background_tasks:task_restart' object.id %}">
+                {% csrf_token %}
+                <button type="submit" name="restart" class="btn btn-default btn-block"
+                        {% if object.in_progress %}disabled{% endif %}
+                        data-toggle="tooltip" title="Перезапустить задачу">
+                    <i class="fa fa-refresh"></i>
+                    Пересоздать
+                </button>
+            </form>
+        </div>
+
+        <div class="col-xs-4 col-xs-offset-4">
+            <a {% if object.result_attachment %}href="{{ object.result_attachment.url }}"{% endif %}
+               style="{% if not object.result_attachment %}display: none{% endif %}"
+               data-toggle="tooltip" title="Скачать результат выполнения задачи" target="_blank"
+               class="btn btn-default btn-block result-attachment"
+                >
+                <i class="fa fa-download"></i>
+                Скачать
+            </a>
+        </div>
+    </div>
+
+    <h4>Журнал событий</h4>
+    <table id="logs" class="table table-condensed table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Описание</th>
+                <th>Время</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for log in object.logs.all %}
+            <tr class="{% if log.is_success %}info
+                       {% elif log.is_fail %}danger
+                       {% endif %}">
+                <td>{{ forloop.revcounter }}</td>
+                <td>{{ log.description }}</td>
+                <td>{{ log.dc }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock %}
+
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static "background_tasks/js/task/detail.js" %}"></script>
+    <script>
+        var taskId = {{ object.id }};
+    </script>
+{% endblock %}

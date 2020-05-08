@@ -24,7 +24,7 @@
         <form id='searchFrom' action="" method="GET">
             <fieldset>
                 {% block legend %}
-                    <legend>Параметры</legend>
+                    <legend>{{ title }}. Параметры поиска</legend>
                 {% endblock %}
                 {% block form %}
                     {% bootstrap_form_errors form %}

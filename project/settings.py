@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'djutils',
     'bootstrap4',
 
+    'background_tasks',
     'core',
 ]
 
@@ -71,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'background_tasks.context_processors.user_background_tasks',
                 'core.context_processors.base_templates',
             ],
         },
@@ -127,6 +129,11 @@ DATETIME_FORMAT = 'd.m.Y H:i'
 SHORT_DATETIME_FORMAT = 'd.m.Y H:i'
 
 DIR_FOR_TMP_FILES = '/tmp/org-portal/'
+
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
 
 # Static files (CSS, JavaScript, Images)

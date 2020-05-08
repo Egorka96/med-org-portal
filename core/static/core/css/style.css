@@ -45,6 +45,10 @@ footer > a {
     background-size: cover;
 }
 
+.page-content {
+    margin-top: 15px;
+}
+
 .portfolio-item {
     margin-bottom: 30px;
 }

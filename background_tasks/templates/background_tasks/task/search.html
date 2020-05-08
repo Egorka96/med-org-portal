@@ -1,0 +1,104 @@
+{% extends 'core/base_list.html' %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block form %}
+    {% bootstrap_form_errors form %}
+
+    <div class="row">
+        {% for field in form %}
+            <div class="col-md-6">{% bootstrap_field field layout='horizontal' %}</div>
+        {% endfor %}
+    </div>
+
+{% endblock form %}
+
+
+{% block pre_table %}
+    {% if page_obj or object_list %}
+        <span class="label label-info">Всего: {% if page_obj %}{{ page_obj.paginator.count }}{% else %}{{ object_list|length }}{% endif %}</span>
+    {% endif %}
+    {% csrf_token %}
+{% endblock %}
+
+
+{% block table_head %}
+    <th>#</th>
+    <th>Название</th>
+    {% if request.user.is_superuser %}
+        <th>Пользователь</th>
+        <th>Функция</th>
+    {% endif %}
+    <th>Статус</th>
+    <th></th>
+    <th>Создана</th>
+    <th>Началась</th>
+    <th>Завершена</th>
+    <th></th>
+    <th></th>
+{% endblock %}
+
+
+{% block tbody %}
+    {% for object in page_obj|default:object_list %}
+        <tr id="task_{{ object.id }}" data-task-id="{{ object.id }}"
+            class="{% if object.is_success %}success
+                   {% elif object.is_fail %}danger
+                   {% endif %}">
+            <td>{{ forloop.counter }}</td>
+            <td>
+                <a href="{% url 'background_tasks:task_info' object.id %}?next={{ request.get_full_path|urlencode }}">
+                    {{ object.name }}
+                </a>
+            </td>
+
+            {% if request.user.is_superuser %}
+                <td>{{ object.user.mis|default:'' }}</td>
+                <td title="{{ object.func_path }}">
+                    {{ object.func_path|truncatechars:20 }}
+                </td>
+            {% endif %}
+
+            <td>
+                <div class="progress" style="{% if not object.in_progress %}display: none{% endif %}">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="{{ object.percent }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ object.percent }}%;">
+                        {{ object.percent }}%
+                    </div>
+                </div>
+                <span class="task-status" style="{% if object.in_progress %}display: none{% endif %}">{{ object.status }}</span>
+            </td>
+            <td>
+                <span class="result-attachment-container" style="{% if not object.result_attachment %}display: none{% endif %}">
+                    <a {% if object.result_attachment %}href="{{ object.result_attachment.url }}"{% endif %}
+                       data-toggle="tooltip" title="Скачать результат выполнения задачи" target="_blank"
+                       class="btn btn-default btn-xs result-attachment"
+                        >
+                        <i class="fa fa-download"></i>
+                    </a>
+                </span>
+            </td>
+            <td>{{ object.created_dt }}</td>
+            <td class="start-dt">{{ object.start_dt|default:'' }}</td>
+            <td class="finish-dt">{{ object.finish_dt|default:'' }}</td>
+            <td>
+                <button type="button" name="cancel" value="{{ object.id }}" class="btn btn-danger btn-xs"
+                        {% if object.start_dt %}disabled{% endif %}
+                        data-toggle="tooltip" title="Отменить">
+                    <i class="fa fa-remove"></i>
+                </button>
+            </td>
+            <td>
+                <button type="button" name="restart" value="{{ object.id }}" class="btn btn-default btn-xs"
+                        {% if object.in_progress %}disabled{% endif %}
+                        data-toggle="tooltip" title="Перезапустить задачу">
+                    <i class="fa fa-refresh"></i>
+                </button>
+            </td>
+    {% endfor %}
+{% endblock %}
+
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static "background_tasks/js/task/search.js" %}"></script>
+{% endblock %}
