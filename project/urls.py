@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth.views import LoginView, logout_then_login
+from django.contrib.auth.views import LoginView, PasswordChangeView, logout_then_login
 
 import core.urls
 
@@ -13,6 +13,9 @@ urlpatterns = [
 
     path('login/', LoginView.as_view(template_name='core/login.html'), name='login'),
     path('logout/', logout_then_login, {'login_url': '/login/?next=/'}, name='logout'),
+
+    path('password_change/', PasswordChangeView.as_view(template_name='core/password_change.html',
+                                                        success_url='/logout/'), name='password_change'),
 ]
 
 if settings.DEBUG:
