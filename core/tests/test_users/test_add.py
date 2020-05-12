@@ -42,7 +42,7 @@ class TestAdd(BaseTestCase):
             'last_name': 'User',
             'email': 'test@tes.ru',
             'is_active': True,
-            'new_password': '123456',
+            'new_password': '123456йцукен',
             'groups': self.permission_group.id,
             'orgs': ["1", "5", "8"]
         }
