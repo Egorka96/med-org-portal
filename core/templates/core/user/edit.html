@@ -13,7 +13,13 @@
 {% block fields %}
     <div class="row">
         <div class="col-sm-4">{% bootstrap_field form.username %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.new_password %}</div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                {% bootstrap_label form.new_password.label %}
+                {% bootstrap_field form.new_password show_label=False show_help=False %}
+                <small class="form-text text-muted" style="margin-top: -10px; list-style: none">{{ form.new_password.help_text|safe }}</small>
+            </div>
+        </div>
         <div class="col-sm-4">{% bootstrap_field form.is_active %}</div>
         <div class="col-sm-4">{% bootstrap_field form.last_name %}</div>
         <div class="col-sm-4">{% bootstrap_field form.first_name %}</div>

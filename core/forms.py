@@ -3,6 +3,7 @@ import json
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 
 from core import models
 from mis.law_item import LawItem
@@ -181,7 +182,12 @@ class UserSearch(forms.Form):
 
 
 class UserEdit(OrgsMixin, forms.ModelForm):
-    new_password = forms.CharField(label='Новый пароль', required=False)
+    new_password = forms.CharField(label='Новый пароль', required=False, validators=[validate_password],
+                                   help_text='<div>Пароль не должен совпадать с именем или другой персональной '
+                                             'информацией пользователя или быть слишком похожим на неё. </div>'
+                                             '<div>Пароль должен содержать как минимум 8 символов. </div>'
+                                             '<div>Пароль не может быть одним из широко распространённых паролей. </div>'
+                                             '<div>Пароль не может состоять только из цифр. </div>')
 
     class Meta:
         model = User
