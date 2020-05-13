@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block fields %}
+    <legend>{% if object.id %}Редактирование пользователя "{{ object }}"{% else %}Создание нового пользователя{% endif %}</legend>
     <div class="row">
         <div class="col-sm-4">{% bootstrap_field form.username %}</div>
         <div class="col-sm-4">

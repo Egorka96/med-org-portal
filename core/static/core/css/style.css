@@ -49,6 +49,10 @@ footer > a {
     margin-bottom: 30px;
 }
 
+.page-content {
+    margin-top: 5px;
+}
+
 .breadcrumb {
     margin-bottom: 5px;
 }

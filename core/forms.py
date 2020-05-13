@@ -206,6 +206,10 @@ class UserEdit(OrgsMixin, forms.ModelForm):
             self.initial['orgs'] = [str(org.id) for org in orgs]
             self.fields['orgs'].widget.choices = [(str(org.id), org.name) for org in orgs]
 
+        self.fields['orgs'].help_text = 'к каким организациям пользователь должен иметь доступ. ' \
+                                        'Оставьте поле пустым, если пользователь должен иметь доступ ко всем ' \
+                                        'доступным организациям'
+
     def save(self, *args, **kwargs):
         new_password = self.cleaned_data.get('new_password')
 
