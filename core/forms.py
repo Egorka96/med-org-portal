@@ -3,6 +3,7 @@ import json
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 
 from core import models
 from mis.law_item import LawItem
@@ -181,7 +182,12 @@ class UserSearch(forms.Form):
 
 
 class UserEdit(OrgsMixin, forms.ModelForm):
-    new_password = forms.CharField(label='Новый пароль', required=False)
+    new_password = forms.CharField(label='Новый пароль', required=False, validators=[validate_password],
+                                   help_text='<div>Пароль не должен совпадать с именем или другой персональной '
+                                             'информацией пользователя или быть слишком похожим на неё. </div>'
+                                             '<div>Пароль должен содержать как минимум 8 символов. </div>'
+                                             '<div>Пароль не может быть одним из широко распространённых паролей. </div>'
+                                             '<div>Пароль не может состоять только из цифр. </div>')
 
     class Meta:
         model = User
@@ -199,6 +205,10 @@ class UserEdit(OrgsMixin, forms.ModelForm):
             orgs = self.instance.core.get_orgs()
             self.initial['orgs'] = [str(org.id) for org in orgs]
             self.fields['orgs'].widget.choices = [(str(org.id), org.name) for org in orgs]
+
+        self.fields['orgs'].help_text = 'к каким организациям пользователь должен иметь доступ. ' \
+                                        'Оставьте поле пустым, если пользователь должен иметь доступ ко всем ' \
+                                        'доступным организациям'
 
     def save(self, *args, **kwargs):
         new_password = self.cleaned_data.get('new_password')

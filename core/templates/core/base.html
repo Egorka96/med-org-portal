@@ -70,6 +70,9 @@
                                                 <i class="fa fa-cogs"></i> Панель администратора
                                             </a>
                                         {% endif %}
+                                        <a class="dropdown-item" href="{% url 'password_change' %}">
+                                            <i class="fa fa-edit"></i> Сменить пароль
+                                        </a>
                                         <a class="dropdown-item" href="{% url 'logout' %}">
                                             <i class="fa fa-sign-out"></i> Выход
                                         </a>

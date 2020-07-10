@@ -40,7 +40,7 @@
     {% if show_orgs %}<th>Организация</th>{% endif %}
     <th>Вид осмотра</th>
     <th>Пункты приказа</th>
-    <th>Стоимость</th>
+    {% if perms.core.view_money %}<th>Стоимость</th>{% endif %}
     <th>Заключение профпатолога</th>
     <th>Примечание</th>
 {% endblock %}
@@ -74,7 +74,7 @@
             {{ law_item.name }} прил.{{ law_item.section }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </td>
-    <td>{{ object.total_cost }}</td>
+    {% if perms.core.view_money %}<td>{{ object.total_cost }}</td>{% endif %}
     <td>{{ object.prof.0.prof_conclusion.conclusion }}</td>
     <td>{{ object.prof.0.note }}</td>
 {% endblock %}

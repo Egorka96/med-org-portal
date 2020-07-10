@@ -6,9 +6,10 @@ from core.excel.base import Excel
 class WorkersDoneExcel(Excel):
     workbook_name = 'Отчет по прошедшим'
 
-    def __init__(self, *args, show_orgs, **kwargs):
+    def __init__(self, *args, show_orgs: bool, show_cost: bool, **kwargs):
         super().__init__(*args, **kwargs)
         self.show_orgs = show_orgs
+        self.show_cost = show_cost
 
     def get_head_static_sizes(self):
         head_static_sizes = {
@@ -27,10 +28,16 @@ class WorkersDoneExcel(Excel):
         head_static_sizes.update({
             'Вид осмотра': 25,
             'Пункты приказа': 18,
-            'Стоимость': 10,
+        })
+
+        if self.show_cost:
+            head_static_sizes['Стоимость'] = 10
+
+        head_static_sizes.update({
             'Заключение профпатолога': 50,
             'Примечание': 50,
         })
+
         return head_static_sizes
 
     def get_object_rows(self):
@@ -56,10 +63,16 @@ class WorkersDoneExcel(Excel):
             row.extend([
                 ', '.join(obj['main_services']),
                 law_items,
-                obj['total_cost'],
+            ])
+
+            if self.show_cost:
+                row.append(obj['total_cost'])
+
+            row.extend([
                 obj['prof'][0]['prof_conclusion']['conclusion'] if obj.get('prof') else '',
                 obj['prof'][0].get('note') if obj.get('prof') else ''
             ])
+
             object_rows.append(row)
 
         return object_rows

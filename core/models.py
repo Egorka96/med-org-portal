@@ -24,6 +24,7 @@ class User(models.Model):
     class Meta:
         permissions = (
             ('view_workers_done_report', 'Просмотр отчета по прошедшим'),
+            ('view_money', 'Просмотр денежной информации'),
 
             ('view_direction', 'Просмотр направлений на осмотр'),
             ('add_direction', 'Создание направлений на осмотр'),

@@ -15,7 +15,7 @@
 {
   "model": "auth.group",
   "fields": {
-    "name": "Направления на осмотр",
+    "name": "Просмотр направлений на осмотр",
     "permissions": [
       [
         "view_direction",
@@ -47,6 +47,19 @@
       ],
       [
         "view_direction",
+        "core",
+        "user"
+      ]
+    ]
+  }
+},
+{
+  "model": "auth.group",
+  "fields": {
+    "name": "Просмотр денежной информации",
+    "permissions": [
+      [
+        "view_money",
         "core",
         "user"
       ]

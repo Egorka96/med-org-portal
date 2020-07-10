@@ -53,6 +53,10 @@ footer > a {
     margin-bottom: 30px;
 }
 
+.page-content {
+    margin-top: 5px;
+}
+
 .breadcrumb {
     margin-bottom: 5px;
 }
@@ -173,6 +177,10 @@ label {
 .alert {
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.help-block {
+    color: rgba(29, 67, 157, 0.84);
 }
 
 /* убирал bootstrapовские галочки в поле */
