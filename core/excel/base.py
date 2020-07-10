@@ -1,13 +1,19 @@
 from tempfile import NamedTemporaryFile
 
 import re
+
+from django.core.files.base import ContentFile
 from django.http import HttpResponse
+from django.utils.timezone import now
 
 from openpyxl import Workbook
 from openpyxl.worksheet.table import Table
 from openpyxl.styles import Font, Border, Side
 
 from swutils.string import transliterate
+
+import background_tasks.models
+import background_tasks.consts
 
 
 class Excel:
@@ -20,10 +26,10 @@ class Excel:
         '№': 10,
     }
 
-    def __init__(self, title=None, objects: list = None, page: int = 1):
+    def __init__(self, title=None, objects: list = None, background_task: background_tasks.models.Task = None):
         self.title = title
         self.objects = objects
-        self.page = page
+        self.background_task = background_task
 
         self._workbook = None
         self._sheet = None
@@ -46,7 +52,37 @@ class Excel:
 
             response = HttpResponse(content_type='application/ms-excel', content=tmp.read())
             response['Content-Disposition'] = 'attachment; filename=%s' % file_name
+
+            if self.background_task:
+                self.finish_background_task(workbook, response.content)
+
             return response
+
+    @classmethod
+    def create_workbook_background(cls, background_task: background_tasks.models.Task, **params):
+        background_tasks.models.Task.objects.filter(id=background_task.id).update(
+            status=background_tasks.consts.STATUS_IN_PROCESS,
+            start_dt=now(),
+            percent=0,
+        )
+        cls(background_task=background_task, **params['workbook_maker_kwargs']).create_workbook()
+
+    def finish_background_task(self, workbook, content):
+        background_tasks.models.Task.objects.filter(id=self.background_task.id).update(
+            status=background_tasks.consts.STATUS_COMPLETE,
+            finish_dt=now(),
+            percent=100,
+        )
+        background_tasks.models.Log.objects.create(
+            task=self.background_task,
+            description='Формирование excel-файла завершено',
+            status=background_tasks.consts.STATUS_COMPLETE,
+        )
+
+        file_name = f"{transliterate(self.get_workbook_name(), space='_')}.xls"
+        background_task = background_tasks.models.Task.objects.get(id=self.background_task.id)
+        workbook.save(file_name)
+        background_task.result_attachment.save(file_name, ContentFile(content))
 
     def get_workbook(self):
         if not self._workbook:
@@ -107,15 +143,6 @@ class Excel:
 
         self.add_current_row()
 
-        if self.page:
-            page_cell = sheet.cell(self.get_current_row(), 1, f'Страница {self.page}')
-
-            bold_font = self.get_bold_font()
-            self.set_font_size(bold_font, 14)
-            page_cell.font = bold_font
-
-            self.add_current_row()
-
     def write_objects(self):
         sheet = self.get_sheet()
 
@@ -148,6 +175,14 @@ class Excel:
 
     def get_object_rows(self):
         raise NotImplementedError()
+
+    def save_background_task_progress(self, percent, description):
+        if not background_tasks.models.Task.objects.filter(id=self.background_task.id, percent=percent).exists():
+            background_tasks.models.Log.objects.create(
+                task=self.background_task,
+                description=description
+            )
+            background_tasks.models.Task.objects.filter(id=self.background_task.id).update(percent=percent)
 
     @staticmethod
     def get_bold_font():

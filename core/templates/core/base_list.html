@@ -24,7 +24,7 @@
         <form id='searchFrom' action="" method="GET">
             <fieldset>
                 {% block legend %}
-                    <legend>Параметры</legend>
+                    <legend>{{ title }}. Параметры поиска</legend>
                 {% endblock %}
                 {% block form %}
                     {% bootstrap_form_errors form %}
@@ -41,7 +41,7 @@
                     <div class="col-md-6 text-right">
                         {% block right_buttons %}
                             {% if add_excel and page_obj|default:object_list %}
-                                <a href="{{ request.get_full_path|safe }}{% if not request.GET %}?{% endif %}&excel=1" class="btn btn-outline-success"
+                                <a href="{{ request.get_full_path|safe }}{% if not request.GET %}?{% endif %}&{% if excel_background %}excel_background{% else %}excel{% endif %}=1" class="btn btn-outline-success"
                                    title="Скачать отчет в виде Excel файла" data-toggle="tooltip" data-placement="bottom">
                                     <i class="fa fa-file-excel-o"></i>
                                     Excel

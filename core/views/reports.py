@@ -33,6 +33,8 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
         user_orgs = self.request.user.core.get_orgs()
         kwargs['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
         kwargs['show_cost'] = True if self.request.user.has_perm('core.view_money') else False
+        kwargs['mis_request_path'] = self.mis_request_path
+        kwargs['filter_params'] = self.get_filter_params()
         return kwargs
 
     def get_excel_title(self):

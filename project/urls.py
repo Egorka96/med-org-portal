@@ -5,10 +5,12 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, PasswordChangeView, logout_then_login
 
 import core.urls
+import background_tasks.urls
 
 
 urlpatterns = [
     path('', include(core.urls, namespace='core')),
+    path('background_tasks/', include(background_tasks.urls, namespace='background_tasks')),
     path('admin/', admin.site.urls),
 
     path('login/', LoginView.as_view(template_name='core/login.html'), name='login'),

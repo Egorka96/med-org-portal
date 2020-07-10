@@ -16,6 +16,7 @@
         <link href="/node_modules/font-awesome/css/font-awesome.css" rel="stylesheet">
         <link href="/node_modules/select2/dist/css/select2.css" rel="stylesheet">
         <link href="/node_modules/jquery-ui/themes/base/all.css" rel="stylesheet">
+        <link href="/node_modules/jquery-toast-plugin/dist/jquery.toast.min.css" rel="stylesheet">
         <link href="/node_modules/select2-bootstrap-theme/dist/select2-bootstrap.css" rel="stylesheet">
         <link href="/node_modules/select2-bootstrap-theme/dist/select2-bootstrap.min.css" rel="stylesheet">
     {% endblock %}
@@ -25,6 +26,7 @@
         <script src="/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
         <script src="/node_modules/jquery-ui/ui/i18n/datepicker-ru.js"></script>
         <script src="/node_modules/jquery.maskedinput/src/jquery.maskedinput.js"></script>
+        <script src="/node_modules/jquery-toast-plugin/dist/jquery.toast.min.js"></script>
         <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
         <script src="/node_modules/select2/dist/js/select2.js"></script>
         <script src="/node_modules/select2/dist/js/i18n/ru.js"></script>
@@ -57,14 +59,10 @@
                         {% block pre_navbar_logo %}
                         {% endblock %}
                     </div>
-                    {% block pre_navbar_additional %}
-                        <div class="col-sm-2"></div>
-                        <div class="col-sm-2"></div>
-                    {% endblock %}
                     {% block pre_navbar_user %}
-                        <div class="col-sm-5 text-right">
+                        <div class="col-sm-9 text-right">
                             {% if user.is_authenticated %}
-                                <li class="dropdown dropdown-user">
+                                <div class="dropdown dropdown-user">
                                     <a class="dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fa fa-user"></i> {{ user.core.get_fio|default:user.username }}
                                     </a>
@@ -81,7 +79,7 @@
                                             <i class="fa fa-sign-out"></i> Выход
                                         </a>
                                     </div>
-                                </li>
+                                </div>
                             {% endif %}
                         </div>
                     {% endblock %}
@@ -98,7 +96,7 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav navbar-center">
-                            {% if user.is_authenticated and request.path != '/' %}
+{#                            {% if user.is_authenticated and request.path != '/' %}#}
                                 {% if perms.core.view_workers_done_report %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="{% url 'core:workers_done_report' %}">Отчет по прошедшим</a>
@@ -114,7 +112,14 @@
                                         <a class="nav-link" href="{% url 'core:user' %}">Пользователи</a>
                                     </li>
                                 {% endif %}
-                            {% endif %}
+                                {% if user_background_tasks.count or user.is_superuser%}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'background_tasks:task_search' %}">
+                                            Фоновые задачи
+                                        </a>
+                                    </li>
+                                {% endif %}
+{#                            {% endif %}#}
                         </ul>
                     </div>
                 </div>
