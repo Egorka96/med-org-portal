@@ -71,7 +71,7 @@
                 <span class="result-attachment-container" style="{% if not object.result_attachment %}display: none{% endif %}">
                     <a {% if object.result_attachment %}href="{{ object.result_attachment.url }}"{% endif %}
                        data-toggle="tooltip" title="Скачать результат выполнения задачи" target="_blank"
-                       class="btn btn-default btn-xs result-attachment"
+                       class="btn btn-outline-secondary btn-xs result-attachment"
                         >
                         <i class="fa fa-download"></i>
                     </a>
@@ -88,7 +88,7 @@
                 </button>
             </td>
             <td>
-                <button type="button" name="restart" value="{{ object.id }}" class="btn btn-default btn-xs"
+                <button type="button" name="restart" value="{{ object.id }}" class="btn btn-outline-secondary btn-xs"
                         {% if object.in_progress %}disabled{% endif %}
                         data-toggle="tooltip" title="Перезапустить задачу">
                     <i class="fa fa-refresh"></i>

@@ -1,3 +1,5 @@
+import pprint
+
 from django import template
 
 import swutils.date
@@ -56,3 +58,8 @@ def date_to_rus(value):
 @register.filter()
 def rus_to_date(value):
     return swutils.date.rus_to_date(value)
+
+
+@register.filter()
+def pretty_value(value):
+    return pprint.pformat(value, indent=2)

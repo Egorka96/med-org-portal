@@ -2,16 +2,24 @@ import os
 import shutil
 import tempfile
 from typing import Optional, List, Dict
+from urllib.parse import quote
 
 import jinja2
 from django.conf import settings
+from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.safestring import mark_safe
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormMixin as DjangoFormMixin
+from djutils.views.helpers import url_params
 from docxtpl import DocxTemplate, InlineImage
 from swutils.string import transliterate
+
+import background_tasks.models
 
 from core.templatetags.custom_tags import get_jinja_filters
 from mis.service_client import Mis
@@ -96,6 +104,10 @@ class RestListMixin:
         if self.object_list:
             c['object_list'] = self.object_list
 
+            # если есть выгрузка в excel и количество объектов больше 50, excel скачиваем в фоне
+            if hasattr(self, 'excel_workbook_maker') and self.count > 50:
+                c['excel_background'] = True
+
         return c
 
 
@@ -142,25 +154,48 @@ class ExcelMixin:
     excel_name = None
     excel_method = 'get'
     excel_workbook_maker = None
-    excel_params = ['excel']
+    excel_params = ['excel', 'excel_background']
 
     def get_workbook_maker(self):
         return self.excel_workbook_maker
 
     def get_excel(self) -> HttpResponse:
         maker = self.get_workbook_maker()
-        workbook_maker_kwargs = self.get_workbook_maker_kwargs()
 
+        if self.is_excel_delay():
+            task_params = {
+                'workbook_maker_kwargs': self.get_workbook_maker_kwargs(with_objects=False)
+            }
+
+            task = background_tasks.models.Task.create_task(
+                method=maker.create_workbook_background,
+                name=self.get_excel_title()[:255],
+                user=self.request.user,
+                params=task_params,
+            )
+
+            redirect_url = self.get_excel_delay_redirect_url()
+            background_task_url = reverse('background_tasks:task_info', kwargs={'pk': task.id}) + \
+                                          f"?next={quote(redirect_url)}"
+
+            messages.info(
+                self.request,
+                mark_safe(f'Создана <strong>фоновая задача</strong> формирования excel-файла '
+                          f'<a class="btn btn-outline-secondary" href="{background_task_url}"><i class="fa fa-eye"></i> '
+                          f'Показать</a>')
+            )
+            return redirect(redirect_url)
+
+        workbook_maker_kwargs = self.get_workbook_maker_kwargs()
         maker_instance = maker(**workbook_maker_kwargs)
         excel_response = maker_instance.create_workbook()
         return excel_response
 
-    def get_workbook_maker_kwargs(self, **kwargs):
-        kwargs.update({
-            'objects': self.get_queryset(),
-            'title': self.get_excel_title(),
-            'page': self.request.GET.get('page')
-        })
+    def get_workbook_maker_kwargs(self, with_objects=True, **kwargs):
+        kwargs['title'] = self.get_excel_title()
+
+        if with_objects:
+            kwargs['objects'] = self.get_queryset()
 
         return kwargs
 
@@ -172,6 +207,16 @@ class ExcelMixin:
 
     def get_excel_method(self):
         return self.excel_method
+
+    def is_excel_delay(self) -> bool:
+        """ Выполнять ли формирование excel в фоне """
+        if self.request.GET.get('excel_background'):
+            return True
+
+        return False
+
+    def get_excel_delay_redirect_url(self):
+        return self.request.path + url_params(self.request, except_params=self.excel_params, as_is=True)
 
     def get(self, *args, **kwargs):
         if self.get_excel_method().lower() == 'get' and \

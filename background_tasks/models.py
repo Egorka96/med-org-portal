@@ -45,7 +45,7 @@ class Task(models.Model):
 
     @classmethod
     def create_task(cls, method: Callable, name: str, user: 'core.models.DjangoUser', params: Dict,
-                    description: str = '', create_notification: bool = False) -> 'Task':
+                    description: str = '') -> 'Task':
         from background_tasks.tasks import start_task
 
         func_path = f"{method.__self__.__module__}.{method.__self__.__qualname__}.{method.__name__}"
@@ -57,7 +57,7 @@ class Task(models.Model):
         )
 
         task.save_params(params)
-        start_task.delay(task.id, create_notification=create_notification)
+        start_task.delay(task.id)
 
         return task
 
