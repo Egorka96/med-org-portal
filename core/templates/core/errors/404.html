@@ -1,0 +1,38 @@
+{% extends BASE_TEMPLATE %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .error-block{
+            text-align:center;
+        }
+
+        .error-block h1{
+            font-size: 13em;
+            margin:0.4em 0 0;
+            line-height: 1;
+        }
+        .error-block h2{
+            font-size: 2em;
+            text-transform: capitalize;
+        }
+
+        .error-block h3{
+            font-size: 0.5em;
+            text-transform: capitalize;
+        }
+
+    </style>
+{% endblock %}
+
+{% block container %}
+    <div class="error-block">
+        <h1>404</h1>
+        <h2>Страница не найдена.</h2>
+        <h4>Возможно она была удалена, перенесена на другой адрес или вообще никогда не существовала.</h4>
+        <h4>Проверьте еще раз введенный Вами адрес или вернитесь на "Главную".</h4>
+        <a class="btn btn-outline-secondary" href="javascript:history.back()">
+            <i class="fa fa-arrow-left"></i> Назад
+        </a>
+    </div>
+{% endblock %}

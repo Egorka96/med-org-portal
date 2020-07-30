@@ -1,0 +1,31 @@
+{% extends BASE_TEMPLATE %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        #footer{
+             text-align: center;
+             position: fixed;
+             margin-left: 530px;
+             bottom: 0
+        }
+    </style>
+{% endblock %}
+
+{% block container %}
+    <div class="container py-5">
+          <div class="row">
+               <div class="col-md-2 text-center">
+                    <p><i class="fa fa-exclamation-triangle fa-5x"></i></p>
+               </div>
+               <div class="col-md-10">
+                   <h3>Недостаточно прав</h3>
+                   <p>К сожалению, у Вас недостаточно прав для просмотра информации на данной странице. </p>
+                   <p>Пожалуйста, вернитесь на предыдущую страницу, чтобы продолжить просмотр.</p>
+                    <a class="btn btn-outline-secondary" href="javascript:history.back()">
+                        <i class="fa fa-arrow-left"></i> Назад
+                    </a>
+               </div>
+          </div>
+     </div>
+{% endblock %}
