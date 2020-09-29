@@ -34,7 +34,7 @@ $(function () {
             taskId = $(this).val()
 
             $.ajax({
-                url: "/background_tasks/rest/task/#{taskId}/restart/",
+                url: "/background_tasks/rest/task/" + taskId + "/restart/",
                 method: 'put',
                 success: function () {
                     $.toast({

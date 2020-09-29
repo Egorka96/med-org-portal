@@ -23,14 +23,11 @@ class Search(core.generic.mixins.FormMixin, core.generic.views.ListView):
     template_name = 'background_tasks/task/search.html'
     model = models.Task
     form_class = forms.TaskSearch
+    filter_class = filters.Task
     paginate_by = 20
 
     def get_queryset(self):
         qs = super().get_queryset()
-
-        form = self.get_form()
-        if form.is_valid():
-            qs = filters.Task(data=form.cleaned_data, queryset=qs).qs
 
         if not self.request.user.is_superuser:
             qs = qs.filter(user=self.request.user)

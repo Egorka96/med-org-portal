@@ -163,6 +163,10 @@
 
         {% block js %}
             <script>
+                $.ajaxSetup({
+                    headers: { "X-CSRFToken": '{{csrf_token}}' }
+                });
+
                 $(function() {
                     $('.date').datepicker({dateFormat: 'dd.mm.yy'});
                     $('.hasDatepicker').mask('99.99.9999');

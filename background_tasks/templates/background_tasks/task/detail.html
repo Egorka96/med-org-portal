@@ -38,7 +38,7 @@
     {% if request.user.is_superuser %}
         <p class="row">
             <span class="col-sm-2 text-right"><strong>Пользователь</strong></span>
-            <span class="col-sm-10">{{ object.user.mis|default:'' }}</span>
+            <span class="col-sm-10">{{ object.user.core|default:'' }}</span>
         </p>
 
         <p class="row">

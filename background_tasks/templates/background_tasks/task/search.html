@@ -53,7 +53,7 @@
             </td>
 
             {% if request.user.is_superuser %}
-                <td>{{ object.user.mis|default:'' }}</td>
+                <td>{{ object.user.core|default:'' }}</td>
                 <td title="{{ object.func_path }}">
                     {{ object.func_path|truncatechars:20 }}
                 </td>
