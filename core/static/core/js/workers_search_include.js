@@ -37,9 +37,15 @@
                 $("#id_middle_name").val(worker.middle_name);
                 $("#id_birth").val(worker.birth_rus);
                 $("#id_gender").val(worker.gender);
-                $("#id_org").val(worker.org.id);
                 $("#id_post").val(worker.post);
                 $("#id_shop").val(worker.shop);
+
+                if (worker.org) {
+                    let orgName = worker.org.legal_name ? worker.org.legal_name : worker.org.name
+                    let opt = "<option value='" + worker.org.id + "' selected'>" + orgName + "</option>"
+                    $("#id_org").html(opt)
+                    $("#id_org").val(worker.org.id).trigger('change')
+                }
 
                 let lawItemsSection1 = [];
                 worker.law_items_section_1.forEach(function (lawItem) {
