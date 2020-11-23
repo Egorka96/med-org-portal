@@ -38,7 +38,7 @@
 
         <div class="col-6 text-right">
             {% if object.number %}
-                <a class="btn btn-outline-secondary" href="{% url 'core:direction_print' object.number %}"
+                <a class="btn btn-outline-secondary no-block" href="{% url 'core:direction_print' object.number %}"
                    data-toggle="tooltip" title="Распечатать направление на осмотр">
                     <i class="fa fa-print"></i> Печать
                 </a>

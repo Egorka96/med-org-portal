@@ -23,9 +23,11 @@
 {% endblock %}.
 
 {% block additional_btn %}
-    <a class="btn btn-success" href="{% url 'core:direction_add' %}">
-        <i class="fa fa-plus"></i> Добавить
-    </a>
+    {% if perms.core.add_direction %}
+        <a class="btn btn-success" href="{% url 'core:direction_add' %}">
+            <i class="fa fa-plus"></i> Добавить
+        </a>
+    {% endif %}
 {% endblock %}
 
 {% block pre_table %}

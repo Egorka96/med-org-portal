@@ -53,15 +53,25 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
     data_method = 'post'
     pk_url_kwarg = 'number'
 
-    def get_success_url(self):
-        return reverse_lazy('core:direction_list')
+    def has_permission(self):
+        perms = self.get_permission_required()
+        return any([self.request.user.has_perm(perm) for perm in perms])
 
     def get_permission_required(self):
-        perm = 'core.add_direction'
-        if self.get_object():
-            perm = 'core.change_direction'
+        permission_required = [self.get_edit_permission()]
+        if self.request.method == 'GET' and self.kwargs.get(self.pk_url_kwarg):
+            permission_required.append('core.view_direction')
 
-        return [perm]
+        return permission_required
+
+    def get_edit_permission(self):
+        if self.kwargs.get(self.pk_url_kwarg):
+            return 'core.change_direction'
+        else:
+            return 'core.add_direction'
+
+    def get_success_url(self):
+        return reverse_lazy('core:direction_list')
 
     def get_initial(self):
         initial = super().get_initial()
@@ -114,6 +124,14 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             ('Направления', reverse('core:direction_list')),
             (self.get_title(), ''),
         ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_edit'] = True
+        if not self.request.user.has_perm(self.get_edit_permission()):
+            context['can_edit'] = False
+
+        return context
 
 
 class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):

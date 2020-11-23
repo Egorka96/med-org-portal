@@ -29,3 +29,17 @@
         {% endblock %}
     </form>
 {% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        {% if can_edit is not None %}
+            let canEdit = {{ can_edit|yesno:"true,false" }};
+            if (!canEdit) {
+                $('input, textarea, button, select, form').not('.no-block').prop('disabled', true);
+                {# если по каким-то причинам нужно, чтобы кнопка-ссылка не блокировалась, то элемент должен принадлежать классу no-block #}
+                $('.btn:not(.no-block)').removeAttr('href').removeAttr('onclick').attr('disabled', true);
+            }
+        {% endif %}
+    </script>
+{% endblock %}
