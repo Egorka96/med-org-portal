@@ -32,6 +32,7 @@ class Direction:
     law_items_section_1: List[LawItem] = None
     law_items_section_2: List[LawItem] = None
     pay_method: dict = None
+    confirm_date: datetime.date = None
 
     def __str__(self):
         fio = ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
@@ -45,48 +46,39 @@ class Direction:
         return label
 
     @classmethod
+    def dict_to_obj(cls, data: dict) -> 'Direction':
+        return cls(
+            number=data['id'],
+            last_name=data['last_name'],
+            first_name=data['first_name'],
+            middle_name=data['middle_name'],
+            birth=iso_to_date(data['birth']),
+            gender=data['gender'],
+            from_date=iso_to_date(data['date_from']),
+            to_date=iso_to_date(data['date_to']),
+            org=Org.get_from_dict(data=data['org']) if data.get('org') else None,
+            pay_method=data['pay_method'],
+            exam_type=data['exam_type'],
+            post=data['post'],
+            shop=data['shop'],
+            law_items_section_1=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', []) if
+                                 l_i['section'] == '1'],
+            law_items_section_2=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', []) if
+                                 l_i['section'] == '2'],
+            confirm_date=iso_to_date(data['confirm_dt']),
+        )
+
+    @classmethod
     def filter(cls, params: Dict = None) -> List['Direction']:
         directions = []
         for item in Mis().request(path='/api/pre_record/', params=params)['results']:
-            directions.append(cls(
-                number=item['id'],
-                last_name=item['last_name'],
-                first_name=item['first_name'],
-                middle_name=item['middle_name'],
-                birth=iso_to_date(item['birth']),
-                gender=item['gender'],
-                from_date=iso_to_date(item['date_from']),
-                to_date=iso_to_date(item['date_to']),
-                org=Org.get_from_dict(data=item['org']) if item.get('org') else None,
-                pay_method=item['pay_method'],
-                exam_type=item['exam_type'],
-                post=item['post'],
-                shop=item['shop'],
-                law_items_section_1=[LawItem.get_from_dict(l_i) for l_i in item.get('law_items', []) if l_i['section'] == '1'],
-                law_items_section_2=[LawItem.get_from_dict(l_i) for l_i in item.get('law_items', []) if l_i['section'] == '2']
-            ))
+            directions.append(cls.dict_to_obj(item))
         return directions
 
     @classmethod
     def get(cls, direction_id) -> 'Direction':
         result = Mis().request(path=f'/api/pre_record/{direction_id}/')
-        direction = cls(
-            number=result['id'],
-            last_name=result['last_name'],
-            first_name=result['first_name'],
-            middle_name=result['middle_name'],
-            birth=iso_to_date(result['birth']),
-            gender=result['gender'],
-            from_date=iso_to_date(result['date_from']),
-            to_date=iso_to_date(result['date_to']),
-            org=Org.get_from_dict(data=result['org']) if result.get('org') else None,
-            pay_method=result['pay_method'],
-            exam_type=result['exam_type'],
-            post=result['post'],
-            shop=result['shop'],
-            law_items_section_1=[LawItem.get_from_dict(l_i) for l_i in result.get('law_items', []) if l_i['section'] == '1'],
-            law_items_section_2=[LawItem.get_from_dict(l_i) for l_i in result.get('law_items', []) if l_i['section'] == '2']
-        )
+        direction = cls.dict_to_obj(result)
         return direction
 
     @classmethod

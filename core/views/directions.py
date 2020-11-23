@@ -104,6 +104,15 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
 
         return self.object
 
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj and obj.confirm_date:
+            messages.error(self.request, 'Редактирование направления запрещено: '
+                                         'по нему уже создана заявка на осмотр в медицинской информационной системе')
+            return super().get(request, *args, **kwargs)
+
+        return super().post(request, *args, **kwargs)
+
     def form_valid(self, form):
         if self.kwargs.get(self.pk_url_kwarg):
             success, description = Direction.edit(direction_id=self.kwargs[self.pk_url_kwarg], params=form.cleaned_data)
@@ -130,6 +139,12 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         context['can_edit'] = True
         if not self.request.user.has_perm(self.get_edit_permission()):
             context['can_edit'] = False
+
+        obj = self.get_object()
+        if obj and obj.confirm_date:
+            context['can_edit'] = False
+            messages.warning(self.request, 'Редактирование направления запрещено: '
+                                           'по нему уже создана заявка на осмотр в медицинской информационной системе')
 
         return context
 
