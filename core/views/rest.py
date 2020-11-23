@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from swutils.date import date_to_rus
 
+from core.datatools.password import create_password
 from mis.law_item import LawItem
 from mis.org import Org
 from mis.worker import Worker
@@ -60,3 +61,12 @@ class Workers(APIView):
         for w in workers_dict:
             w['birth_rus'] = date_to_rus(w['birth'])
         return Response({'results': workers_dict})
+
+
+class GeneratePasswordView(APIView):
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        return Response({'password': create_password()})
+

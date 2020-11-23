@@ -17,8 +17,16 @@
         <div class="col-sm-4">
             <div class="form-group">
                 {% bootstrap_label form.new_password.label %}
-                {% bootstrap_field form.new_password show_label=False show_help=False %}
-                <small class="form-text text-muted" style="margin-top: -10px; list-style: none">{{ form.new_password.help_text|safe }}</small>
+                <div class="input-group">
+                    <input type='text' name="new_password" id="id_new_password" class="form-control" autocomplete="off"
+                           value="" placeholder="Новый пароль">
+                    <span class="input-group-append">
+                        <button type="button" class="input-group-text btn btn-outline-secondary generate-password" data-toggle="tooltip" title="Сгенерировать пароль">
+                            <i class="fa fa-key"></i>
+                        </button>
+                    </span>
+                </div>
+                <small class="form-text text-muted" style="list-style: none">{{ form.new_password.help_text|safe }}</small>
             </div>
         </div>
         <div class="col-sm-4">{% bootstrap_field form.is_active %}</div>
@@ -29,4 +37,18 @@
         <div class="col-sm-4">{% bootstrap_field form.groups %}</div>
         <div class="col-sm-4">{% bootstrap_field form.is_superuser %}</div>
     </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        $('.generate-password').click(function() {
+            return $.get({
+                url: "/rest/generate_password/",
+                success: function(data) {
+                    return $('#id_new_password').val(data.password);
+                }
+            });
+        });
+    </script>
 {% endblock %}

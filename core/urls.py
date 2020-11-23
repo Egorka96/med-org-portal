@@ -27,4 +27,5 @@ urlpatterns = [
     path('rest/orgs/', rest.Orgs.as_view(), name='rest_orgs'),
     path('rest/workers/', rest.Workers.as_view(), name='rest_workers'),
     path('rest/law_items/', rest.LawItems.as_view(), name='rest_law_items'),
+    path('rest/generate_password/', rest.GeneratePasswordView.as_view(), name='rest_generate_password'),
 ]
