@@ -1,29 +1,27 @@
-#name: Django CI
-#
-#on:
-#  push:
-#    branches: [ master ]
+name: Django CI
+
+on:
+  push:
+    branches: [ master ]
 #  pull_request:
 #    branches: [ master ]
-#
-#jobs:
-#  build:
-#    runs-on: self-hosted
-#    steps:
-#    - uses: actions/checkout@v2
-#    - name: Build Docker Image
-#      run: |
-#        docker build . --file Dockerfile --pull -t ${{ secrets.DOCKER_REGISTRY }}
-#        docker push ${{ secrets.DOCKER_REGISTRY }}
-#
-#  test:
-#    runs-on: self-hosted
-#    needs: build
-#    steps:
-#    - name: Run Tests
-#      run: |
-#        docker pull ${{ secrets.DOCKER_REGISTRY }}
-#        docker run --rm ${{ secrets.DOCKER_REGISTRY }} bash -c "coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report"
+
+jobs:
+  build:
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Docker Image
+      run: |
+        docker build . --file Dockerfile --pull -t ${{ secrets.DOCKER_REGISTRY }}
+        docker push ${{ secrets.DOCKER_REGISTRY }}
+
+  test:
+    needs: build
+    steps:
+    - name: Run Tests
+      run: |
+        docker pull ${{ secrets.DOCKER_REGISTRY }}
+        docker run --rm ${{ secrets.DOCKER_REGISTRY }} bash -c "coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report"
 
 #  deploy:
 #    runs-on: self-hosted
