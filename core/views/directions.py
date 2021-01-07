@@ -228,6 +228,7 @@ class Print(PermissionRequiredMixin, core.generic.mixins.DocxMixin, View):
     def get_print_context_data(self, **kwargs):
         context = super().get_print_context_data(**kwargs)
         context['object'] = self.get_object()
+        context['user'] = self.request.user
 
         # добавим штрих-код заявки
         direction_barcode_path = core.datatools.barcode.create_jpg(

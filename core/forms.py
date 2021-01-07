@@ -188,10 +188,11 @@ class UserEdit(OrgsMixin, forms.ModelForm):
                                              '<div>Пароль должен содержать как минимум 8 символов. </div>'
                                              '<div>Пароль не может быть одним из широко распространённых паролей. </div>'
                                              '<div>Пароль не может состоять только из цифр. </div>')
+    post = forms.CharField(label='Должность', required=False)
 
     class Meta:
         model = User
-        exclude = ['password', 'date_joined', 'last_login', 'is_staff']
+        exclude = ['password', 'date_joined', 'last_login', 'is_staff', ]
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'need-select2'}),
             'user_permissions': forms.SelectMultiple(attrs={'class': 'need-select2'}),
@@ -205,6 +206,8 @@ class UserEdit(OrgsMixin, forms.ModelForm):
             orgs = self.instance.core.get_orgs()
             self.initial['orgs'] = [str(org.id) for org in orgs]
             self.fields['orgs'].widget.choices = [(str(org.id), org.name) for org in orgs]
+
+            self.initial['post'] = self.instance.core.post
 
         self.fields['orgs'].help_text = 'к каким организациям пользователь должен иметь доступ. ' \
                                         'Оставьте поле пустым, если пользователь должен иметь доступ ко всем ' \
@@ -230,6 +233,7 @@ class UserEdit(OrgsMixin, forms.ModelForm):
             user.mis = models.User.objects.create(django_user=user)
 
         user.core.org_ids = json.dumps(self.cleaned_data.get('orgs', []))
+        user.core.post = self.cleaned_data.get('post')
         user.core.save()
 
 

@@ -29,13 +29,16 @@
                 <small class="form-text text-muted" style="list-style: none">{{ form.new_password.help_text|safe }}</small>
             </div>
         </div>
-        <div class="col-sm-4">{% bootstrap_field form.is_active %}</div>
+        <div class="col-sm-4">
+            {% bootstrap_field form.is_active %}
+            {% bootstrap_field form.is_superuser %}
+        </div>
         <div class="col-sm-4">{% bootstrap_field form.last_name %}</div>
         <div class="col-sm-4">{% bootstrap_field form.first_name %}</div>
         <div class="col-sm-4">{% bootstrap_field form.email %}</div>
         <div class="col-sm-4">{% bootstrap_field form.orgs %}</div>
+        <div class="col-sm-4">{% bootstrap_field form.post %}</div>
         <div class="col-sm-4">{% bootstrap_field form.groups %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.is_superuser %}</div>
     </div>
 {% endblock %}
 
