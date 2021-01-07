@@ -1,5 +1,4 @@
 name: Django CI
-
 on:
   push:
     branches: [ master ]
@@ -9,28 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.8]
     steps:
     - uses: actions/checkout@v2
-    - name: Build Docker Image
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
       run: |
-        docker build . --file Dockerfile --pull -t ${{ secrets.DOCKER_REGISTRY }}
-        docker push ${{ secrets.DOCKER_REGISTRY }}
-
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
     - name: Run Tests
       run: |
-        docker pull ${{ secrets.DOCKER_REGISTRY }}
-        docker run --rm ${{ secrets.DOCKER_REGISTRY }} bash -c "coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report"
-
-#  deploy:
-#    runs-on: self-hosted
-#    needs: [build, test]
-#    steps:
-#      - name: Deploy Stage
-#        run: |
-#          docker pull ${{ secrets.DOCKER_REGISTRY }}
-#          docker run --rm ${{ secrets.DOCKER_REGISTRY }} bash -c 'mkdir /root/.ssh/ && echo "${{ secrets.SSH_PRIVATE_KEY }}" > /root/.ssh/id_rsa && echo "${{ secrets.SSH_PUBLIC_KEY }}" > /root/.ssh/id_rsa.pub && chmod =600 ~/.ssh/id_rsa &&
-#                                                                  apt-get update && apt-get install -y ansible=2.7.7+dfsg-1 -V && rm -rf /var/lib/apt/lists/* && ansible-playbook -i ansible/inventory -u ansible -v ansible/install.yml -e "web_server_name=${{ secrets.web_server_name }} host=${{ secrets.host }} image_name=${{ secrets.image_name }} image=${{ secrets.DOCKER_REGISTRY }} service_name=${{ secrets.service_name }} service_port=${{ secrets.service_port }} db_host=${{ secrets.db_host }} MIS_URL=${{ secrets.MIS_URL }} MIS_TOKEN=${{ secrets.MIS_TOKEN }} PASSWORD=${{ secrets.DB_PASSWORD }} sentry_url=${{ secrets.sentry_url }}"'
+        coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report
