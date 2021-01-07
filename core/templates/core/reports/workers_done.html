@@ -75,6 +75,26 @@
         {% endfor %}
     </td>
     {% if perms.core.view_money %}<td>{{ object.total_cost }}</td>{% endif %}
-    <td>{{ object.prof.0.prof_conclusion.conclusion }}</td>
+    <td>
+        {% if object.prof.0.prof_conclusion.conclusion %}
+            <span data-toggle="tooltip"
+                    {% if object.prof.0.prof_conclusion.no_contraindications %}
+                        class="badge badge-success"
+                    {% elif object.prof.0.prof_conclusion.temporary_contraindications %}
+                        class="badge badge-warning"
+                    {% elif object.prof.0.prof_conclusion.permanent_contraindications %}
+                        class="badge badge-danger"
+                    {% else %}
+                        class="badge badge-info"
+                    {% endif %}
+
+                {% if object.prof.0.prof_conclusion.conclusion|length > 50 %}
+                    title="{{ object.prof.0.prof_conclusion.conclusion }}"
+                {% endif %}
+            >
+               {{ object.prof.0.prof_conclusion.conclusion|truncatechars:50 }}
+            </span>
+        {% endif %}
+    </td>
     <td>{{ object.prof.0.note }}</td>
 {% endblock %}
