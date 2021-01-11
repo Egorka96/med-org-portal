@@ -10,6 +10,7 @@ from mis.law_item import LawItem
 from mis.org import Org
 from mis.service_client import Mis
 from mis.pay_method import PayMethod as MisPayMethod
+from mis.document_type import DocumentType as MisDocumentType
 
 User = get_user_model()
 
@@ -101,7 +102,7 @@ class OrgsMixin(forms.Form):
             choices = []
             values = self.data.getlist(field) if hasattr(self.data, 'getlist') else None
             if not values:
-                values =  self.initial.get(field, [])
+                values = self.initial.get(field, [])
 
             if not isinstance(values, list):
                 values = [values]
@@ -144,6 +145,16 @@ class LawItems(forms.Form):
             self.fields[field].widget.choices = choices
 
 
+class DocumentTypeMixin(forms.Form):
+    document_types = ListField(label='Виды документов', help_text='для печати из МИС', required=False, choices=[],
+                               widget=forms.SelectMultiple(attrs={'class': 'need-select2'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['document_types'].widget.choices = [('', '----------')] + \
+                                                       [(d_t.id, d_t.name) for d_t in MisDocumentType.filter()]
+
+
 class DateFromTo(forms.Form):
     date_from = RusDateField(label='С', required=False, initial=None)
     date_to = RusDateField(label='По', required=False, initial=None)
@@ -181,7 +192,7 @@ class UserSearch(forms.Form):
     is_active = forms.NullBooleanField(label='Активен', required=False, initial=True)
 
 
-class UserEdit(OrgsMixin, forms.ModelForm):
+class UserEdit(OrgsMixin, DocumentTypeMixin, forms.ModelForm):
     new_password = forms.CharField(label='Новый пароль', required=False, validators=[validate_password],
                                    help_text='<div>Пароль не должен совпадать с именем или другой персональной '
                                              'информацией пользователя или быть слишком похожим на неё. </div>'
@@ -201,17 +212,21 @@ class UserEdit(OrgsMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].label = 'Логин'
+        self.fields['email'].label = 'Email'
+        self.fields['email'].help_text = 'адрес электронной почты'
 
         if getattr(self.instance, 'core', None):
             orgs = self.instance.core.get_orgs()
             self.initial['orgs'] = [str(org.id) for org in orgs]
             self.fields['orgs'].widget.choices = [(str(org.id), org.name) for org in orgs]
 
+            self.initial['document_types'] = [str(d_t.id) for d_t in self.instance.core.get_available_document_types()]
             self.initial['post'] = self.instance.core.post
 
         self.fields['orgs'].help_text = 'к каким организациям пользователь должен иметь доступ. ' \
                                         'Оставьте поле пустым, если пользователь должен иметь доступ ко всем ' \
                                         'доступным организациям'
+        self.fields['document_types'].help_text = 'какие виды документов доступны пользователю для печати'
 
     def save(self, *args, **kwargs):
         new_password = self.cleaned_data.get('new_password')
@@ -235,6 +250,12 @@ class UserEdit(OrgsMixin, forms.ModelForm):
         user.core.org_ids = json.dumps(self.cleaned_data.get('orgs', []))
         user.core.post = self.cleaned_data.get('post')
         user.core.save()
+
+        if document_type_ids := self.cleaned_data.get('document_types', []):
+            for d_t_id in document_type_ids:
+                user.core.available_document_type_ids.get_or_create(document_type_id=d_t_id)
+
+            user.core.available_document_type_ids.exclude(document_type_id__in=document_type_ids).delete()
 
 
 class WorkerSearch(FIO, DateFromTo, OrgsMixin, forms.Form):

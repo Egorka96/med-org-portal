@@ -1,6 +1,5 @@
 (function () {
     $(function () {
-
         let initialLawItemSelect2 = function (section) {
             $("#id_law_items_section_" + section).select2({
                 language: "ru",

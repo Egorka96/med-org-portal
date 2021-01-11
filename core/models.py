@@ -4,6 +4,7 @@ from typing import List
 from django.db import models
 from django.contrib.auth.models import User as DjangoUser
 
+from mis.document_type import DocumentType
 from mis.org import Org
 
 
@@ -63,6 +64,21 @@ class User(models.Model):
             return []
 
         return [Org.get(org_id=org_id) for org_id in json.loads(self.org_ids)]
+
+    def get_available_document_types(self) -> List[DocumentType]:
+        user_doc_type_ids = self.available_document_type_ids.values_list('document_type_id', flat=True)
+        return [DocumentType.get(document_type_id=d_t_id) for d_t_id in user_doc_type_ids]
+
+
+class UserAvailableDocumentType(models.Model):
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE,
+                             related_name='available_document_type_ids')
+    document_type_id = models.IntegerField('ID вида документа в МИС')
+
+    class Meta:
+        verbose_name = 'Доступный вид документа для пользователя'
+        verbose_name_plural = 'Доступные виды документов для пользователей'
+        unique_together = ('user', 'document_type_id')
 
 
 class Worker(models.Model):
