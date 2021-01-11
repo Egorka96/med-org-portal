@@ -8,6 +8,7 @@ from django.conf import settings
 class Mis:
     WORKERS_DONE_REPORT_URL = '/api/orders/by_client_date/'
     DIRECTIONS_LIST_URL = '/api/pre_record/'
+    WORKERS_LIST_URL = '/api/workers/'
 
     def __init__(self):
         self.url = settings.MIS_URL

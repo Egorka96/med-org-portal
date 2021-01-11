@@ -3,7 +3,7 @@
 <div class="row paginator-row">
     <div class="col-sm-1">
         <div class="dropup" data-toggle="tooltip" title="Количество объектов на странице" data-placement="bottom" >
-              <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {% if paginator.per_page <= object_list|length %}{{ paginator.per_page }}{% else %}Все{% endif %}
                     <span class="caret"></span>
               </button>
@@ -13,7 +13,7 @@
                     <li><a href="{% set_per_page 300 additional_params %}" class="dropdown-item">300</a></li>
                     <li><a href="{% set_per_page 1000 additional_params %}" class="dropdown-item">1000</a></li>
                     {% if request.user.is_superuser %}
-                        <li class="divider"></li>
+                        <hr>
                         <li><a href="{% set_per_page 'all' additional_params %}" class="dropdown-item">Все</a></li>
                     {% endif %}
               </ul>

@@ -65,5 +65,18 @@
       ]
     ]
   }
+},
+{
+  "model": "auth.group",
+  "fields": {
+    "name": "Просмотр сотрудников",
+    "permissions": [
+      [
+        "view_worker",
+        "core",
+        "worker"
+      ]
+    ]
+  }
 }
 ]

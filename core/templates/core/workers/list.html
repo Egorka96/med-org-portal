@@ -1,0 +1,66 @@
+{% extends 'core/base_list.html' %}
+{% load bootstrap4 %}
+
+{% block form %}
+    <div class="row">
+        <div class="col-sm-4">
+            {% bootstrap_field form.last_name layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+            {% bootstrap_field form.first_name layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+            {% bootstrap_field form.middle_name layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+        </div>
+        <div class="col-sm-3">
+            {% bootstrap_field form.date_from layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+            {% bootstrap_field form.date_to layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+            {% bootstrap_field form.is_active layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+        </div>
+        <div class="col-sm-5">
+            {% if show_orgs %}{% bootstrap_field form.orgs layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}{% endif %}
+            {% bootstrap_field form.shop layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+            {% bootstrap_field form.post layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block pre_table %}
+    {% if page_obj|default:object_list %}
+        <span class="label label-info">Всего: {{ page_obj.paginator.count|default:object_list.count }}</span>
+    {% endif %}
+{% endblock pre_table %}
+
+{% block table %}
+    {% for object in page_obj|default:object_list %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ object }}</h5>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {% if show_orgs %}{{ object.org.legal_name }}<br>{% endif %}
+                            <b>Должность: </b>{{ object.post }}
+                            {% if object.shop %}
+                                <br><b>Подразделение: </b>{{ object.shop }}
+                            {% endif %}
+                            {% if object.law_items_section_1 or object.law_items_section_2 %}
+                                <br><b>Пункты приказа 302н:</b>
+                                <ul>
+                                    {% if object.law_items_section_1 %}
+                                        <li>
+                                            <b>Приложение 1:</b> {% for l_i in object.law_items_section_1 %}п.{{ l_i.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                        </li>
+                                    {% endif %}
+                                    {% if object.law_items_section_2 %}
+                                        <li>
+                                            <b>Приложение 2:</b> {% for l_i in object.law_items_section_2 %}п.{{ l_i.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            {% endif %}
+                        </h6>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

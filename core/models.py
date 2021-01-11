@@ -65,6 +65,13 @@ class User(models.Model):
         return [Org.get(org_id=org_id) for org_id in json.loads(self.org_ids)]
 
 
+class Worker(models.Model):
+
+    class Meta:
+        verbose_name = 'Сотрудник'
+        verbose_name_plural = 'Сотрудники'
+
+
 class DirectionDocxTemplate(models.Model):
     name = models.CharField('Название', max_length=255, unique=True)
     description = models.TextField('Описание', blank=True)

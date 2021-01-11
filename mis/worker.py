@@ -11,6 +11,7 @@ from mis.service_client import Mis
 
 @dataclass
 class Worker:
+    id: int
     org: Org
     last_name: str
     first_name: str
@@ -27,7 +28,7 @@ class Worker:
         return ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
 
     @classmethod
-    def filter(cls, params: Dict = None, user = None) -> List['Worker']:
+    def filter(cls, params: Dict = None, user=None) -> List['Worker']:
         workers = []
         for item in Mis().request(path='/api/workers/', params=params, user=user)['results']:
             workers.append(cls.get_from_dict(item))
@@ -42,6 +43,7 @@ class Worker:
     @classmethod
     def get_from_dict(cls, data: dict) -> 'Worker':
         return cls(
+            id=data['id'],
             last_name=data['last_name'],
             first_name=data['first_name'],
             middle_name=data['middle_name'],

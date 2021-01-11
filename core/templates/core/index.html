@@ -4,6 +4,14 @@
     <div class="index-content">
         <div class="row">
             <div class="col-sm-12 text-center">
+                {% if perms.core.view_worker %}
+                    <a class="btn btn-index-info index-btn" href="{% url 'core:workers' %}">
+                         <p><i class="fa fa-users"></i></p>
+                            Сотрудники
+                            <p class="index-btn-small-text">сотрудники организации</p>
+                    </a>
+                {% endif %}
+
                 {% if perms.core.view_workers_done_report %}
                     <a class="btn btn-index-primary index-btn" href="{% url 'core:workers_done_report' %}">
                          <p><i class="fa fa-list"></i></p>

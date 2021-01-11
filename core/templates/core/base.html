@@ -97,6 +97,11 @@
                     <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav navbar-center">
 {#                            {% if user.is_authenticated and request.path != '/' %}#}
+                                {% if perms.core.view_worker %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'core:workers' %}">Сотрудники</a>
+                                    </li>
+                                {% endif %}
                                 {% if perms.core.view_workers_done_report %}
                                     <li class="nav-item">
                                         <a class="nav-link" href="{% url 'core:workers_done_report' %}">Отчет по прошедшим</a>

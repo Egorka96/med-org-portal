@@ -84,7 +84,7 @@ class RestListMixin:
                     user=self.request.user,
                     params=filter_params,
                 )
-                self.object_list = response_data['results']
+                self.object_list = self.process_response_results(response_data['results'])
                 self.count = response_data['count']
                 self.have_next = bool(response_data['next'])
                 self.have_previous = bool(response_data['previous'])
@@ -93,6 +93,9 @@ class RestListMixin:
                 self.count = 0
 
         return self.object_list
+
+    def process_response_results(self, objects: List[Dict]) -> List[Dict]:
+        return objects
 
     def get_context_data(self, **kwargs):
         self.get_objects()
