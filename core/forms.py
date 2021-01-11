@@ -10,7 +10,7 @@ from mis.law_item import LawItem
 from mis.org import Org
 from mis.service_client import Mis
 from mis.pay_method import PayMethod as MisPayMethod
-from mis.document_type import DocumentType as MisDocumentType
+from mis.document import DocumentType as MisDocumentType
 
 User = get_user_model()
 

@@ -3,15 +3,23 @@ import json
 from copy import copy
 
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from swutils.date import date_to_rus
 
 from core.datatools.password import create_password
+from core import serializers
 from mis.law_item import LawItem
 from mis.org import Org
 from mis.worker import Worker
+
+
+class ViewWorkerPermission(BasePermission):
+    message = 'Просмотр сотрудника не разрешен'
+
+    def has_permission(self, request, view):
+        return request.user.has_perm('core.view_worker')
 
 
 class Orgs(APIView):
@@ -61,6 +69,24 @@ class Workers(APIView):
         for w in workers_dict:
             w['birth_rus'] = date_to_rus(w['birth'])
         return Response({'results': workers_dict})
+
+
+class WorkerDocuments(APIView):
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (ViewWorkerPermission, )
+
+    def get(self, request, *args, **kwargs):
+        serializer = serializers.WorkerDocuments(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        worker = Worker.get(worker_id=serializer.validated_data['worker_mis_id'], user=self.request.user)
+        documents_by_date = worker.get_documents_by_dates()
+
+        serialized_documents_by_dates = {}
+        for date, documents in documents_by_date.items():
+            serialized_documents_by_dates[date] = [dataclasses.asdict(document) for document in documents]
+
+        return Response({'documents': serialized_documents_by_dates})
 
 
 class GeneratePasswordView(APIView):

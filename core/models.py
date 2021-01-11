@@ -4,7 +4,7 @@ from typing import List
 from django.db import models
 from django.contrib.auth.models import User as DjangoUser
 
-from mis.document_type import DocumentType
+from mis.document import DocumentType
 from mis.org import Org
 
 

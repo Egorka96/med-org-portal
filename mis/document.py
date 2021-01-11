@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass
 from typing import List, Dict
 
@@ -41,4 +42,19 @@ class DocumentType:
         return cls(
             id=data['id'],
             name=data.get('name'),
+        )
+
+
+@dataclass
+class Document:
+    date: datetime.date
+    document_type: DocumentType
+    document_link: str
+
+    @classmethod
+    def get_from_dict(cls, data) -> 'Document':
+        return cls(
+            date=data['date'],
+            document_type=DocumentType.get_from_dict(data['doc_type']),
+            document_link=data['doc_link'],
         )
