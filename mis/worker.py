@@ -54,7 +54,7 @@ class Worker:
                 for document_data in date_data.get('documents', []):
                     if document_data['doc_type']['id'] not in available_document_type_ids:
                         continue
-                    document_data['date'] = date_data['date']
+                    document_data['date'] = iso_to_date(date_data['date'])
                     data['documents'].append(Document.get_from_dict(document_data))
 
         return cls(

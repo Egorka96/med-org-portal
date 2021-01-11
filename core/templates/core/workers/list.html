@@ -37,7 +37,7 @@
                     <div class="col-sm-5">
                         <h6 class="card-subtitle mb-2 text-muted">
                             {% if show_orgs %}{{ object.org.legal_name }}<br>{% endif %}
-                            <b>Должность: </b>{{ object.post }}
+                            <b>Должность: </b>{{ object.post|default:"Не указана" }}
                             {% if object.shop %}
                                 <br><b>Подразделение: </b>{{ object.shop }}
                             {% endif %}
@@ -60,12 +60,16 @@
                     </div>
                     <div class="col-sm-2">
                         <div class="worker-documents">
-                            <span class="badge badge-secondary" data-toggle="tooltip" title="Загрузка информации о документах по сотруднику">
+                            <span class="badge badge-secondary badge-loading" data-toggle="tooltip" title="Загрузка информации о документах по сотруднику">
                                 Загрузка...
                             </span>
-                            <button type="button" class="btn btn-outline-secondary worker-documents-btn" data-worker-id="{{ object.id }}" hidden>
-                                <i class="fa fa-file-pdf-o"></i>
-                            </button>
+                            <span data-toggle="tooltip" title="Документы по сотруднику">
+                                <button type="button" class="btn btn-outline-secondary worker-documents-btn"
+                                        data-worker-id="{{ object.id }}">
+                                    <i class="fa fa-file-pdf-o"></i>
+                                </button>
+                            </span>
+
                         </div>
                     </div>
                 </div>

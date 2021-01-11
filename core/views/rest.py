@@ -84,9 +84,9 @@ class WorkerDocuments(APIView):
 
         serialized_documents_by_dates = {}
         for date, documents in documents_by_date.items():
-            serialized_documents_by_dates[date] = [dataclasses.asdict(document) for document in documents]
+            serialized_documents_by_dates[date_to_rus(date)] = [dataclasses.asdict(document) for document in documents]
 
-        return Response({'documents': serialized_documents_by_dates})
+        return Response({'documents': dict(reversed(list(serialized_documents_by_dates.items())))})
 
 
 class GeneratePasswordView(APIView):
