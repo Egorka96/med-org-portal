@@ -13,10 +13,11 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
              core.generic.views.ListView):
     title = 'Сотрудники'
     form_class = forms.WorkerSearch
-    paginate_by = 50
+    paginate_by = 100
     permission_required = 'core.view_worker'
     template_name = 'core/workers/list.html'
     mis_request_path = Mis.WORKERS_LIST_URL
+    load_without_params = True
 
     def get_breadcrumbs(self):
         return [

@@ -71,13 +71,3 @@ class Worker:
             law_items_section_2=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', []) if l_i['section'] == '2'],
             documents=data.get('documents')
         )
-
-    def get_documents_by_dates(self) -> Dict:
-        if not self.documents:
-            return {}
-
-        documents_by_dates = {}
-        for document in self.documents:
-            documents_by_dates.setdefault(document.date, []).append(document)
-
-        return documents_by_dates

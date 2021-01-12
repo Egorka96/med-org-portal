@@ -80,13 +80,15 @@ class WorkerDocuments(APIView):
         serializer.is_valid(raise_exception=True)
 
         worker = Worker.get(worker_id=serializer.validated_data['worker_mis_id'], user=self.request.user)
-        documents_by_date = worker.get_documents_by_dates()
+        worker_documents = sorted(worker.documents or [], key=lambda d: d.date, reverse=True)
 
-        serialized_documents_by_dates = {}
-        for date, documents in documents_by_date.items():
-            serialized_documents_by_dates[date_to_rus(date)] = [dataclasses.asdict(document) for document in documents]
+        serialized_documents = []
+        for document in worker_documents:
+            document_dict = dataclasses.asdict(document)
+            document_dict['date'] = date_to_rus(document.date)
+            serialized_documents.append(document_dict)
 
-        return Response({'documents': dict(reversed(list(serialized_documents_by_dates.items())))})
+        return Response({'documents': serialized_documents})
 
 
 class GeneratePasswordView(APIView):

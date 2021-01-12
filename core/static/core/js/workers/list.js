@@ -17,23 +17,24 @@
                         let workerDocumentBtn = $($.find(`[data-worker-id="${workerId}"]`))
                         workerDocumentBtn.parents("div").children(".badge-loading").hide()
 
-                        if (Object.keys(response.documents).length) {
-                            let content = ''
-                            $.each(response.documents, function(date, documents) {
-                                content += `<h5>${date}</h5><ul>`
-                                for (let i = 0; i < documents.length; i++) {
-                                    let document = documents[i]
-                                    content += `<li><a href="">${document.document_type.name}</a> </li>`
-                                }
-                                content += "</ul><hr>"
-                            });
+                        if (response.documents.length) {
+                            let content = '<ul class="worker-documents-list">'
+                            for (let i = 0; i < response.documents.length; i++) {
+                                let document = response.documents[i]
+                                content += `<li class="worker-documents-item">
+                                                <a href="">${document.document_type.name}</a> 
+                                                <span class="help-block">${document.date}</span>
+                                            </li>`
+                            }
+                            content += "</ul>"
 
                             workerDocumentBtn.show()
                             workerDocumentBtn.popover({
                                 container: 'body',
                                 trigger: 'focus',
                                 content: content,
-                                html: true
+                                html: true,
+                                title: "Документы сотрудника"
                             })
                         } else {
 
