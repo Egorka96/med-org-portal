@@ -151,8 +151,7 @@ class DocumentTypeMixin(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['document_types'].widget.choices = [('', '----------')] + \
-                                                       [(d_t.id, d_t.name) for d_t in MisDocumentType.filter()]
+        self.fields['document_types'].widget.choices = [(d_t.id, d_t.name) for d_t in MisDocumentType.filter()]
 
 
 class DateFromTo(forms.Form):
