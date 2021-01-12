@@ -39,7 +39,9 @@
                             for (let i = 0; i < response.documents.length; i++) {
                                 let document = response.documents[i]
                                 content += `<li class="worker-documents-item">
-                                                <a href="">${document.document_type.name}</a> 
+                                                <a href="/workers/documents/print/?worker_mis_id=${response.worker_mis_id}&document_link=${encodeURIComponent(document.document_link)}" target="_blank">
+                                                    ${document.document_type.name}
+                                                </a> 
                                                 <span class="help-block">${document.date}</span>
                                             </li>`
                             }

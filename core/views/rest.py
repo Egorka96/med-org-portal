@@ -88,7 +88,7 @@ class WorkerDocuments(APIView):
             document_dict['date'] = date_to_rus(document.date)
             serialized_documents.append(document_dict)
 
-        return Response({'documents': serialized_documents})
+        return Response({'worker_mis_id': worker.id, 'documents': serialized_documents})
 
 
 class GeneratePasswordView(APIView):

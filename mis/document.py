@@ -58,3 +58,12 @@ class Document:
             document_type=DocumentType.get_from_dict(data['doc_type']),
             document_link=data['doc_link'],
         )
+
+    @classmethod
+    def get_content(cls, path: str) -> bytes:
+        url = settings.MIS_URL + path
+        print(url)
+        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.content

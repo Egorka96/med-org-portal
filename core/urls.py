@@ -18,6 +18,7 @@ urlpatterns = [
     path('user/<int:pk>/delete/', user.Delete.as_view(), name='user_delete'),
 
     path('workers/', worker.Search.as_view(), name='workers'),
+    path('workers/documents/print/', worker.DocumentPrint.as_view(), name='worker_documents_print'),
 
     path('reports/workers_done_report/', reports.WorkersDoneReport.as_view(), name='workers_done_report'),
 
