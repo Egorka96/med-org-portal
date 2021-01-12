@@ -23,9 +23,7 @@
     {% block form_container %}
         <form id='searchFrom' action="" method="GET">
             <fieldset>
-                {% block legend %}
-                    <legend>{{ title }}. Параметры поиска</legend>
-                {% endblock %}
+                <legend>Параметры поиска</legend>
                 {% block form %}
                     {% bootstrap_form_errors form %}
                     {% bootstrap_form form %}
@@ -66,7 +64,9 @@
     {% endblock pre_table %}
 
     {% if object_list %}
-        {% include 'core/paginator.html' %}
+        {% block paginator_top %}
+            {% include 'core/paginator.html' %}
+        {% endblock %}
         {% block table %}
             <div class="table-container">
             <table class="report-table table table-striped table-hover">
@@ -91,7 +91,9 @@
             </table>
             </div>
         {% endblock table %}
-        {% include 'core/paginator.html' %}
+        {% block paginator_bottom %}
+            {% include 'core/paginator.html' %}
+        {% endblock %}
     {% elif form.is_bound and request.GET %}
         <div class="alert alert-warning">
             По вашему запросу ничего не найдено.

@@ -8,7 +8,7 @@
 
     prepareOrgs = function () {
         let initialSelect2 = function () {
-            $('#id_org, #id_orgs').not(':hidden').select2({
+            $('#id_org, #id_orgs').select2({
                 language: "ru",
                 theme: "bootstrap",
                 ajax: {

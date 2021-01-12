@@ -1,5 +1,40 @@
 {% extends 'core/base_list.html' %}
 {% load bootstrap4 %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .help-block {
+            color: #7d7d7d
+        }
+        .card-worker {
+            margin-bottom: 20px;
+            border-color: #bfbfbf;
+        }
+        .card-worker-extra-info {
+            height: 25px;
+        }
+        .worker-documents-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .worker-documents-item {
+            margin-bottom: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block container %}
+    <div class="row">
+        <div class="col-sm-12 text-right">
+            <button type="button" class="btn btn-outline-secondary btn-sm btn-show-search-form" data-toggle="tooltip" title="Показать параметры фильтрации">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+    </div>
+    {{ block.super }}
+{% endblock %}
 
 {% block form %}
     <div class="row">
@@ -21,46 +56,52 @@
     </div>
 {% endblock %}
 
+{% block right_buttons %}
+    {{ block.super }}
+    <button type="button" class="btn btn-outline-secondary btn-hide-search-form" data-toggle="tooltip" title="Убрать параметры поиска">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+{% endblock %}
+
 {% block pre_table %}
     {% if page_obj|default:object_list %}
-        <span class="label label-info">Всего: {{ page_obj.paginator.count|default:object_list.count }}</span>
+        <h5>Количество сотрудников: {{ page_obj.paginator.count|default:object_list.count }}</h5>
     {% endif %}
 {% endblock pre_table %}
 
+{% block paginator_top %}{% endblock %}
+
 {% block table %}
-    {% for object in page_obj|default:object_list %}
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ object }}</h5>
-                <div class="row">
-                    <div class="col-sm-5">
-                        <h6 class="card-subtitle mb-2 text-muted">
-                            {% if show_orgs %}{{ object.org.legal_name }}<br>{% endif %}
-                            <b>Должность: </b>{{ object.post }}
-                            {% if object.shop %}
-                                <br><b>Подразделение: </b>{{ object.shop }}
-                            {% endif %}
-                            {% if object.law_items_section_1 or object.law_items_section_2 %}
-                                <br><b>Пункты приказа 302н:</b>
-                                <ul>
-                                    {% if object.law_items_section_1 %}
-                                        <li>
-                                            <b>Приложение 1:</b> {% for l_i in object.law_items_section_1 %}п.{{ l_i.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                                        </li>
-                                    {% endif %}
-                                    {% if object.law_items_section_2 %}
-                                        <li>
-                                            <b>Приложение 2:</b> {% for l_i in object.law_items_section_2 %}п.{{ l_i.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            {% endif %}
-                        </h6>
-                    </div>
-                    <div class="col-sm-2">
+    <div class="row workers">
+        {% for object in page_obj|default:object_list %}
+            <div class="col-sm-6">
+                <div class="card card-worker">
+                    <div class="card-body">
+                        <div class="card-worker-info">
+                            <h5 class="card-title">{{ object }}</h5>
+                            <p class="card-text help-block">
+                                {{ object.post|default:"Не указана" }}
+                                {% if object.shop %}<br>{{ object.shop }}{% endif %}
+                            </p>
+                        </div>
+                        <hr>
+                        <div class="card-worker-extra-info">
+                            <span class="badge badge-secondary badge-loading" data-toggle="tooltip" title="Загрузка информации о документах по сотруднику" data-placement="left" data-container="body">
+                                Загрузка...
+                            </span>
+                            <button type="button" class="btn btn-outline-secondary btn-sm worker-documents-btn"
+                                    data-worker-id="{{ object.id }}">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static "core/js/workers/list.js" %}"></script>
 {% endblock %}

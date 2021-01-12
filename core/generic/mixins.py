@@ -36,6 +36,8 @@ class RestPaginator(Paginator):
 
 
 class RestListMixin:
+    load_without_params = False
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.object_list: Optional[List[Dict]] = None
@@ -78,7 +80,9 @@ class RestListMixin:
         if self.object_list is None:
             form = self.get_form()
             filter_params = self.get_filter_params()
-            if form.is_valid() or (not form.is_bound and filter_params):
+            if form.is_valid() or (not form.is_bound and (filter_params or self.load_without_params)):
+                request_params = filter_params
+                request_params['per_page'] = self.request.GET.get('per_page', self.paginate_by)
                 response_data = Mis().request(
                     path=self.mis_request_path,
                     user=self.request.user,

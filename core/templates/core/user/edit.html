@@ -13,32 +13,35 @@
 {% block fields %}
     <legend>{% if object.id %}Редактирование пользователя "{{ object }}"{% else %}Создание нового пользователя{% endif %}</legend>
     <div class="row">
-        <div class="col-sm-4">{% bootstrap_field form.username %}</div>
-        <div class="col-sm-4">
-            <div class="form-group">
-                {% bootstrap_label form.new_password.label %}
-                <div class="input-group">
-                    <input type='text' name="new_password" id="id_new_password" class="form-control" autocomplete="off"
-                           value="" placeholder="Новый пароль">
-                    <span class="input-group-append">
-                        <button type="button" class="input-group-text btn btn-outline-secondary generate-password" data-toggle="tooltip" title="Сгенерировать пароль">
-                            <i class="fa fa-key"></i>
-                        </button>
-                    </span>
+        <div class="col-sm-6 border-right">
+            {% bootstrap_field form.username layout='horizontal' %}
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="id_username">Пароль</label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <input type='text' name="new_password" id="id_new_password" class="form-control" autocomplete="off"
+                               value="" placeholder="Новый пароль">
+                        <span class="input-group-append">
+                            <button type="button" class="input-group-text btn btn-outline-secondary generate-password" data-toggle="tooltip" title="Сгенерировать пароль">
+                                <i class="fa fa-key"></i>
+                            </button>
+                        </span>
+                    </div>
+                    <small class="form-text text-muted" style="list-style: none">{{ form.new_password.help_text|safe }}</small>
                 </div>
-                <small class="form-text text-muted" style="list-style: none">{{ form.new_password.help_text|safe }}</small>
             </div>
+            {% bootstrap_field form.groups layout='horizontal' %}
+            {% bootstrap_field form.is_active layout='horizontal' %}
+            {% bootstrap_field form.is_superuser layout='horizontal' %}
         </div>
-        <div class="col-sm-4">
-            {% bootstrap_field form.is_active %}
-            {% bootstrap_field form.is_superuser %}
+        <div class="col-sm-6">
+            {% bootstrap_field form.last_name layout='horizontal' %}
+            {% bootstrap_field form.first_name layout='horizontal' %}
+            {% bootstrap_field form.email layout='horizontal' %}
+            {% bootstrap_field form.orgs layout='horizontal' %}
+            {% bootstrap_field form.post layout='horizontal' %}
+            {% bootstrap_field form.document_types layout='horizontal' %}
         </div>
-        <div class="col-sm-4">{% bootstrap_field form.last_name %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.first_name %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.email %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.orgs %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.post %}</div>
-        <div class="col-sm-4">{% bootstrap_field form.groups %}</div>
     </div>
 {% endblock %}
 
