@@ -1,5 +1,22 @@
 (function () {
     $(function () {
+        // по-умолчанию, будем прятать параметры фильтрации
+        $("#searchFrom").hide()
+        $(".btn-show-search-form").click(function () {
+            $("#searchFrom").show()
+            $(".btn-show-search-form").hide()
+        })
+        $(".btn-hide-search-form").click(function () {
+            $("#searchFrom").hide()
+            $(".btn-show-search-form").show()
+        })
+
+        // вычислим максимальную высоту карточки с сотрудников и присвоем эту высоту всем карточкам
+        let workerCardHeights = $.map($('.card-worker-info'), function (item) {
+            return $(item).height()
+        })
+        $('.card-worker-info').height(Math.max.apply(Math, workerCardHeights))
+
         $(".worker-documents-btn").hide()
         let workerIds = $.map($('.worker-documents-btn'), function (btn) {
             return $(btn).data('worker-id')
