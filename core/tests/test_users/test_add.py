@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 
 from mis.org import Org
+from mis.document import DocumentType
 
 from core import models
 from core.tests.base import BaseTestCase
@@ -19,6 +20,16 @@ class TestAdd(BaseTestCase):
     view = 'core:user_add'
     permission = 'auth.add_user'
 
+    @mock.patch.object(Org, 'get')
+    @mock.patch.object(DocumentType, 'filter')
+    def setUp(self, mock_document_type, mock_org):
+        mock_document_type.return_value = [
+            DocumentType(id=1, name='Тестовый документ1'),
+            DocumentType(id=2, name='Тестовый документ2'),
+        ]
+        mock_org.return_value = Org(id=1, name='test org')
+        super().setUp()
+
     def generate_data(self):
         self.core_user = models.User.objects.create(django_user=self.user)
 
@@ -27,7 +38,12 @@ class TestAdd(BaseTestCase):
         self.permission_group.permissions.add(self.auth_permission)
 
     @mock.patch.object(Org, 'get')
-    def test_add(self, mock_org):
+    @mock.patch.object(DocumentType, 'filter')
+    def test_add(self, mock_document_type, mock_org):
+        mock_document_type.return_value = [
+            DocumentType(id=1, name='Тестовый документ1'),
+            DocumentType(id=2, name='Тестовый документ2'),
+        ]
         mock_org.return_value = Org(id=1, name='test org')
 
         users_count = User.objects.count()
@@ -57,7 +73,15 @@ class TestAdd(BaseTestCase):
         self.assertEqual(core_user.django_user, user)
         self.assertEqual(core_user.org_ids, json.dumps(params['orgs']))
 
-    def test_add_errors(self):
+    @mock.patch.object(Org, 'get')
+    @mock.patch.object(DocumentType, 'filter')
+    def test_add_errors(self, mock_document_type, mock_org):
+        mock_document_type.return_value = [
+            DocumentType(id=1, name='Тестовый документ1'),
+            DocumentType(id=2, name='Тестовый документ2'),
+        ]
+        mock_org.return_value = Org(id=1, name='test org')
+
         params = {
             'username': '',
         }

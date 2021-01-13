@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group as AuthGroup
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 
+from mis.document import DocumentType
 from mis.org import Org
 from core.tests.base import BaseTestCase
 from core import models
@@ -16,6 +17,16 @@ User = get_user_model()
 class TestEdit(BaseTestCase):
     view = 'core:user_edit'
     permission = 'auth.change_user'
+
+    @mock.patch.object(Org, 'get')
+    @mock.patch.object(DocumentType, 'filter')
+    def setUp(self, mock_document_type, mock_org):
+        mock_document_type.return_value = [
+            DocumentType(id=1, name='Тестовый документ1'),
+            DocumentType(id=2, name='Тестовый документ2'),
+        ]
+        mock_org.return_value = Org(id=1, name='test org')
+        super().setUp()
 
     def generate_data(self):
         self.core_user = models.User.objects.create(django_user=self.user)
@@ -33,8 +44,14 @@ class TestEdit(BaseTestCase):
         return {'pk': self.test_user.id}
 
     @mock.patch.object(Org, 'get')
-    def test_add(self, mock_org):
+    @mock.patch.object(DocumentType, 'filter')
+    def test_edit(self, mock_document_type, mock_org):
+        mock_document_type.return_value = [
+            DocumentType(id=1, name='Тестовый документ1'),
+            DocumentType(id=2, name='Тестовый документ2'),
+        ]
         mock_org.return_value = Org(id=1, name='test org')
+
         response = self.client.get(self.get_url())
         self.check_response(response)
         self.assertEqual(response.context_data['object'], self.test_user)
