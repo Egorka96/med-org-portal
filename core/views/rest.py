@@ -36,7 +36,7 @@ class Orgs(APIView):
 
         orgs = Org.filter(params=filter_params)
         results = [
-            {'id': org.id, 'text': org.name} for org in orgs
+            {'id': org.id, 'text': str(org)} for org in orgs
         ]
 
         return Response({'results': results})
