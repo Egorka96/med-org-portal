@@ -87,7 +87,10 @@ class Direction:
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
         params['date_from'] = now().date()
-        params['date_to'] = params['date_from'] + relativedelta(days=settings.DIRECTION_ACTION_DAYS)
+        if getattr(settings, 'DIRECTION_ACTION_DAYS', None):
+            params['date_to'] = params['date_from'] + relativedelta(days=settings.DIRECTION_ACTION_DAYS)
+        else:
+            params['date_to'] = datetime.date(params['date_from'].year, 12, 31)
         params['order_types'] = [2]  # ПРОФ осмотр
 
         if params.get('law_items_section_1') or params.get('law_items_section_2'):
