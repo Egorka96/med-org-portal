@@ -113,7 +113,7 @@ class OrgsMixin(forms.Form):
                         continue
 
                     org = Org.get(org_id=value)
-                    choices.append((org.id, org.name))
+                    choices.append((org.id, str(org)))
 
             self.fields[field].widget.choices = choices
 
