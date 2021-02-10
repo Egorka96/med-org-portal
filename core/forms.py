@@ -286,6 +286,14 @@ class DirectionSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     post = forms.CharField(label='Должность', required=False)
     confirmed = forms.NullBooleanField(label='Подтвержден', required=False)
 
+    def clean_confirmed(self):
+        value = self.cleaned_data.get('confirmed')
+        if value is None:
+            return
+
+        # возвращаем в формате, ожидаемому МИС
+        return int(value)
+
 
 class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Form):
     GENDER_CHOICE = (

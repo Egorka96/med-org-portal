@@ -144,7 +144,7 @@ TEMPLATES_DICT = {
 
 # время действия направления (в днях)
 # если не указано, то направление действует до конца текущего года
-# DIRECTION_ACTION_DAYS = 30
+DIRECTION_ACTION_DAYS = os.environ.get('DIRECTION_ACTION_DAYS', '')
 
 try:
     from project.local_settings import *

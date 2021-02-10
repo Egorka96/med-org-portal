@@ -44,7 +44,13 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
         return initial
 
     def get_filter_params(self):
-        return dict(self.request.GET) or self.get_initial()
+        form = self.get_form()
+        if form.is_valid():
+            filter_params = form.cleaned_data
+        else:
+            filter_params = self.get_initial()
+
+        return filter_params
 
 
 class Edit(PermissionRequiredMixin, core.generic.views.EditView):
