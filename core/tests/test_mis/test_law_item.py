@@ -2,14 +2,13 @@ from unittest import mock
 
 from coverage.backunittest import TestCase
 from django.test import override_settings
-from mis.org import Org
+from kombu.utils import json
+from mis.law_item import LawItem
 from requests import Response
-from rest_framework.utils import json
 from django.conf import settings
 
 
-
-class OrgTests(TestCase):
+class LawItemTests(TestCase):
     MIS_URL = 'http://127.0.0.1:8000'
 
     def get_response(self, content='', status_code=200):
@@ -24,66 +23,69 @@ class OrgTests(TestCase):
         response_json = {
             'results':[{
                 'id': 1,
-                'name': 'Организация 1',
-                'legal_name': 'ООО "Организация 1" '
+                'name': 'test 1',
+                'section': 'test 1',
+                'description': 'test 1'
             },
             {
                 'id': 2,
-                'name':'Организация 2',
-                'legal_name': 'ОАО "Организация 2" '
+                'name': 'test 2',
+                'section': 'test 2',
+                'description': 'test 2'
             },
             {
                 'id': 3,
-                'name': 'Организация 3',
-                'legal_name': 'ООО "Организация 3" '
+                'name': 'test 3',
+                'section': 'test 3',
+                'description': 'test 3'
             }]
         }
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
 
-        expected_orgs = []
+        law_items = []
         for item in response_json['results']:
-            org = Org(id=item['id'], name=item['name'], legal_name=item['legal_name'])
-            expected_orgs.append(org)
+            law_items.append(LawItem(
+                id=item['id'],
+                name=item['name'],
+                section=item['section'],
+                description=item['description']
+            ))
 
-        filter_params = {'name': 'Организация 1'}
+        filter_params = {'name': 'test 3'}
         expect_params = {
-            'url': self.MIS_URL + '/api/orgs/',
+            'url': self.MIS_URL + f'/api/law_items/',
             'params': filter_params,
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'}
         }
 
-        orgs = Org.filter(params=filter_params)
-        self.assertEqual(expected_orgs, orgs)
+        law_item = LawItem.filter(filter_params)
         self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
+        self.assertEqual(law_items, law_item)
 
     @mock.patch('requests.get')
     @override_settings(MIS_URL=MIS_URL)
     def test_get(self, mock_request):
-        get_params = 1
+        law_item_id = 1
         response_json = {
-            'id': get_params,
-            'name': 'Организация 1',
-            'legal_name': 'ОАО "Организация 1" '
+            'id': 1,
+            'name': 'test 3',
+            'section': 'test 3',
+            'description': 'test 3'
         }
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
 
-        org = Org(
-            id=response_json['id'],
-            name=response_json['name'],
-            legal_name=response_json['legal_name']
-        )
-
         expect_params = {
-            'url': self.MIS_URL + f'/api/orgs/{get_params}/',
-            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
+            'url': self.MIS_URL + f'/api/law_items/{law_item_id}',
+            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'}
         }
 
-        orgs = Org.get(get_params)
+        law_item = LawItem(
+            id=response_json['id'],
+            name=response_json['name'],
+            section=response_json['section'],
+            description=response_json['description']
+        )
+
+        law_items = LawItem.get(law_item_id)
         self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
-        self.assertEqual(org, orgs)
-
-
-
-
-
-
+        self.assertEqual(law_item, law_items)
