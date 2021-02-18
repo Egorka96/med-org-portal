@@ -58,7 +58,7 @@ class DocumentTypeTests(TestCase):
         doc_id = 1
         response_json = {
             'id': 1,
-            'name': 'НУ КАК ТАК'
+            'name': 'Обходной лист'
         }
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
 
