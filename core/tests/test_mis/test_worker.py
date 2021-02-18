@@ -104,7 +104,7 @@ class WorkerTests(TestCase):
             'url': self.MIS_URL + '/api/workers/',
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
             'method': 'get',
-            'params': params,
+            'params': {'last_name': 'Сидоров', 'orgs': json.loads(self.user.core.org_ids)},
             'data': None
         }
         Worker.filter(params, self.user)
@@ -283,7 +283,8 @@ class WorkerTests(TestCase):
 
     @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
-    def test_get_from_dict_user(self, mock_request):
+    def test_get_from_dict_user_one_doc_type(self, mock_request):
+        models.UserAvailableDocumentType.objects.all().delete()
         models.UserAvailableDocumentType.objects.create(user=self.core_user, document_type_id=4)
         org_data = {
             'id': 1,
