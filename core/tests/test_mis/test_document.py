@@ -23,15 +23,15 @@ class DocumentTypeTests(TestCase):
     def test_filter(self, mock_request):
         response_json = [{
                 'id': 1,
-                'name': 'БЛА БЛА'
+                'name': 'Обходной лист'
             },
             {
                 'id': 2,
-                'name': 'ХАХАХА'
+                'name': 'Простой лист'
             },
             {
                 'id': 3,
-                'name': 'НУ КАК ТАК'
+                'name': 'Обычный лист'
         }]
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
 
