@@ -67,7 +67,7 @@ class OrgTests(TestCase):
         }
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
 
-        org = Org(
+        org_expected = Org(
             id=response_json['id'],
             name=response_json['name'],
             legal_name=response_json['legal_name']
@@ -78,9 +78,9 @@ class OrgTests(TestCase):
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
         }
 
-        orgs = Org.get(get_params)
+        org = Org.get(get_params)
         self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
-        self.assertEqual(org, orgs)
+        self.assertEqual(org, org_expected)
 
 
 
