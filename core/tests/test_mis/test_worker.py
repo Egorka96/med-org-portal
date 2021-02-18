@@ -77,9 +77,9 @@ class WorkerTests(TestCase):
 
         params = {'last_name': 'Сидоров'}
 
-        workers = []
+        workers_expected = []
         for item in response_json['results']:
-            workers.append(Worker(
+            workers_expected.append(Worker(
                 id=item['id'],
                 org=org,
                 last_name=item['last_name'],
@@ -93,8 +93,8 @@ class WorkerTests(TestCase):
                 law_items_section_2=[],
             ))
 
-        worker = Worker.filter(params)
-        self.assertEqual(worker, workers)
+        workers = Worker.filter(params)
+        self.assertEqual(workers, workers_expected)
 
     @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
