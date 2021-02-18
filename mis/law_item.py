@@ -20,7 +20,7 @@ class LawItem:
         url = settings.MIS_URL + f'/api/law_items/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(url=url, params=params, headers=headers)
         response.raise_for_status()
 
         law_items = []
@@ -33,7 +33,7 @@ class LawItem:
         url = settings.MIS_URL + f'/api/law_items/{law_item_id}'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
-        response = requests.get(url, headers=headers)
+        response = requests.get(url=url, headers=headers)
         response.raise_for_status()
 
         law_item_data = response.json()

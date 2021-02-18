@@ -19,7 +19,7 @@ class DocumentType:
         url = settings.MIS_URL + f'/api/document_type/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(url=url, params=params, headers=headers)
         response.raise_for_status()
 
         document_types = []
@@ -31,7 +31,7 @@ class DocumentType:
     def get(cls, document_type_id) -> 'DocumentType':
         url = settings.MIS_URL + f'/api/document_type/{document_type_id}/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-        response = requests.get(url, headers=headers)
+        response = requests.get(url=url, headers=headers)
         response.raise_for_status()
 
         result = response.json()
@@ -62,8 +62,7 @@ class Document:
     @classmethod
     def get_content(cls, path: str) -> bytes:
         url = settings.MIS_URL + path
-        print(url)
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-        response = requests.get(url, headers=headers)
+        response = requests.get(url=url, headers=headers)
         response.raise_for_status()
         return response.content

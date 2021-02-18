@@ -17,7 +17,7 @@ class PayMethod:
     def filter(cls) -> List['PayMethod']:
         url = settings.MIS_URL + f'/api/pay_methods/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-        response = requests.get(url, headers=headers)
+        response = requests.get(url=url, headers=headers)
         response.raise_for_status()
 
         pay_methods = []

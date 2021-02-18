@@ -19,7 +19,7 @@ class Org:
         url = settings.MIS_URL + f'/api/orgs/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(url=url, params=params, headers=headers)
         response.raise_for_status()
 
         orgs = []
@@ -31,7 +31,7 @@ class Org:
     def get(cls, org_id) -> 'Org':
         url = settings.MIS_URL + f'/api/orgs/{org_id}/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-        response = requests.get(url, headers=headers)
+        response = requests.get(url=url, headers=headers)
         response.raise_for_status()
 
         result = response.json()
