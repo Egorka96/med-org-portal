@@ -18,9 +18,6 @@ class DirectionTests(TestCase):
         response._content = bytes(content, encoding='utf-8')
         return response
 
-    # expect_result = (True, 'Направление создано: Номер {response_data["id"]}')
-    # self.assertEqual()
-
     @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
     def test_filter(self, mock_request):
