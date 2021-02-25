@@ -18,6 +18,23 @@ class DirectionTests(TestCase):
         response._content = bytes(content, encoding='utf-8')
         return response
 
+    def get_direction_params(self):
+        return {
+            'id': 1,
+            'last_name': 'Сидоров',
+            'first_name': 'Василий',
+            'birth': datetime.date(2002, 5, 12).isoformat(),
+            'gender': 'Мужчина',
+            'exam_type': '',
+            'date_from': None,
+            'middle_name': '',
+            'post': '',
+            'shop': '',
+            'pay_method': '',
+            'confirm_dt': '',
+            'date_to': None
+        }
+
     @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
     def test_filter(self, mock_request):
@@ -81,24 +98,10 @@ class DirectionTests(TestCase):
     @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
     def test_get(self, mock_request):
-        direction_id = 1
-        response_json = {
-            'id': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'confirm_dt': '',
-            'date_to': None
-        }
+        response_json = self.get_direction_params()
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
 
+        direction_id = 1
         expect_params = {
             'url': self.MIS_URL + f'/api/pre_record/{direction_id}/',
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
@@ -113,21 +116,7 @@ class DirectionTests(TestCase):
     @mock.patch('requests.post')
     @override_settings(MIS_URL=MIS_URL)
     def test_create(self, mock_request):
-        response_json = {
-            'id': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'confirm_dt': '',
-            'date_to': None
-        }
+        response_json = self.get_direction_params()
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
 
         params = {
@@ -149,49 +138,11 @@ class DirectionTests(TestCase):
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
             'data': params,
         }
-
-        Direction.create(params)
-        self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
-
-    @mock.patch('requests.post')
-    @override_settings(MIS_URL=MIS_URL)
-    def test_create_status_code_201(self, mock_request):
-        response_json = {
-            'id': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'confirm_dt': '',
-            'date_to': None
-        }
-        mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
-
-        params = {
-            'number': response_json['id'],
-            'last_name': response_json['last_name'],
-            'first_name': response_json['first_name'],
-            'birth': response_json['birth'],
-            'gender': response_json['gender'],
-            'exam_type': response_json['exam_type'],
-            'date_from': response_json['date_from'],
-            'middle_name': response_json['middle_name'],
-            'post': response_json['post'],
-            'shop': response_json['shop'],
-            'pay_method': response_json['pay_method'],
-            'law_items_section_1': [],
-            'law_items_section_2': []
-        }
         expect_result = (True, f'Направление создано: Номер {response_json["id"]}')
 
-        directions = Direction.create(params)
-        self.assertEqual(directions, expect_result)
+        direction_result = Direction.create(params)
+        self.assertEqual(direction_result, expect_result)
+        self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
 
     @mock.patch('requests.post')
     @override_settings(MIS_URL=MIS_URL)
@@ -199,138 +150,44 @@ class DirectionTests(TestCase):
         response_json = {'error': "Бах, все сломалось"}
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=400)
 
-        params = {
-            'number': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'law_items_section_1': [],
-            'law_items_section_2': []
-        }
+        params = self.get_direction_params()
 
         expect_result = (False, f'Ошибка создания направления: {response_json["error"]}')
 
-        directions = Direction.create(params)
-        self.assertEqual(directions, expect_result)
+        direction_result = Direction.create(params)
+        self.assertEqual(direction_result, expect_result)
 
     @mock.patch('requests.post')
     @override_settings(MIS_URL=MIS_URL)
-    def test_create_status_code_499(self, mock_request):
+    def test_create_status_code_500(self, mock_request):
         response_json = 'Невозможно создать направление в МИС - ошибка на сервере МИС'
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=500)
 
-        params = {
-            'number': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'law_items_section_1': [],
-            'law_items_section_2': []
-        }
+        params = self.get_direction_params()
 
         expect_result = (False, 'Невозможно создать направление в МИС - ошибка на сервере МИС')
 
-        directions = Direction.create(params)
-        self.assertEqual(directions, expect_result)
+        direction_result = Direction.create(params)
+        self.assertEqual(direction_result, expect_result)
 
     @mock.patch('requests.put')
     @override_settings(MIS_URL=MIS_URL)
     def test_edit(self, mock_request):
-        response_json = {
-            'id': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'confirm_dt': '',
-            'date_to': None
-        }
+        response_json = self.get_direction_params()
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=200)
 
-        params = {
-            'number': 1,
-            'last_name': 'Яковле',
-            'first_name': 'Иван',
-            'birth': datetime.date(1978, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'law_items_section_1': [],
-            'law_items_section_2': []
-        }
-        direction_id = params['number']
+        params = self.get_direction_params()
+        params['last_name'] = 'Яковлев'
+        direction_id = params['id']
+        expect_result = (True, f'Направление успешно изменено.')
         expect_params = {
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
             'data': params,
         }
 
-        Direction.edit(direction_id, params)
+        direction_result = Direction.edit(direction_id, params)
+        self.assertEqual(direction_result, expect_result)
         self.assertEqual(mock_request.call_args_list[0].kwargs, expect_params)
-
-    @mock.patch('requests.put')
-    @override_settings(MIS_URL=MIS_URL)
-    def test_edit_status_code_201(self, mock_request):
-        response_json = {
-            'id': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'confirm_dt': '',
-            'date_to': None
-        }
-        mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=200)
-
-        params = {
-            'number': 1,
-            'last_name': 'Яковле',
-            'first_name': 'Иван',
-            'birth': datetime.date(1978, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'law_items_section_1': [],
-            'law_items_section_2': []
-        }
-        direction_id = params['number']
-        expect_result = (True, f'Направление успешно изменено.')
-
-        directions = Direction.edit(direction_id, params)
-        self.assertEqual(directions, expect_result)
 
     @mock.patch('requests.put')
     @override_settings(MIS_URL=MIS_URL)
@@ -338,26 +195,13 @@ class DirectionTests(TestCase):
         response_json = {'error': "Бах, все сломалось"}
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=400)
 
-        params = {
-            'number': 1,
-            'last_name': 'Яковле',
-            'first_name': 'Иван',
-            'birth': datetime.date(1978, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'law_items_section_1': [],
-            'law_items_section_2': []
-        }
-        direction_id = params['number']
+        params = self.get_direction_params()
+        params['last_name'] = 'Яковлев'
+        direction_id = params['id']
         expect_result = (False, f'Ошибка редактирования направления: {response_json["error"]}')
 
-        directions = Direction.edit(direction_id, params)
-        self.assertEqual(directions, expect_result)
+        direction_result = Direction.edit(direction_id, params)
+        self.assertEqual(direction_result, expect_result)
 
     @mock.patch('requests.put')
     @override_settings(MIS_URL=MIS_URL)
@@ -365,79 +209,28 @@ class DirectionTests(TestCase):
         response_json = f'Невозможно изменить направление в МИС - ошибка на сервере МИС'
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=500)
 
-        params = {
-            'number': 1,
-            'last_name': 'Яковле',
-            'first_name': 'Иван',
-            'birth': datetime.date(1978, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'law_items_section_1': [],
-            'law_items_section_2': []
-        }
-        direction_id = params['number']
+        params = self.get_direction_params()
+        params['last_name'] = 'Яковлев'
+        direction_id = params['id']
         expect_result = (False, 'Невозможно изменить направление в МИС - ошибка на сервере МИС')
 
-        directions = Direction.edit(direction_id, params)
-        self.assertEqual(directions, expect_result)
+        direction_result = Direction.edit(direction_id, params)
+        self.assertEqual(direction_result, expect_result)
 
     @mock.patch('requests.delete')
     @override_settings(MIS_URL=MIS_URL)
     def test_delete(self, mock_request):
-        response_json = {
-            'id': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'confirm_dt': '',
-            'date_to': None
-        }
+        response_json = self.get_direction_params()
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=204)
         direction_id = response_json['id']
+        expect_result = (True, 'Направление успешно удалено.')
         expect_params = {
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
         }
 
-        Direction.delete(direction_id)
+        direction_result = Direction.delete(direction_id)
+        self.assertEqual(direction_result, expect_result)
         self.assertEqual(mock_request.call_args_list[0].kwargs, expect_params)
-
-    @mock.patch('requests.delete')
-    @override_settings(MIS_URL=MIS_URL)
-    def test_delete_status_code_204(self, mock_request):
-        response_json = {
-            'id': 1,
-            'last_name': 'Сидоров',
-            'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
-            'gender': 'Мужчина',
-            'exam_type': '',
-            'date_from': None,
-            'middle_name': '',
-            'post': '',
-            'shop': '',
-            'pay_method': '',
-            'confirm_dt': '',
-            'date_to': None
-        }
-        mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=204)
-
-        direction_id = response_json['id']
-        expect_result = (True, 'Направление успешно удалено.')
-
-        directions = Direction.delete(direction_id)
-        self.assertEqual(directions, expect_result)
 
     @mock.patch('requests.delete')
     @override_settings(MIS_URL=MIS_URL)
@@ -448,20 +241,20 @@ class DirectionTests(TestCase):
         direction_id = 1
         expect_result = (False, 'Ошибка удаления направления: Ошибка запроса')
 
-        directions = Direction.delete(direction_id)
-        self.assertEqual(directions, expect_result)
+        direction_result = Direction.delete(direction_id)
+        self.assertEqual(direction_result, expect_result)
 
     @mock.patch('requests.delete')
     @override_settings(MIS_URL=MIS_URL)
-    def test_delete_status_code_400(self, mock_request):
+    def test_delete_status_code_500(self, mock_request):
         response_json = 'Невозможно удалить направление в МИС - ошибка на сервере МИС'
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=500)
 
         direction_id = 1
         expect_result = (False, 'Невозможно удалить направление в МИС - ошибка на сервере МИС')
 
-        directions = Direction.delete(direction_id)
-        self.assertEqual(directions, expect_result)
+        direction_result = Direction.delete(direction_id)
+        self.assertEqual(direction_result, expect_result)
 
 
 
