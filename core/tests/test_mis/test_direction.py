@@ -35,10 +35,8 @@ class DirectionTests(TestCase):
             'date_to': None
         }
 
-    @mock.patch('requests.request')
-    @override_settings(MIS_URL=MIS_URL)
-    def test_filter(self, mock_request):
-        response_json = {
+    def get_direction_params_list(self):
+        return {
             'results':[{
                 'id': 1,
                 'last_name': 'Сидоров',
@@ -70,6 +68,11 @@ class DirectionTests(TestCase):
                 'date_to': None
             }]
         }
+
+    @mock.patch('requests.request')
+    @override_settings(MIS_URL=MIS_URL)
+    def test_filter(self, mock_request):
+        response_json = self.get_direction_params_list()
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
 
         params = {'last_name': 'Сидоров'}
@@ -119,21 +122,7 @@ class DirectionTests(TestCase):
         response_json = self.get_direction_params()
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
 
-        params = {
-            'number': response_json['id'],
-            'last_name': response_json['last_name'],
-            'first_name': response_json['first_name'],
-            'birth': response_json['birth'],
-            'gender': response_json['gender'],
-            'exam_type': response_json['exam_type'],
-            'date_from': response_json['date_from'],
-            'middle_name': response_json['middle_name'],
-            'post': response_json['post'],
-            'shop': response_json['shop'],
-            'pay_method': response_json['pay_method'],
-            'law_items_section_1': [],
-            'law_items_section_2': []
-        }
+        params = self.get_direction_params()
         expect_params = {
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
             'data': params,
