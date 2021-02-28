@@ -2,11 +2,13 @@ import datetime
 import json
 from unittest import mock
 
+import core.forms
 from core import models
 from core.tests.base import BaseTestCase
 from mis.pay_method import PayMethod
 from requests import Response
 from django.conf import settings
+
 
 
 class TestCreate(BaseTestCase):
@@ -66,8 +68,6 @@ class TestCreate(BaseTestCase):
         m['data']['date_from'] = m['data']['date_from'].strftime('%d.%m.%Y')
         m['data']['birth'] = m['data']['birth'].strftime('%d.%m.%Y')
         self.assertEqual (expect_params, m)
-
-    import core.forms
 
     @mock.patch('requests.post')
     @mock.patch.object(core.forms, 'MisPayMethod')
