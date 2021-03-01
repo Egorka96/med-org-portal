@@ -39,8 +39,6 @@ class TestCreate(BaseTestCase):
             'post': '',
             'shop': '',
             'order_types': [2],
-            'date_from': datetime.date.today().strftime('%d.%m.%Y'),
-            'date_to': '31.12.2021'
         }
 
     def get_response(self, content='', status_code=200):
@@ -57,6 +55,8 @@ class TestCreate(BaseTestCase):
         mock_request_pay_method.return_value = []
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
         response = self.client.post(self.get_url(), params)
+        params['date_to'] = '31.12.2021'
+        params['date_from'] = datetime.date.today().strftime('%d.%m.%Y')
 
         expect_params = {
             'data': params ,
@@ -71,7 +71,7 @@ class TestCreate(BaseTestCase):
 
     @mock.patch('requests.post')
     @mock.patch.object(core.forms, 'MisPayMethod')
-    def test_create(self, mock_request_pay_method, mock_request):
+    def test_form_invalid(self, mock_request_pay_method, mock_request):
         response_json = {
             'id': 1,
             'error': 'test_error'
