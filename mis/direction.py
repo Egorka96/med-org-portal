@@ -145,7 +145,7 @@ class Direction:
         url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
-        response = requests.delete(url, headers=headers)
+        response = requests.delete(url=url, headers=headers)
 
         if response.status_code == 204:
             success = True

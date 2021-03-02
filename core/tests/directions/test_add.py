@@ -55,7 +55,8 @@ class TestCreate(BaseTestCase):
         mock_request_pay_method.return_value = []
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
         response = self.client.post(self.get_url(), params)
-        params['date_to'] = '31.12.2021'
+        params['date_from'] = datetime.date.today()
+        params['date_to'] = datetime.date(params['date_from'].year, 12, 31).strftime('%d.%m.%Y')
         params['date_from'] = datetime.date.today().strftime('%d.%m.%Y')
 
         expect_params = {
@@ -67,7 +68,7 @@ class TestCreate(BaseTestCase):
         m['data']['date_to'] = m['data']['date_to'].strftime('%d.%m.%Y')
         m['data']['date_from'] = m['data']['date_from'].strftime('%d.%m.%Y')
         m['data']['birth'] = m['data']['birth'].strftime('%d.%m.%Y')
-        self.assertEqual (expect_params, m)
+        self.assertEqual(expect_params, m)
 
     @mock.patch('requests.post')
     @mock.patch.object(core.forms, 'MisPayMethod')
