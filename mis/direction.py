@@ -123,7 +123,7 @@ class Direction:
         if params.get('law_items_section_1') or params.get('law_items_section_2'):
             params['law_items'] = [*params.get('law_items_section_1', []), *params.get('law_items_section_2', [])]
 
-        response = requests.put(url, data=params, headers=headers)
+        response = requests.put(url=url, data=params, headers=headers)
         response_data = response.json()
 
         if response.status_code == 200:

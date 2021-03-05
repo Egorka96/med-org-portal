@@ -54,11 +54,11 @@ class TestCreate(BaseTestCase):
         response_json = {'id': 1}
         mock_request_pay_method.return_value = []
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
+
         response = self.client.post(self.get_url(), params)
         params['date_from'] = datetime.date.today()
         params['date_to'] = datetime.date(params['date_from'].year, 12, 31).strftime('%d.%m.%Y')
         params['date_from'] = datetime.date.today().strftime('%d.%m.%Y')
-
         expect_params = {
             'data': params ,
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'}
