@@ -4,16 +4,20 @@ from unittest import mock
 
 import core.forms
 from core import models
+from django.test import override_settings
 from mis.pay_method import PayMethod
 from core.tests.base import BaseTestCase
 from mis.direction import Direction
 from requests import Response
+from django.conf import settings
+from djutils.date_utils import iso_to_date
 
 
 class TestEdit(BaseTestCase):
     view = 'core:direction_edit'
     permission = 'core.change_direction'
     direction_number = 1
+    MIS_URL = 'http://127.0.0.1:8000'
 
     def generate_data(self):
         self.core_user = models.User.objects.create(django_user=self.user)
@@ -34,10 +38,10 @@ class TestEdit(BaseTestCase):
     def get_mis(self):
         return {
             'id':1,
-            'last_name': 'Яковлев',
-            'first_name': 'Иван',
+            'last_name': 'Иван',
+            'first_name': 'Яковлев',
             'middle_name': 'Михайлович',
-            'birth': datetime.date.today().isoformat(),
+            'birth': datetime.date(2021, 3, 2).isoformat(),
             'exam_type': 'Периодический',
             'pay_method': {
                 "id":1,
@@ -115,3 +119,100 @@ class TestEdit(BaseTestCase):
         }
 
         self.assertEqual(expect_params, response.context_data['form'].initial)
+
+    @mock.patch('requests.put')
+    @mock.patch.object(core.forms, 'MisPayMethod')
+    @mock.patch.object(core.forms, 'LawItem')
+    @mock.patch.object(core.forms, 'Org')
+    @mock.patch.object(Direction, 'get')
+    @override_settings(MIS_URL=MIS_URL)
+    def test_post(self, mock_request_direction, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request_put):
+        get_mis = self.get_mis()
+        response_json = self.get_url_kwargs()
+        mock_request_put.return_value = self.get_response(content=json.dumps(response_json))
+        mock_request_pay_method.return_value = []
+        mock_request_law_items.return_value = [(601, 'test'), (602, 'test2')]
+        mock_request_org.return_value = [(908, 'test')]
+        mock_request_direction.return_value = Direction(
+            number=get_mis['id'],
+            last_name=get_mis['last_name'],
+            first_name=get_mis['first_name'],
+            middle_name=get_mis['middle_name'],
+            birth=get_mis['birth'],
+            gender=get_mis['gender'],
+        )
+
+        params = {
+            'last_name': 'Василий',
+            'first_name': 'Пупкин',
+            'middle_name': get_mis['middle_name'],
+            'birth': '04.03.2001',
+            'gender': '',
+            'law_items_section_1': [],
+            'law_items_section_2': [],
+            'exam_type': get_mis['exam_type'],
+            'org': '',
+            'orgs': [],
+            'pay_method': '',
+            'post': '',
+            'shop': ''
+        }
+        response = self.client.post(self.get_url(), params)
+        params['order_types'] = [2]
+        params['birth'] = datetime.date(2001, 3, 4)
+        expect_params = {
+            'data': params ,
+            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
+            'url': self.MIS_URL + '/api/pre_record/1/'
+        }
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(mock_request_put.call_args_list[0].kwargs, expect_params)
+
+    @mock.patch('requests.put')
+    @mock.patch.object(core.forms, 'MisPayMethod')
+    @mock.patch.object(core.forms, 'LawItem')
+    @mock.patch.object(core.forms, 'Org')
+    @mock.patch.object(Direction, 'get')
+    @override_settings(MIS_URL=MIS_URL)
+    def test_post_confirm_date(self, mock_request_direction, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request_put):
+        get_mis = self.get_mis()
+        response_json = self.get_url_kwargs()
+        mock_request_put.return_value = self.get_response(content=json.dumps(response_json))
+        mock_request_pay_method.return_value = []
+        mock_request_law_items.return_value = [(601, 'test'), (602, 'test2')]
+        mock_request_org.return_value = [(908, 'test')]
+        mock_request_direction.return_value = Direction(
+            number=get_mis['id'],
+            last_name=get_mis['last_name'],
+            first_name=get_mis['first_name'],
+            middle_name=get_mis['middle_name'],
+            birth=get_mis['birth'],
+            gender=get_mis['gender'],
+            confirm_date=datetime.date(2021, 4, 3),
+        )
+
+        params = {
+            'last_name': 'Василий',
+            'first_name': 'Пупкин',
+            'middle_name': get_mis['middle_name'],
+            'birth': '04.03.2001',
+            'gender': '',
+            'law_items_section_1': [],
+            'law_items_section_2': [],
+            'exam_type': get_mis['exam_type'],
+            'org': '',
+            'orgs': [],
+            'pay_method': '',
+            'post': '',
+            'shop': ''
+        }
+        response = self.client.post(self.get_url(), params)
+
+        self.assertEqual(
+            response.context['messages']._loaded_data[0].message,
+            'Редактирование направления запрещено: по нему уже создана заявка на осмотр в медицинской информационной системе'
+        )
+
+
+
