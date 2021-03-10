@@ -35,7 +35,7 @@ class TestEdit(BaseTestCase):
         )
         super().setUp()
 
-    def get_mis(self):
+    def get_result_mis(self):
         return {
             'id':1,
             'last_name': 'Иван',
@@ -87,6 +87,23 @@ class TestEdit(BaseTestCase):
         response._content = bytes(content, encoding='utf-8')
         return response
 
+    def get_params(self):
+        return {
+            'last_name': 'Василий',
+            'first_name': 'Пупкин',
+            'middle_name': self.get_result_mis()['middle_name'],
+            'birth': '04.03.2001',
+            'gender': '',
+            'law_items_section_1': [],
+            'law_items_section_2': [],
+            'exam_type': self.get_result_mis()['exam_type'],
+            'org': '',
+            'orgs': [],
+            'pay_method': '',
+            'post': '',
+            'shop': ''
+        }
+
     @mock.patch('requests.request')
     @mock.patch.object(core.forms, 'MisPayMethod')
     @mock.patch.object(core.forms, 'LawItem')
@@ -95,21 +112,21 @@ class TestEdit(BaseTestCase):
         mock_request_org.return_value = [(908, 'test')]
         mock_request_law_items.return_value = [(601, 'test'), (602, 'test2')]
         mock_request_pay_method.return_value = [('', '----------'), (1, 'test'), (2, 'test2')]
-        mock_request.return_value = self.get_response(content=json.dumps(self.get_mis()))
+        mock_request.return_value = self.get_response(content=json.dumps(self.get_result_mis()))
 
         response = self.client.post(self.get_url())
-        get_mis = self.get_mis()
+        result_mis = self.get_result_mis()
         expect_params = {
-            'last_name': get_mis['last_name'],
-            'first_name': get_mis['first_name'],
-            'middle_name': get_mis['middle_name'],
+            'last_name': result_mis['last_name'],
+            'first_name': result_mis['first_name'],
+            'middle_name': result_mis['middle_name'],
             'birth': datetime.datetime.strptime('2021-03-02', "%Y-%m-%d").date(),
-            'exam_type': get_mis['exam_type'],
+            'exam_type': result_mis['exam_type'],
             'pay_method': 1,
-            'gender': get_mis['gender'],
-            'post': get_mis['post'],
-            'shop': get_mis['shop'],
-            'org': get_mis['org']['id'],
+            'gender': result_mis['gender'],
+            'post': result_mis['post'],
+            'shop': result_mis['shop'],
+            'org': result_mis['org']['id'],
             'law_items_section_1': [601],
             'law_items_section_2': [602],
             'confirm_date': datetime.date(2021, 10, 31),
@@ -127,36 +144,22 @@ class TestEdit(BaseTestCase):
     @mock.patch.object(Direction, 'get')
     @override_settings(MIS_URL=MIS_URL)
     def test_post(self, mock_request_direction, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request_put):
-        get_mis = self.get_mis()
+        result_mis = self.get_result_mis()
         response_json = self.get_url_kwargs()
         mock_request_put.return_value = self.get_response(content=json.dumps(response_json))
         mock_request_pay_method.return_value = []
         mock_request_law_items.return_value = [(601, 'test'), (602, 'test2')]
         mock_request_org.return_value = [(908, 'test')]
         mock_request_direction.return_value = Direction(
-            number=get_mis['id'],
-            last_name=get_mis['last_name'],
-            first_name=get_mis['first_name'],
-            middle_name=get_mis['middle_name'],
-            birth=get_mis['birth'],
-            gender=get_mis['gender'],
+            number=result_mis['id'],
+            last_name=result_mis['last_name'],
+            first_name=result_mis['first_name'],
+            middle_name=result_mis['middle_name'],
+            birth=result_mis['birth'],
+            gender=result_mis['gender'],
         )
 
-        params = {
-            'last_name': 'Василий',
-            'first_name': 'Пупкин',
-            'middle_name': get_mis['middle_name'],
-            'birth': '04.03.2001',
-            'gender': '',
-            'law_items_section_1': [],
-            'law_items_section_2': [],
-            'exam_type': get_mis['exam_type'],
-            'org': '',
-            'orgs': [],
-            'pay_method': '',
-            'post': '',
-            'shop': ''
-        }
+        params = self.get_params()
         response = self.client.post(self.get_url(), params)
         params['order_types'] = [2]
         params['birth'] = datetime.date(2001, 3, 4)
@@ -176,37 +179,23 @@ class TestEdit(BaseTestCase):
     @mock.patch.object(Direction, 'get')
     @override_settings(MIS_URL=MIS_URL)
     def test_post_confirm_date(self, mock_request_direction, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request_put):
-        get_mis = self.get_mis()
+        result_mis = self.get_result_mis()
         response_json = self.get_url_kwargs()
         mock_request_put.return_value = self.get_response(content=json.dumps(response_json))
         mock_request_pay_method.return_value = []
         mock_request_law_items.return_value = [(601, 'test'), (602, 'test2')]
         mock_request_org.return_value = [(908, 'test')]
         mock_request_direction.return_value = Direction(
-            number=get_mis['id'],
-            last_name=get_mis['last_name'],
-            first_name=get_mis['first_name'],
-            middle_name=get_mis['middle_name'],
-            birth=get_mis['birth'],
-            gender=get_mis['gender'],
+            number=result_mis['id'],
+            last_name=result_mis['last_name'],
+            first_name=result_mis['first_name'],
+            middle_name=result_mis['middle_name'],
+            birth=result_mis['birth'],
+            gender=result_mis['gender'],
             confirm_date=datetime.date(2021, 4, 3),
         )
 
-        params = {
-            'last_name': 'Василий',
-            'first_name': 'Пупкин',
-            'middle_name': get_mis['middle_name'],
-            'birth': '04.03.2001',
-            'gender': '',
-            'law_items_section_1': [],
-            'law_items_section_2': [],
-            'exam_type': get_mis['exam_type'],
-            'org': '',
-            'orgs': [],
-            'pay_method': '',
-            'post': '',
-            'shop': ''
-        }
+        params = self.get_params()
         response = self.client.post(self.get_url(), params)
 
         self.assertEqual(
