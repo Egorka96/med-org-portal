@@ -49,7 +49,7 @@ class LawItems(APIView):
     def get(self, request, *args, **kwargs):
         filter_params = copy(self.request.GET)
 
-        law_items = LawItem.filter(params={'name': filter_params.get('term'), 'section': filter_params.get('section')})
+        law_items = LawItem.filter(params=filter_params)
         results = [
             {'id': l_i.id, 'text': l_i.name} for l_i in law_items
         ]

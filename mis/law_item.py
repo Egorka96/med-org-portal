@@ -6,10 +6,24 @@ from django.conf import settings
 
 
 @dataclass
+class Law:
+    id: int
+    name: str
+
+    @classmethod
+    def get_from_dict(cls, data: dict) -> 'Law':
+        return cls(
+            id=data['id'],
+            name=data['name'],
+        )
+
+
+@dataclass
 class LawItem:
     id: int
     name: str
     section: str
+    law: Law
     description: str
 
     def __str__(self):
@@ -45,5 +59,6 @@ class LawItem:
             id=data['id'],
             name=data['name'],
             section=data['section'],
+            law=Law.get_from_dict(data['law']),
             description=data.get('description'),
         )
