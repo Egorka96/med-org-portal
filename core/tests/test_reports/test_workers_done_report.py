@@ -8,14 +8,13 @@ from core.tests.base import BaseTestCase
 from djutils.date_utils import iso_to_date
 from requests import Response
 from django.conf import settings
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
 from swutils.date import date_to_rus
 
 
 class TestWorkersDoneReport(BaseTestCase):
     view = 'core:workers_done_report'
     permission = 'core.view_workers_done_report'
-    MIS_URL = 'http://127.0.0.1:8000'
 
     def generate_data(self):
         self.core_user = models.User.objects.create(django_user=self.user)
@@ -139,7 +138,6 @@ class TestWorkersDoneReport(BaseTestCase):
         mock_request.return_value = self.get_response(content=json.dumps(self.get_result_mis()))
 
         response = self.client.get(self.get_url())
-
         self.assertFalse(response.context_data['object_list'])
 
     @mock.patch('requests.request')
@@ -151,11 +149,12 @@ class TestWorkersDoneReport(BaseTestCase):
         params = self.get_params()
         params['excel'] = 1
         response = self.client.get(self.get_url(), params)
-
         self.assertIn('application/ms-excel' ,response._content_type_for_repr)
 
-        with open('core/tests/test_reports/test.xlsx', 'wb') as file:
+        filepath = 'core/tests/test_reports/test.xlsx'
+        with open(filepath, 'wb') as file:
             file.write(response.content)
+        wb = load_workbook(filename=filepath)
 
         response_json = self.get_result_mis()
         result_expected_dict = {
@@ -172,20 +171,16 @@ class TestWorkersDoneReport(BaseTestCase):
             'prof_conclusion': response_json['results'][0]['prof'][0]['prof_conclusion']['conclusion'],
         }
         result_expected = list(result_expected_dict.values())
-        wb = load_workbook(filename = 'core/tests/test_reports/test.xlsx')
         result_excel = [c.value for c in wb.worksheets[0][3]][:11]
-
         self.assertEqual(result_excel, result_expected)
 
         title_list = ['№', 'Дата осмотра', 'ФИО', 'Дата рождения', 'Пол', 'Подразделение', 'Должность', 'Организация',
                       'Вид осмотра', 'Пункты приказа', 'Заключение профпатолога', 'Примечание']
         result_excel_title = [c.value for c in wb.worksheets[0][2]]
-
         self.assertEqual(result_excel_title, title_list)
 
         header_list = ['Отчет по прошедшим']
         result_excel_header = [c.value for c in wb.worksheets[0][1][:1]]
-
         self.assertEqual(result_excel_header, header_list)
 
-        os.remove('core/tests/test_reports/test.xlsx')
+        os.remove(filepath)
