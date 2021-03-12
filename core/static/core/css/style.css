@@ -183,10 +183,6 @@ label {
     color: rgba(29, 67, 157, 0.84);
 }
 
-.to-minimize .mini-indent .form-group, .to-minimize .mini-indent .input-group {
-    margin-bottom: 2px;
-}
-
 /* убирал bootstrapовские галочки в поле */
 .form-control.is-valid {
     background-image: none;
