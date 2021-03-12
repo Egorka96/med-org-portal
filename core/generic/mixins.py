@@ -98,7 +98,7 @@ class RestListMixin:
 
         return self.object_list
 
-    def process_response_results(self, objects: List[Dict]) -> List[Dict]:
+    def process_response_results(self, objects: List[Dict]) -> List:
         return objects
 
     def get_context_data(self, **kwargs):
