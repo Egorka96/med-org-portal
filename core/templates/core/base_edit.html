@@ -6,6 +6,8 @@
         {% csrf_token %}
         {{ form.media }}
 
+        {% bootstrap_form_errors form %}
+
         {% block fields %}
             {% bootstrap_form form layout='horizontal' %}
         {% endblock %}

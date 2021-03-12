@@ -91,8 +91,7 @@ class DirectionTests(TestCase):
                 post=item['post'],
                 shop=item['shop'],
                 pay_method=item['pay_method'],
-                law_items_section_1=[],
-                law_items_section_2=[]
+                law_items=[],
             ))
 
         directions = Direction.filter(params)

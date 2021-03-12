@@ -17,8 +17,22 @@
             {% bootstrap_field form.post layout='horizontal' %}
             {% bootstrap_field form.shop layout='horizontal' %}
             {% bootstrap_field form.exam_type layout='horizontal' %}
-            {% bootstrap_field form.law_items_section_1 layout='horizontal' %}
-            {% bootstrap_field form.law_items_section_2 layout='horizontal' %}
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="id_law_items_section_1">Пункты приказа 302н</label>
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-sm-6 mini-indent">
+                            {% bootstrap_field form.law_items_302_section_1 show_label=False %}
+                            <div class="help-block" style="margin-top: -15px">приложение 1</div>
+                        </div>
+                        <div class="col-sm-6 mini-indent">
+                            {% bootstrap_field form.law_items_302_section_2 show_label=False %}
+                            <div class="help-block" style="margin-top: -15px">приложение 2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% bootstrap_field form.law_items_29 layout='horizontal' %}
             {% bootstrap_field form.pay_method layout='horizontal' %}
 
             {% include 'core/directions/worker_search_include.html' %}

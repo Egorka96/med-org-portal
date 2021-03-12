@@ -89,7 +89,7 @@ class DocumentTests(TestCase):
     @override_settings(MIS_URL=MIS_URL)
     def test_get_content(self, mock_request):
         path = '/path/to/file/'
-        with open('%s/core/tests/test_mis/test.txt' % settings.BASE_DIR, mode='rb') as file:
+        with open('%s/mis/tests/test.txt' % settings.BASE_DIR, mode='rb') as file:
             mock_request.return_value = self.get_response(content=file.read())
 
         expect_params = {
