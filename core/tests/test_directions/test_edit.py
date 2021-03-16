@@ -145,7 +145,7 @@ class TestEdit(BaseTestCase):
     @override_settings(MIS_URL=MIS_URL)
     def test_post(self, mock_request_direction, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request_put):
         result_mis = self.get_result_mis()
-        response_json = self.get_url_kwargs()
+        response_json = {'id': 1}
         mock_request_put.return_value = self.get_response(content=json.dumps(response_json))
         mock_request_pay_method.return_value = []
         mock_request_law_items.return_value = [(601, 'test'), (602, 'test2')]
@@ -180,7 +180,7 @@ class TestEdit(BaseTestCase):
     @override_settings(MIS_URL=MIS_URL)
     def test_post_confirm_date(self, mock_request_direction, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request_put):
         result_mis = self.get_result_mis()
-        response_json = self.get_url_kwargs()
+        response_json = {'id': 1}
         mock_request_put.return_value = self.get_response(content=json.dumps(response_json))
         mock_request_pay_method.return_value = []
         mock_request_law_items.return_value = [(601, 'test'), (602, 'test2')]

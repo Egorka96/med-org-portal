@@ -2,12 +2,10 @@ import datetime
 import json
 from unittest import mock
 
-import core.forms
 from core.tests.base import BaseTestCase
 from django.conf import settings
 from django.test import override_settings
 from mis.direction import Direction
-from mis.pay_method import PayMethod
 from requests import Response
 
 
@@ -52,17 +50,10 @@ class TestDelete(BaseTestCase):
 
         self.assertEqual (expect_params, mock_request.call_args_list[0].kwargs)
 
-    # @mock.patch.object(Direction, 'delete')
-    # @override_settings(MIS_URL=MIS_URL)
-    # def test_delete(self, mock_request_direction):
-    #     mock_request_direction.return_value = [False, 'Ошибка удаления направления: Ошибка запроса']
-    #
-    #     response = self.client.delete(self.get_url())
-
     @mock.patch.object(Direction, 'get')
     @mock.patch('requests.delete')
     @override_settings(MIS_URL=MIS_URL)
-    def test_delete(self, mock_request, mock_request_direction):
+    def test_delete_error(self, mock_request, mock_request_direction):
         response_json = {
             'id': self.direction_number,
             'error': 'test_error'
