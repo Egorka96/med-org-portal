@@ -44,6 +44,7 @@ class LawItems(APIView):
 
     def get(self, request, *args, **kwargs):
         filter_params = copy(self.request.GET)
+        filter_params['name'] = filter_params.getlist('term')
 
         law_items = LawItem.filter_raw(params=filter_params)
         return Response(law_items)
