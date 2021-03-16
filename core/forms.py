@@ -291,6 +291,13 @@ class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, f
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        workers = [v for v in cleaned_data.values() if v]
+        if not workers:
+            raise forms.ValidationError(
+                    "Введите параметры фильтрации."
+                )
 
 class DirectionSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
