@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 User = get_user_model()
 
@@ -131,3 +132,50 @@ class BaseTestCase(TestCase):
                 self.assertIn(obj, response_data)
         else:
             self.assertEqual(response_data, value)
+
+
+class BaseRestTestCase(TestCase):
+    username = 'test'
+    password = 'testtest'
+    permission = None
+    any_permissions = None
+
+    def get_permission(self):
+        return self.permission
+
+    def get_any_permissions(self):
+        return self.any_permissions
+
+    def generate_data(self):
+        pass
+
+    def user_config(self):
+        perms = []
+        if self.get_permission():
+            perms.append(self.get_permission().split('.'))
+        elif self.get_any_permissions():
+            perms.extend([perm.split('.') for perm in self.get_any_permissions()])
+
+        for app_label, codename in perms:
+            self.user.user_permissions.add(
+                Permission.objects.get(content_type__app_label=app_label, codename=codename)
+            )
+
+    def create_user(self):
+        self.user = User.objects.create(
+            username=self.username,
+            password=self.password,
+        )
+        self.user_config()
+
+    def _force_request(self, url = None):
+        factory = APIRequestFactory()
+        request = factory.get(url or self.url)
+        force_authenticate(request, user=self.user)
+        self.client.force_login(self.user)
+        return request
+
+    def setUp(self):
+        self.create_user()
+        self.generate_data()
+        self.client.force_login(self.user)
