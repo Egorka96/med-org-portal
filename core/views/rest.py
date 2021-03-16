@@ -34,12 +34,8 @@ class Orgs(APIView):
                 'id': json.loads(self.request.user.core.org_ids)
             })
 
-        orgs = Org.filter(params=filter_params)
-        results = [
-            {'id': org.id, 'text': str(org)} for org in orgs
-        ]
-
-        return Response({'results': results})
+        orgs_data = Org.filter_raw(params=filter_params)
+        return Response(orgs_data)
 
 
 class LawItems(APIView):
@@ -49,12 +45,8 @@ class LawItems(APIView):
     def get(self, request, *args, **kwargs):
         filter_params = copy(self.request.GET)
 
-        law_items = LawItem.filter(params={'name': filter_params.get('term'), 'section': filter_params.get('section')})
-        results = [
-            {'id': l_i.id, 'text': l_i.name} for l_i in law_items
-        ]
-
-        return Response({'results': results})
+        law_items = LawItem.filter_raw(params=filter_params)
+        return Response(law_items)
 
 
 class Workers(APIView):

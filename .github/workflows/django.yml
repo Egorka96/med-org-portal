@@ -1,9 +1,6 @@
 name: Django CI
 on:
-  push:
-    branches: [ master ]
-#  pull_request:
-#    branches: [ master ]
+  [push, pull_request]
 
 jobs:
   build:
@@ -24,4 +21,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        coverage run --source='core' --omit='*migrations*,*tests*' manage.py test -v 2 core && coverage report
+        coverage run --source='core,mis' --omit='*migrations*,*tests*' manage.py test -v 2 core mis && coverage report

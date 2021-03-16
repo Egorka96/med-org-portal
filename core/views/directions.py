@@ -81,11 +81,13 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             if initial.get('org'):
                 initial['org'] = initial['org']['id']
 
-            if initial.get('law_items_section_1'):
-                initial['law_items_section_1'] = [l_i['id'] for l_i in initial['law_items_section_1']]
+            if initial.get('law_items'):
+                for l_i in initial['law_items']:
+                    field_name = f'law_items_{l_i["law"]["name"].replace("н", "")}'
+                    if l_i["law"]["name"] == '302н':
+                        field_name += f'_section_{l_i["section"]}'
 
-            if initial.get('law_items_section_2'):
-                initial['law_items_section_2'] = [l_i['id'] for l_i in initial['law_items_section_2']]
+                    initial.setdefault(field_name, []).append(l_i["id"])
 
             if initial.get('pay_method'):
                 initial['pay_method'] = initial['pay_method']['id']

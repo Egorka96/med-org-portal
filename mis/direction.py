@@ -29,8 +29,7 @@ class Direction:
     org: Org = None
     post: str = None
     shop: str = None
-    law_items_section_1: List[LawItem] = None
-    law_items_section_2: List[LawItem] = None
+    law_items: List[LawItem] = None
     pay_method: dict = None
     confirm_date: datetime.date = None
 
@@ -61,10 +60,7 @@ class Direction:
             exam_type=data['exam_type'],
             post=data['post'],
             shop=data['shop'],
-            law_items_section_1=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', []) if
-                                 l_i['section'] == '1'],
-            law_items_section_2=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', []) if
-                                 l_i['section'] == '2'],
+            law_items=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', [])],
             confirm_date=iso_to_date(data['confirm_dt']),
         )
 
@@ -93,8 +89,9 @@ class Direction:
             params['date_to'] = datetime.date(params['date_from'].year, 12, 31)
         params['order_types'] = [2]  # ПРОФ осмотр
 
-        if params.get('law_items_section_1') or params.get('law_items_section_2'):
-            params['law_items'] = [*params.get('law_items_section_1', []), *params.get('law_items_section_2', [])]
+        params['law_items'] = []
+        for field_name in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
+            params['law_items'].extend(params.get(field_name, []))
 
         response = requests.post(url, data=params, headers=headers)
         response_data = response.json()
@@ -120,8 +117,9 @@ class Direction:
 
         params['order_types'] = [2]  # ПРОФ осмотр
 
-        if params.get('law_items_section_1') or params.get('law_items_section_2'):
-            params['law_items'] = [*params.get('law_items_section_1', []), *params.get('law_items_section_2', [])]
+        params['law_items'] = []
+        for field_name in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
+            params['law_items'].extend(params.get(field_name, []))
 
         response = requests.put(url=url, data=params, headers=headers)
         response_data = response.json()
@@ -160,3 +158,13 @@ class Direction:
             raise Exception('Unexpected status code o_O')
 
         return success, description
+
+    def get_law_items(self, law_name: str = None, section: int = None) -> List[LawItem]:
+        law_items = self.law_items
+
+        if law_name:
+            law_items = list(filter(lambda l_i: l_i.law.name == law_name, law_items))
+        if section:
+            law_items = list(filter(lambda l_i: l_i.section == section, law_items))
+
+        return law_items

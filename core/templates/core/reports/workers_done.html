@@ -64,7 +64,7 @@
     {% if show_orgs %}
         <td>
             {% for org in object.orgs %}
-                {{ org.name }}
+                {{ org.legal_name|default:org.name }}
             {% endfor %}
         </td>
     {% endif %}

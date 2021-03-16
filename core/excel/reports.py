@@ -88,15 +88,14 @@ class WorkersDoneExcel(Excel):
                 obj['prof'][0]['shop'] if obj.get('prof') else '',
                 ', '.join(obj['posts']),
             ]
-
             if self.show_orgs:
-                row.append(', '.join([org['name'] for org in obj['orgs']]) if obj.get('orgs') else '')
+                row.append(', '.join([org['legal_name'] or org['name']
+                                      for org in obj['orgs']]) if obj.get('orgs') else '')
 
             row.extend([
                 ', '.join(self.get_obj_main_services(obj)),
                 law_items,
             ])
-
             if self.show_cost:
                 row.append(obj['total_cost'])
 
@@ -104,7 +103,6 @@ class WorkersDoneExcel(Excel):
                 obj['prof'][0]['prof_conclusion']['conclusion'] if obj.get('prof') else '',
                 obj['prof'][0].get('note') if obj.get('prof') else ''
             ])
-
             object_rows.append(row)
 
         return object_rows

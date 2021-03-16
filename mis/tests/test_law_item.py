@@ -3,7 +3,7 @@ from unittest import mock
 from coverage.backunittest import TestCase
 from django.test import override_settings
 from kombu.utils import json
-from mis.law_item import LawItem
+from mis.law_item import LawItem, Law
 from requests import Response
 from django.conf import settings
 
@@ -17,7 +17,7 @@ class LawItemTests(TestCase):
         response._content = bytes(content, encoding='utf-8')
         return response
 
-    @mock.patch('requests.get')
+    @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
     def test_filter(self, mock_request):
         response_json = {
@@ -25,19 +25,31 @@ class LawItemTests(TestCase):
                 'id': 1,
                 'name': 'test 1',
                 'section': 'test 1',
-                'description': 'test 1'
+                'description': 'test 1',
+                'law': {
+                    'id': 1,
+                    'name': '302н'
+                }
             },
             {
                 'id': 2,
                 'name': 'test 2',
                 'section': 'test 2',
-                'description': 'test 2'
+                'description': 'test 2',
+                'law': {
+                    'id': 2,
+                    'name': '29н'
+                }
             },
             {
                 'id': 3,
                 'name': 'test 3',
                 'section': 'test 3',
-                'description': 'test 3'
+                'description': 'test 3',
+                'law': {
+                    'id': 1,
+                    'name': '302н'
+                }
             }]
         }
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
@@ -48,21 +60,25 @@ class LawItemTests(TestCase):
                 id=item['id'],
                 name=item['name'],
                 section=item['section'],
+                law=Law(id=item['law']['id'], name=item['law']['name']),
                 description=item['description']
             ))
 
         filter_params = {'name': 'test 3'}
+        law_item = LawItem.filter(filter_params)
+        self.assertEqual(law_items, law_item)
+
         expect_params = {
             'url': self.MIS_URL + f'/api/law_items/',
             'params': filter_params,
-            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'}
+            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
+            'method': 'get',
+            'data': None
         }
 
-        law_item = LawItem.filter(filter_params)
         self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
-        self.assertEqual(law_items, law_item)
 
-    @mock.patch('requests.get')
+    @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
     def test_get(self, mock_request):
         law_item_id = 1
@@ -70,22 +86,31 @@ class LawItemTests(TestCase):
             'id': 1,
             'name': 'test 3',
             'section': 'test 3',
-            'description': 'test 3'
+            'description': 'test 3',
+                'law': {
+                    'id': 1,
+                    'name': '302н'
+                }
         }
         mock_request.return_value = self.get_response(content=json.dumps(response_json))
-
-        expect_params = {
-            'url': self.MIS_URL + f'/api/law_items/{law_item_id}',
-            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'}
-        }
 
         law_item = LawItem(
             id=response_json['id'],
             name=response_json['name'],
             section=response_json['section'],
+            law=Law(id=response_json['law']['id'], name=response_json['law']['name']),
             description=response_json['description']
         )
 
         law_items = LawItem.get(law_item_id)
-        self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
         self.assertEqual(law_item, law_items)
+
+        expect_params = {
+            'url': self.MIS_URL + f'/api/law_items/{law_item_id}/',
+            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
+            'method': 'get',
+            'data': None,
+            'params': None
+        }
+
+        self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)

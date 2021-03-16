@@ -21,11 +21,11 @@
 
 {% block container %}
     {% block form_container %}
+        {% bootstrap_form_errors form %}
         <form id='searchFrom' action="" method="GET">
             <fieldset>
                 <legend>Параметры поиска</legend>
                 {% block form %}
-                    {% bootstrap_form_errors form %}
                     {% bootstrap_form form %}
                 {% endblock form %}
             </fieldset>
@@ -94,7 +94,7 @@
         {% block paginator_bottom %}
             {% include 'core/paginator.html' %}
         {% endblock %}
-    {% elif form.is_bound and request.GET %}
+    {% elif form.is_valid and request.GET %}
         <div class="alert alert-warning">
             По вашему запросу ничего не найдено.
         </div>

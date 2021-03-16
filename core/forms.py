@@ -119,8 +119,9 @@ class OrgsMixin(forms.Form):
 
 
 class LawItems(forms.Form):
-    law_items_section_1 = ListField(label='Пункты приказа прил.1', required=False, choices=[])
-    law_items_section_2 = ListField(label='Пункты приказа прил.2', required=False, choices=[])
+    law_items_302_section_1 = ListField(label='Пункты приказа 302н прил.1', required=False, choices=[])
+    law_items_302_section_2 = ListField(label='Пункты приказа 302н прил.2', required=False, choices=[])
+    law_items_29 = ListField(label='Пункты приказа 29н', required=False, choices=[])
 
     class Media:
         js = ['core/js/law_items.js']
@@ -128,11 +129,11 @@ class LawItems(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for field in ('law_items_section_1', 'law_items_section_2'):
+        for field in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
             choices = []
             values = self.data.getlist(field) if hasattr(self.data, 'getlist') else None
             if not values:
-                values =  self.initial.get(field, [])
+                values = self.initial.get(field, [])
 
             if values and not isinstance(values, list):
                 values = [values]
@@ -143,6 +144,16 @@ class LawItems(forms.Form):
                     choices.append((law_item.id, law_item.name))
 
             self.fields[field].widget.choices = choices
+
+    def clean(self):
+        law_items_302n = [*self.cleaned_data.get('law_items_302_section_1', []),
+                          *self.cleaned_data.get('law_items_302_section_2', [])]
+        law_items_29n = self.cleaned_data.get('law_items_29', [])
+
+        if law_items_302n and law_items_29n:
+            raise forms.ValidationError('Необходимо указать пункты приказа 302н ИЛИ 29н.')
+
+        return self.cleaned_data
 
 
 class DocumentTypeMixin(forms.Form):
@@ -280,6 +291,13 @@ class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, f
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        workers = [v for v in cleaned_data.values() if v]
+        if not workers:
+            raise forms.ValidationError(
+                    "Введите параметры фильтрации."
+                )
 
 class DirectionSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
