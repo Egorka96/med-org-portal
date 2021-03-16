@@ -8,7 +8,6 @@ from rest_framework.utils import json
 from django.conf import settings
 
 
-
 class OrgTests(TestCase):
     MIS_URL = 'http://127.0.0.1:8000'
 
@@ -18,7 +17,7 @@ class OrgTests(TestCase):
         response._content = bytes(content, encoding='utf-8')
         return response
 
-    @mock.patch('requests.get')
+    @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
     def test_filter(self, mock_request):
         response_json = {
@@ -46,17 +45,19 @@ class OrgTests(TestCase):
             expected_orgs.append(org)
 
         filter_params = {'name': 'Организация 1'}
+        orgs = Org.filter(params=filter_params)
+        self.assertEqual(expected_orgs, orgs)
+
         expect_params = {
             'url': self.MIS_URL + '/api/orgs/',
             'params': filter_params,
-            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'}
+            'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
+            'method': 'get',
+            'data': None
         }
-
-        orgs = Org.filter(params=filter_params)
-        self.assertEqual(expected_orgs, orgs)
         self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
 
-    @mock.patch('requests.get')
+    @mock.patch('requests.request')
     @override_settings(MIS_URL=MIS_URL)
     def test_get(self, mock_request):
         get_params = 1
@@ -72,18 +73,14 @@ class OrgTests(TestCase):
             name=response_json['name'],
             legal_name=response_json['legal_name']
         )
+        org = Org.get(get_params)
+        self.assertEqual(org, org_expected)
 
         expect_params = {
             'url': self.MIS_URL + f'/api/orgs/{get_params}/',
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
+            'method': 'get',
+            'params': None,
+            'data': None,
         }
-
-        org = Org.get(get_params)
         self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
-        self.assertEqual(org, org_expected)
-
-
-
-
-
-

@@ -1,8 +1,8 @@
-from dataclasses import dataclass
+import json
+from dataclasses import dataclass, asdict
 from typing import List, Dict
 
-import requests
-from django.conf import settings
+from mis.service_client import Mis
 
 
 @dataclass
@@ -15,26 +15,36 @@ class Org:
         return self.legal_name or self.name
 
     @classmethod
-    def filter(cls, params: Dict = None) -> List['Org']:
-        url = settings.MIS_URL + f'/api/orgs/'
-        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
+    def filter_raw(cls, params: Dict = None, user: 'core.models.DjangoUser' = None):
+        if user:
+            params = params or {}
+            params['id'] = json.loads(user.core.org_ids)
 
-        response = requests.get(url=url, params=params, headers=headers)
-        response.raise_for_status()
+        response_json = Mis().request(path='/api/orgs/', params=params, user=user)
 
         orgs = []
-        for item in response.json()['results']:
+        for item in response_json['results']:
+            orgs.append(asdict(cls.get_from_dict(item)))
+
+        response_json['results'] = orgs
+        return response_json
+
+    @classmethod
+    def filter(cls, params: Dict = None, user: 'core.models.DjangoUser' = None) -> List['Org']:
+        if user:
+            params = params or {}
+            params['id'] = json.loads(user.core.org_ids)
+
+        response_json = Mis().request(path='/api/orgs/', params=params, user=user)
+
+        orgs = []
+        for item in response_json['results']:
             orgs.append(cls.get_from_dict(item))
         return orgs
 
     @classmethod
     def get(cls, org_id) -> 'Org':
-        url = settings.MIS_URL + f'/api/orgs/{org_id}/'
-        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-        response = requests.get(url=url, headers=headers)
-        response.raise_for_status()
-
-        result = response.json()
+        result = Mis().request(path= f'/api/orgs/{org_id}/')
         return cls.get_from_dict(result)
 
     @classmethod

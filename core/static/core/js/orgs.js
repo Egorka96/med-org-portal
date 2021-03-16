@@ -31,6 +31,12 @@
                 },
                 escapeMarkup: function (markup) {
                     return markup
+                },
+                templateResult: function (data, container) {
+                    return data.legal_name || data.name || data.text
+                },
+                templateSelection: function (data, container) {
+                    return data.legal_name || data.name || data.text
                 }
             })
         };
