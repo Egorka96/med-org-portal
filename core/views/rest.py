@@ -45,12 +45,8 @@ class LawItems(APIView):
     def get(self, request, *args, **kwargs):
         filter_params = copy(self.request.GET)
 
-        law_items = LawItem.filter(params=filter_params)
-        results = [
-            {'id': l_i.id, 'text': l_i.name} for l_i in law_items
-        ]
-
-        return Response({'results': results})
+        law_items = LawItem.filter_raw(params=filter_params)
+        return Response(law_items)
 
 
 class Workers(APIView):

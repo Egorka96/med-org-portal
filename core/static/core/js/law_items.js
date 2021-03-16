@@ -26,13 +26,19 @@
                         return {
                             results: data.results,
                             pagination: {
-                                more: data['more']
+                                more: data['next']
                             }
                         };
                     }
                 },
                 escapeMarkup: function (markup) {
                     return markup
+                },
+                templateResult: function (data, container) {
+                    return data.name || data.text
+                },
+                templateSelection: function (data, container) {
+                    return data.name || data.text
                 }
             });
         };

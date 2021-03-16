@@ -24,7 +24,7 @@
                         return {
                             results: data.results,
                             pagination: {
-                                more: data['more']
+                                more: data['next']
                             }
                         };
                     }
