@@ -15,7 +15,7 @@ class TestLawItems(BaseRestTestCase, APITestCase):
         super().generate_data()
         self.url = reverse('core:rest_law_items')
 
-    def get_mocked_orgs(self):
+    def get_mocked_law_items(self):
         law_items = []
         for i in range(3):
             law = Law(
@@ -40,7 +40,7 @@ class TestLawItems(BaseRestTestCase, APITestCase):
 
     @mock.patch.object(LawItem, 'filter_raw')
     def test_law_items(self, mock_law_item):
-        mock_law_item.return_value = self.get_mocked_orgs()
+        mock_law_item.return_value = self.get_mocked_law_items()
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -56,7 +56,7 @@ class TestLawItems(BaseRestTestCase, APITestCase):
 
     @mock.patch.object(LawItem, 'filter_raw')
     def test_law_items_filter(self, mock_law_item):
-        mock_law_item.return_value = self.get_mocked_orgs()
+        mock_law_item.return_value = self.get_mocked_law_items()
 
         filter_params = {'term': 'test'}
         response = self.client.get(self.url, data=filter_params)
