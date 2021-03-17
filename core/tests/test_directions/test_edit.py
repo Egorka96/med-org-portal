@@ -10,7 +10,6 @@ from core.tests.base import BaseTestCase
 from mis.direction import Direction
 from requests import Response
 from django.conf import settings
-from djutils.date_utils import iso_to_date
 
 
 class TestEdit(BaseTestCase):
@@ -55,7 +54,6 @@ class TestEdit(BaseTestCase):
             'date_from': datetime.date.today().isoformat(),
             'date_to': datetime.date(2021, 12, 31).isoformat(),
             'confirm_dt': datetime.date(2021, 10, 31).isoformat(),
-            # 'order_types': [2],
             "org":{
                 "id":908,
                 "legal_name":"ООО \"Тестовая организация\""
@@ -66,14 +64,20 @@ class TestEdit(BaseTestCase):
                     "name":"3.4.2",
                     "section":"1",
                     "description":"Общая вибрация ",
-                    "display":"3.4.2 прил.1"
+                    "law": {
+                        "id": 1,
+                        "name": "302н",
+                    },
                 },
                 {
                     "id":602,
                     "name":"3.5",
                     "section":"2",
                     "description":"Производственный шум на рабочих местах с вредными и (или) опасными условиями труда, на которых имеется технологическое оборудование, являющееся источником шума.",
-                    "display":"3.5 прил.1"
+                    "law": {
+                        "id": 1,
+                        "name": "302н",
+                    },
                 },
             ],
         }
@@ -94,9 +98,11 @@ class TestEdit(BaseTestCase):
             'middle_name': self.get_result_mis()['middle_name'],
             'birth': '04.03.2001',
             'gender': '',
-            'law_items_section_1': [],
-            'law_items_section_2': [],
+            'law_items_29': [],
+            'law_items_302_section_1': [],
+            'law_items_302_section_2': [],
             'exam_type': self.get_result_mis()['exam_type'],
+            'law_items': [],
             'org': '',
             'orgs': [],
             'pay_method': '',
@@ -127,8 +133,9 @@ class TestEdit(BaseTestCase):
             'post': result_mis['post'],
             'shop': result_mis['shop'],
             'org': result_mis['org']['id'],
-            'law_items_section_1': [601],
-            'law_items_section_2': [602],
+            'law_items_302_section_1': [601],
+            'law_items_302_section_2': [602],
+            'law_items': result_mis['law_items'],
             'confirm_date': datetime.date(2021, 10, 31),
             'from_date': datetime.date.today(),
             'to_date': datetime.date(2021, 12, 31),
