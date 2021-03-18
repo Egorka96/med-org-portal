@@ -24,8 +24,7 @@ class TestPrint(BaseTestCase):
             first_name='Яковлев',
             gender='М',
             birth=datetime.date.today(),
-            law_items_section_1=[],
-            law_items_section_2=[]
+            law_items=[]
         )
         super().setUp()
 
@@ -46,8 +45,7 @@ class TestPrint(BaseTestCase):
             first_name='Яковлев',
             gender='М',
             birth=datetime.date.today(),
-            law_items_section_1=[],
-            law_items_section_2=[]
+            law_items=[]
         )
         response = self.client.get(self.get_url())
 
