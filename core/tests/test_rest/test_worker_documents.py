@@ -3,14 +3,12 @@ import datetime
 from unittest import mock
 
 from core.datatools.string import random_word
+from mis.document import Document, DocumentType
+from mis.worker import Worker
+from swutils.date import date_to_rus
 from core.tests.base import BaseRestTestCase
 from django.urls import reverse
-from mis.document import Document, DocumentType
-from mis.org import Org
-from mis.worker import Worker
 from rest_framework.test import APITestCase
-from djutils.date_utils import iso_to_date
-from swutils.date import date_to_rus
 
 
 class TestWorkerDocuments(BaseRestTestCase, APITestCase):
@@ -66,7 +64,4 @@ class TestWorkerDocuments(BaseRestTestCase, APITestCase):
             serialized_documents.append(document_dict)
 
         self.assertEqual(serialized_documents[0], response.data['documents'][1])
-
-
-
 

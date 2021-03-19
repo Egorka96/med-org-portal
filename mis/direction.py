@@ -121,7 +121,7 @@ class Direction:
         for field_name in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
             params['law_items'].extend(params.get(field_name, []))
 
-        response = requests.put(url, data=params, headers=headers)
+        response = requests.put(url=url, data=params, headers=headers)
         response_data = response.json()
 
         if response.status_code == 200:
@@ -143,7 +143,7 @@ class Direction:
         url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
-        response = requests.delete(url, headers=headers)
+        response = requests.delete(url=url, headers=headers)
 
         if response.status_code == 204:
             success = True

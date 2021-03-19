@@ -83,6 +83,7 @@ class RestListMixin:
             if form.is_valid() or (not form.is_bound and (filter_params or self.load_without_params)):
                 request_params = filter_params
                 request_params['per_page'] = self.request.GET.get('per_page', self.paginate_by)
+
                 response_data = Mis().request(
                     path=self.mis_request_path,
                     user=self.request.user,
@@ -119,18 +120,16 @@ class RestListMixin:
 
 
 class FormMixin(DjangoFormMixin):
-    data_method = None
+    data_method = 'GET'
 
     def get_form_kwargs(self):
         kwargs = {
             'initial': self.get_initial(),
             'prefix': self.get_prefix(),
+            'data': getattr(self.request, self.data_method.upper()) or None,
+            'files': self.request.FILES or None
         }
 
-        kwargs.update({
-            'data': getattr(self.request, self.data_method.upper() if self.data_method else 'GET') or None,
-            'files': self.request.FILES or None
-        })
         return kwargs
 
 
