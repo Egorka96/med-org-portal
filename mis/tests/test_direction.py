@@ -169,6 +169,7 @@ class DirectionTests(TestCase):
         expect_params = {
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
             'data': params,
+            'url': self.MIS_URL + f'/api/pre_record/{direction_id}/'
         }
 
         direction_result = Direction.edit(direction_id, params)
@@ -212,6 +213,7 @@ class DirectionTests(TestCase):
         expect_result = (True, 'Направление успешно удалено.')
         expect_params = {
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
+            'url': self.MIS_URL + f'/api/pre_record/{direction_id}/'
         }
 
         direction_result = Direction.delete(direction_id)

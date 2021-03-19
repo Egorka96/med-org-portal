@@ -32,12 +32,6 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
     template_name = settings.TEMPLATES_DICT.get("direction_list")
     mis_request_path = Mis.DIRECTIONS_LIST_URL
 
-    def get_breadcrumbs(self):
-        return [
-            ('Главная', reverse('core:index')),
-            (self.title, ''),
-        ]
-
     def get_initial(self):
         initial = super().get_initial()
         initial['date_from'] = datetime.date.today()
