@@ -13,4 +13,4 @@ class TessGeneratePasswordView(BaseRestTestCase, APITestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response._container)
+        self.assertTrue(response.data['password'])
