@@ -4,7 +4,7 @@ from swutils.date import date_to_rus, iso_to_date
 
 
 class DirectionsExcel(Excel):
-    workbook_name = 'Отчет по направлению.'
+    workbook_name = 'Направления'
 
     def __init__(self, *args, show_orgs: bool, mis_request_path: str, filter_params, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,7 +64,7 @@ class DirectionsExcel(Excel):
 
     def get_object_rows(self):
         object_rows = []
-        print(self.objects)
+
         for index, obj in enumerate(self.objects, start=1):
             law_items = ', '.join([f"{l_i['name']} прил.{l_i['section']}"
                                    for l_i in obj['law_items']]) if obj.get('law_items') else ''
@@ -83,7 +83,7 @@ class DirectionsExcel(Excel):
             row.extend([
                 obj['shop'],
                 law_items,
-                ' '.join([f"с {obj['date_from']} по {obj['date_to']}"]),
+                ' '.join([f"с {date_to_rus(iso_to_date(obj['date_from']))} по {date_to_rus(iso_to_date(obj['date_to']))}"]),
                 confirm_dt
             ])
 
@@ -91,15 +91,6 @@ class DirectionsExcel(Excel):
 
         return object_rows
 
-    def get_obj_main_services(self, obj):
-        main_services = []
-
-        for app in ['prof', 'lmk', 'certificate', 'heal']:
-            app_orders = obj[app]
-            for o in app_orders:
-                main_services.append(o.get('main_services'))
-
-        return main_services
 
 
 
