@@ -141,17 +141,20 @@ class TestSearch(BaseTestCase):
             'birth': '14.11.1982',
             'gender':'Мужской',
             'org': "ООО \"Тестовая организация\"",
+            'post': 'Тестировщик',
             'shop': 'Тест',
+            'exam_type': 'Периодический',
             'law_items': '3.4.2 прил.1, 3.5 прил.1',
             'date': 'с 20.02.2021 по 31.12.2021',
+            'confirm_dt': '-'
         }
         result_expected = list(result_expected_dict.values())
-        result_excel = [c.value for c in wb.worksheets[0][3]][:8]
+        result_excel = [c.value for c in wb.worksheets[0][3]][:11]
 
         self.assertEqual(result_excel, result_expected)
 
-        title_list = ['№', 'ФИО', 'Дата рождения', 'Пол', 'Организация', 'Подразделение', 'Пункты приказа',
-                      'Время действия', 'Дата прохождения']
+        title_list = ['№', 'ФИО', 'Дата рождения', 'Пол', 'Организация', 'Должность', 'Подразделение', 'Вид осмотра',
+                      'Пункты приказа', 'Время действия', 'Дата прохождения']
         result_excel_title = [c.value for c in wb.worksheets[0][2]]
 
         self.assertEqual(result_excel_title, title_list)

@@ -51,11 +51,13 @@ class DirectionsExcel(Excel):
         }
 
         if self.show_orgs:
-            head_static_sizes['Организация'] = 30
+            head_static_sizes['Организация'] = 40
 
         head_static_sizes.update({
-            'Подразделение': 20,
-            'Пункты приказа': 20,
+            'Должность': 30,
+            'Подразделение': 30,
+            'Вид осмотра': 20,
+            'Пункты приказа': 30,
             'Время действия': 30,
             'Дата прохождения': 20
         })
@@ -68,7 +70,7 @@ class DirectionsExcel(Excel):
         for index, obj in enumerate(self.objects, start=1):
             law_items = ', '.join([f"{l_i['name']} прил.{l_i['section']}"
                                    for l_i in obj['law_items']]) if obj.get('law_items') else ''
-            confirm_dt = [dt for dt in obj['confirm_dt']] if obj.get('confirm_dt') else  '-'
+            confirm_dt = date_to_rus(iso_to_date(obj['confirm_dt'])) if obj.get('confirm_dt') else  '-'
 
             row = [
                 index,
@@ -81,7 +83,9 @@ class DirectionsExcel(Excel):
                 row.append(obj['org']['legal_name'])
 
             row.extend([
+                obj['post'],
                 obj['shop'],
+                obj['exam_type'],
                 law_items,
                 ' '.join([f"с {date_to_rus(iso_to_date(obj['date_from']))} по {date_to_rus(iso_to_date(obj['date_to']))}"]),
                 confirm_dt
