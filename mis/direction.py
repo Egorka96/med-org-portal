@@ -7,6 +7,7 @@ import requests
 from django.conf import settings
 from django.utils.timezone import now
 from djutils.date_utils import iso_to_date
+from mis.insurance_policy import InsurancePolicy
 
 from mis.law_item import LawItem
 from mis.org import Org
@@ -32,6 +33,7 @@ class Direction:
     law_items: List[LawItem] = None
     pay_method: dict = None
     confirm_date: datetime.date = None
+    insurance_policy: InsurancePolicy = None
 
     def __str__(self):
         fio = self.get_fio()
@@ -64,6 +66,8 @@ class Direction:
             shop=data['shop'],
             law_items=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', [])],
             confirm_date=iso_to_date(data['confirm_dt']),
+            insurance_policy=InsurancePolicy.get_from_dict(data=data['insurance_policy'])
+                             if data.get('insurance_policy') else None
         )
 
     @classmethod
@@ -106,7 +110,17 @@ class Direction:
         for field_name in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
             params['law_items'].extend(params.get(field_name, []))
 
-        response = requests.post(url, data=params, headers=headers)
+        if params.get('insurance_number'):
+            params['insurance_policy'] = {
+                'number': params['insurance_number']
+            }
+
+        params['birth'] = params['birth'].isoformat()
+        params['date_to'] = params['date_to'].isoformat()
+        params['date_from']= params['date_from'].isoformat()
+        params = {key: value for key, value in params.items() if value}
+
+        response = requests.post(url, json=params, headers=headers)
         response_data = response.json()
 
         if response.status_code == 201:
@@ -126,15 +140,24 @@ class Direction:
     @classmethod
     def edit(cls, direction_id, params) -> Tuple[bool, str]:
         url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
-        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-
+        headers = {
+            'Authorization': f'Token {settings.MIS_TOKEN}',
+        }
         params['order_types'] = [2]  # ПРОФ осмотр
 
         params['law_items'] = []
         for field_name in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
             params['law_items'].extend(params.get(field_name, []))
 
-        response = requests.put(url=url, data=params, headers=headers)
+        if params.get('insurance_number'):
+            params['insurance_policy'] = {
+                'number': params['insurance_number']
+            }
+
+        params['birth'] = params['birth'].isoformat()
+        params = {key: value for key, value in params.items() if value}
+
+        response = requests.put(url=url, json=params, headers=headers, )
         response_data = response.json()
 
         if response.status_code == 200:
@@ -142,7 +165,7 @@ class Direction:
             description = f'Направление успешно изменено.'
         elif response.status_code == 400:
             success = False
-            description = f'Ошибка редактирования направления: {response_data["error"]}'
+            description = f'Ошибка редактирования направления: {response_data.get("error", response_data)}'
         elif response.status_code > 499:
             success = False
             description = f'Невозможно изменить направление в МИС - ошибка на сервере МИС'

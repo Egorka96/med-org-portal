@@ -139,7 +139,8 @@ class TestEdit(BaseTestCase):
             'confirm_date': datetime.date(2021, 10, 31),
             'from_date': datetime.date.today(),
             'to_date': datetime.date(2021, 12, 31),
-            'number': 1
+            'number': 1,
+            'insurance_policy': None
         }
 
         self.assertEqual(expect_params, response.context_data['form'].initial)
@@ -169,9 +170,10 @@ class TestEdit(BaseTestCase):
         params = self.get_params()
         response = self.client.post(self.get_url(), params)
         params['order_types'] = [2]
-        params['birth'] = datetime.date(2001, 3, 4)
+        params['birth'] = datetime.date(2001, 3, 4).isoformat()
+        params = {key: value for key, value in params.items() if value}
         expect_params = {
-            'data': params ,
+            'json': params ,
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
             'url': self.MIS_URL + '/api/pre_record/1/'
         }

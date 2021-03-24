@@ -1,3 +1,4 @@
+from copy import copy
 from unittest import TestCase
 import datetime
 from unittest import mock
@@ -23,7 +24,7 @@ class DirectionTests(TestCase):
             'id': 1,
             'last_name': 'Сидоров',
             'first_name': 'Василий',
-            'birth': datetime.date(2002, 5, 12).isoformat(),
+            'birth': datetime.date(2002, 5, 12),
             'gender': 'Мужчина',
             'exam_type': '',
             'date_from': None,
@@ -122,9 +123,16 @@ class DirectionTests(TestCase):
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
 
         params = self.get_direction_params()
+        params = {key: value for key, value in params.items() if value}
+        expect_json = copy(params)
+        expect_json['birth'] = params['birth'].isoformat()
+        expect_json['date_from'] = datetime.date.today()
+        expect_json['date_to'] = datetime.date(expect_json['date_from'].year, 12, 31).isoformat()
+        expect_json['date_from'] = expect_json['date_from'].isoformat()
+        expect_json['order_types'] = [2]
         expect_params = {
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
-            'data': params,
+            'json': expect_json,
         }
         expect_result = (True, f'Направление создано: Номер {response_json["id"]}')
 
@@ -166,9 +174,13 @@ class DirectionTests(TestCase):
         params['last_name'] = 'Яковлев'
         direction_id = params['id']
         expect_result = (True, f'Направление успешно изменено.')
+        params = {key: value for key, value in params.items() if value}
+        expect_json = copy(params)
+        expect_json['birth'] = params['birth'].isoformat()
+        expect_json['order_types'] = [2]
         expect_params = {
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'},
-            'data': params,
+            'json': expect_json,
             'url': self.MIS_URL + f'/api/pre_record/{direction_id}/'
         }
 

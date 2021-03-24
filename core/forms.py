@@ -323,6 +323,7 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Fo
     birth = RusDateField(label='Дата рождения', initial=None)
     post = forms.CharField(label='Должность', required=False)
     shop = forms.CharField(label='Подразделение', required=False)
+    insurance_number = forms.CharField(label='Страховой номер', required=False)
 
     def __init__(self, *args, current_user, **kwargs):
         super().__init__(*args, **kwargs)
