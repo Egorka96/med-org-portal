@@ -199,7 +199,7 @@ class TestSearch(BaseTestCase):
             'post': 'Тестировщик',
             'shop': 'Тест',
             'exam_type': 'Периодический',
-            'law_items': '3.4.2, 3.5',
+            'law_items': 'п. 3.4.2, п. 3.5',
             'date': 'с 20.02.2021 по 31.12.2021',
             'confirm_dt': '-'
         }
