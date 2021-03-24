@@ -28,7 +28,7 @@ class LawItem:
     description: str
 
     def __str__(self):
-        label = self.name
+        label = f'п. {self.name}'
         if self.law.name == '302н':
             label += f' прил.{self.section}'
         return label

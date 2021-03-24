@@ -22,8 +22,12 @@ class DirectionsExcel(Excel):
         # выкачиваем из МИС данные для отчета пока не кончатся
         page = 1
         while True:
-            response_data = Direction.filter_raw(params=self.filter_params, user=self.background_task.user)
-            objects.extend(response_data['results'])
+            response_data = Mis().request(
+                path=self.mis_request_path + f"?page={page}",
+                user=self.background_task.user,
+                params=self.filter_params,
+            )
+            objects.extend([Direction.dict_to_obj(obj) for obj in response_data['results']])
             if not response_data['next']:
                 break
 
@@ -66,7 +70,7 @@ class DirectionsExcel(Excel):
         for index, obj in enumerate(self.objects, start=1):
             law_items = ', '.join([str(l_i)
                                    for l_i in obj.law_items]) if obj.law_items else ''
-            confirm_dt = date_to_rus(obj.confirm_date) if date_to_rus(obj.confirm_date) else  '-'
+            confirm_dt = date_to_rus(obj.confirm_date) if date_to_rus(obj.confirm_date) else '-'
 
             row = [
                 index,
@@ -76,7 +80,7 @@ class DirectionsExcel(Excel):
             ]
 
             if self.show_orgs:
-                row.append(obj.org.legal_name)
+                row.append(obj.org.legal_name if obj.org else '')
 
             row.extend([
                 obj.post,

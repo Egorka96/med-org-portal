@@ -35,9 +35,6 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
     template_name = settings.TEMPLATES_DICT.get("direction_list")
     mis_request_path = Mis.DIRECTIONS_LIST_URL
 
-    def process_response_results(self, objects):
-        return [Direction.dict_to_obj(obj) for obj in objects]
-
     def get_workbook_maker_kwargs(self, **kwargs):
         kwargs = super().get_workbook_maker_kwargs(**kwargs)
 
@@ -75,6 +72,9 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
             filter_params = self.get_initial()
 
         return filter_params
+
+    def process_response_results(self, objects):
+        return [Direction.dict_to_obj(obj) for obj in objects]
 
 
 class Edit(PermissionRequiredMixin, core.generic.views.EditView):
