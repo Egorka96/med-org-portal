@@ -5,6 +5,7 @@ from unittest import mock
 import core.forms
 from core import models
 from core.tests.base import BaseTestCase
+from djutils.date_utils import rus_to_date
 from mis.pay_method import PayMethod
 from requests import Response
 from django.conf import settings
@@ -57,20 +58,18 @@ class TestCreate(BaseTestCase):
         mock_request_pay_method.return_value = []
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
 
+        params = {key: value for key, value in params.items() if value}
         response = self.client.post(self.get_url(), params)
         params['date_from'] = datetime.date.today()
-        params['date_to'] = datetime.date(params['date_from'].year, 12, 31).strftime('%d.%m.%Y')
-        params['date_from'] = datetime.date.today().strftime('%d.%m.%Y')
+        params['date_to'] = datetime.date(params['date_from'].year, 12, 31).isoformat()
+        params['date_from'] = datetime.date.today().isoformat()
+        params['birth'] = rus_to_date(params['birth']).isoformat()
         expect_params = {
-            'data': params ,
+            'json': params ,
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'}
         }
 
-        m = mock_request.call_args_list[0].kwargs
-        m['data']['date_to'] = m['data']['date_to'].strftime('%d.%m.%Y')
-        m['data']['date_from'] = m['data']['date_from'].strftime('%d.%m.%Y')
-        m['data']['birth'] = m['data']['birth'].strftime('%d.%m.%Y')
-        self.assertEqual(expect_params, m)
+        self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
 
     @mock.patch('requests.post')
     @mock.patch.object(core.forms, 'MisPayMethod')

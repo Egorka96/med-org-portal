@@ -115,7 +115,12 @@ class Direction:
                 'number': params['insurance_number']
             }
 
-        response = requests.post(url, data=params, headers=headers)
+        params['birth'] = params['birth'].isoformat()
+        params['date_to'] = params['date_to'].isoformat()
+        params['date_from']= params['date_from'].isoformat()
+        params = {key: value for key, value in params.items() if value}
+
+        response = requests.post(url, json=params, headers=headers)
         response_data = response.json()
 
         if response.status_code == 201:
@@ -137,7 +142,6 @@ class Direction:
         url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
         headers = {
             'Authorization': f'Token {settings.MIS_TOKEN}',
-            'Content-Type': 'application/json'
         }
         params['order_types'] = [2]  # ПРОФ осмотр
 
