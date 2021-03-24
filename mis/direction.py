@@ -135,8 +135,10 @@ class Direction:
     @classmethod
     def edit(cls, direction_id, params) -> Tuple[bool, str]:
         url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
-        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
-
+        headers = {
+            'Authorization': f'Token {settings.MIS_TOKEN}',
+            'Content-Type': 'application/json'
+        }
         params['order_types'] = [2]  # ПРОФ осмотр
 
         params['law_items'] = []
@@ -148,18 +150,18 @@ class Direction:
                 'number': params['insurance_number']
             }
 
-        response = requests.put(url=url, data=params, headers=headers)
-        response_data = response.json()
+        params['birth'] = params['birth'].isoformat()
+        params = {key: value for key, value in params.items() if value}
 
-        print(params)
-        print(response_data)
+        response = requests.put(url=url, json=params, headers=headers, )
+        response_data = response.json()
 
         if response.status_code == 200:
             success = True
             description = f'Направление успешно изменено.'
         elif response.status_code == 400:
             success = False
-            description = f'Ошибка редактирования направления: {response_data["error"]}'
+            description = f'Ошибка редактирования направления: {response_data.get("error", response_data)}'
         elif response.status_code > 499:
             success = False
             description = f'Невозможно изменить направление в МИС - ошибка на сервере МИС'
