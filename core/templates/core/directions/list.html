@@ -53,22 +53,22 @@
 {% block table_body %}
     <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
     <td>
-        <a href="{% url 'core:direction_edit' object.id %}">{{ object.id }}</a>
+        <a href="{% url 'core:direction_edit' object.number %}">{{ object.number }}</a>
     </td>
     <td>{{ object.last_name }} {{ object.first_name }} {{ object.middle_name }}</td>
-    <td>{{ object.birth|iso_to_date }}</td>
+    <td>{{ object.birth }}</td>
     <td>{{ object.gender }}</td>
     {% if show_orgs %}<td>{{ object.org.legal_name }}</td>{% endif %}
     <td>{{ object.shop }}</td>
     <td>
         {% for law_item in object.law_items %}
-            {{ law_item.display }}{% if not forloop.last %}, {% endif %}
+            {{ law_item }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </td>
-    <td>{% if object.date_from %}c {{ object.date_from|iso_to_date }}{% endif %} {% if object.date_to %} по {{ object.date_to|iso_to_date }}{% endif %}</td>
-    <td>{{ object.confirm_dt|iso_to_date|default_if_none:'-' }}</td>
+    <td>{% if object.from_date %}c {{ object.from_date }}{% endif %} {% if object.to_date %} по {{ object.to_date }}{% endif %}</td>
+    <td>{{ object.confirm_date|default_if_none:'-' }}</td>
     <td>
-        <a class="btn btn-outline-secondary" href="{% url 'core:direction_print' object.id %}" data-toggle="tooltip" title="Распечатать направление на осмотр">
+        <a class="btn btn-outline-secondary" href="{% url 'core:direction_print' object.number %}" data-toggle="tooltip" title="Распечатать направление на осмотр">
             <i class="fa fa-print"></i>
         </a>
     </td>

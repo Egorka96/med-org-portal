@@ -1,6 +1,6 @@
 import datetime
 from dateutil.relativedelta import relativedelta
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Dict, List, Tuple
 
 import requests
@@ -34,8 +34,7 @@ class Direction:
     confirm_date: datetime.date = None
 
     def __str__(self):
-        fio = ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
-
+        fio = self.get_fio()
         label = f'Направление "{fio}"'
         if self.from_date:
             label += f' c {self.from_date.strftime("%d.%m.%Y")}'
@@ -43,6 +42,9 @@ class Direction:
             label += f' по {self.to_date.strftime("%d.%m.%Y")}'
 
         return label
+
+    def get_fio(self):
+        return ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
 
     @classmethod
     def dict_to_obj(cls, data: dict) -> 'Direction':
@@ -63,6 +65,17 @@ class Direction:
             law_items=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', [])],
             confirm_date=iso_to_date(data['confirm_dt']),
         )
+
+    @classmethod
+    def filter_raw(cls, params: Dict = None, user: 'core.models.DjangoUser' = None):
+        response_json = Mis().request(path='/api/pre_record/', params=params, user=user)
+
+        directions = []
+        for item in response_json['results']:
+            directions.append(asdict(cls.dict_to_obj(item)))
+
+        response_json['results'] = directions
+        return response_json
 
     @classmethod
     def filter(cls, params: Dict = None) -> List['Direction']:

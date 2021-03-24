@@ -4,6 +4,7 @@ import json
 import os
 import tempfile
 
+from core.excel.directions import DirectionsExcel
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -15,6 +16,7 @@ from docx.shared import Mm
 
 from mis.direction import Direction
 from mis.service_client import Mis
+from core.datatools.report import get_report_period
 
 import core.generic.mixins
 import core.generic.views
@@ -29,8 +31,33 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
     title = 'Направления'
     permission_required = 'core.view_direction'
     paginate_by = 50
+    excel_workbook_maker = DirectionsExcel
     template_name = settings.TEMPLATES_DICT.get("direction_list")
     mis_request_path = Mis.DIRECTIONS_LIST_URL
+
+    def get_workbook_maker_kwargs(self, **kwargs):
+        kwargs = super().get_workbook_maker_kwargs(**kwargs)
+
+        user_orgs = self.request.user.core.get_orgs()
+        kwargs['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
+        kwargs['mis_request_path'] = self.mis_request_path
+        kwargs['filter_params'] = self.get_filter_params()
+        return kwargs
+
+    def get_excel_title(self):
+        title = self.get_title()
+
+        form = self.get_form()
+        if form.is_valid():
+            title += get_report_period(
+                date_from=form.cleaned_data.get('date_from'),
+                date_to=form.cleaned_data.get('date_to')
+            )
+
+            if orgs := form.cleaned_data.get('orgs'):
+                title += f'. Организации: {", ".join(str(org) for org in orgs)}'
+
+        return title
 
     def get_initial(self):
         initial = super().get_initial()
@@ -45,6 +72,9 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
             filter_params = self.get_initial()
 
         return filter_params
+
+    def process_response_results(self, objects):
+        return [Direction.dict_to_obj(obj) for obj in objects]
 
 
 class Edit(PermissionRequiredMixin, core.generic.views.EditView):
