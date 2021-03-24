@@ -1,4 +1,5 @@
 from core.excel.base import Excel
+from mis.direction import Direction
 from mis.service_client import Mis
 from swutils.date import date_to_rus, iso_to_date
 
@@ -12,7 +13,6 @@ class DirectionsExcel(Excel):
         self.mis_request_path = mis_request_path
         self.filter_params = filter_params
 
-
         if not self.objects:
             self.objects = self.get_objects()
 
@@ -22,11 +22,7 @@ class DirectionsExcel(Excel):
         # выкачиваем из МИС данные для отчета пока не кончатся
         page = 1
         while True:
-            response_data = Mis().request(
-                path=self.mis_request_path + f"?page={page}",
-                user=self.background_task.user,
-                params=self.filter_params,
-            )
+            response_data = Direction.filter_raw(params=self.filter_params, user=self.background_task.user)
             objects.extend(response_data['results'])
             if not response_data['next']:
                 break
@@ -68,26 +64,26 @@ class DirectionsExcel(Excel):
         object_rows = []
 
         for index, obj in enumerate(self.objects, start=1):
-            law_items = ', '.join([f"{l_i['name']} прил.{l_i['section']}"
-                                   for l_i in obj['law_items']]) if obj.get('law_items') else ''
-            confirm_dt = date_to_rus(iso_to_date(obj['confirm_dt'])) if obj.get('confirm_dt') else  '-'
+            law_items = ', '.join([str(l_i)
+                                   for l_i in obj.law_items]) if obj.law_items else ''
+            confirm_dt = date_to_rus(obj.confirm_date) if date_to_rus(obj.confirm_date) else  '-'
 
             row = [
                 index,
-                ' '.join([obj['last_name'], obj['first_name'], obj['middle_name']]),
-                date_to_rus(iso_to_date(obj['birth'])),
-                obj['gender'],
+                obj.get_fio(),
+                date_to_rus(obj.birth),
+                obj.gender,
             ]
 
             if self.show_orgs:
-                row.append(obj['org']['legal_name'])
+                row.append(obj.org.legal_name)
 
             row.extend([
-                obj['post'],
-                obj['shop'],
-                obj['exam_type'],
+                obj.post,
+                obj.shop,
+                obj.exam_type,
                 law_items,
-                ' '.join([f"с {date_to_rus(iso_to_date(obj['date_from']))} по {date_to_rus(iso_to_date(obj['date_to']))}"]),
+                ' '.join([f"с {date_to_rus(obj.from_date)} по {date_to_rus(obj.to_date)}"]),
                 confirm_dt
             ])
 

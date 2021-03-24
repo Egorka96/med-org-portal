@@ -35,12 +35,14 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
     template_name = settings.TEMPLATES_DICT.get("direction_list")
     mis_request_path = Mis.DIRECTIONS_LIST_URL
 
+    def process_response_results(self, objects):
+        return [Direction.dict_to_obj(obj) for obj in objects]
+
     def get_workbook_maker_kwargs(self, **kwargs):
         kwargs = super().get_workbook_maker_kwargs(**kwargs)
 
         user_orgs = self.request.user.core.get_orgs()
         kwargs['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
-        # kwargs['show_cost'] = True if self.request.user.has_perm('core.view_money') else False
         kwargs['mis_request_path'] = self.mis_request_path
         kwargs['filter_params'] = self.get_filter_params()
         return kwargs

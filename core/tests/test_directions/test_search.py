@@ -4,11 +4,15 @@ import os
 
 from core import models
 from core.tests.base import BaseTestCase
+from mis.direction import Direction
+from mis.law_item import LawItem, Law
+from mis.org import Org
 from mis.service_client import Mis
 from requests import Response
 from openpyxl import load_workbook
 from swutils.date import date_to_rus
 from djutils.date_utils import iso_to_date
+import dataclasses
 
 
 class TestSearch(BaseTestCase):
@@ -51,6 +55,10 @@ class TestSearch(BaseTestCase):
                         "name":"3.4.2",
                         "section":"1",
                         "description":"Общая вибрация ",
+                         "law": {
+                            "id": 5,
+                            "name": "29н"
+                        },
                         "display":"3.4.2 прил.1"
                     },
                     {
@@ -58,6 +66,10 @@ class TestSearch(BaseTestCase):
                         "name":"3.5",
                         "section":"1",
                         "description":"Производственный шум на рабочих местах с вредными и (или) опасными условиями труда, на которых имеется технологическое оборудование, являющееся источником шума.",
+                         "law": {
+                            "id": 5,
+                            "name": "29н"
+                        },
                         "display":"3.5 прил.1"
                     },
                 ],
@@ -93,7 +105,29 @@ class TestSearch(BaseTestCase):
     def test_get_initial(self, mock_request):
         mock_request.return_value = self.get_result_mis()
         response = self.client.get(self.get_url())
-        self.assertEqual(response.context_data['object_list'], mock_request.return_value['results'])
+        directions_expected = []
+        for item in mock_request.return_value['results']:
+            direction = Direction(
+                number=item['id'],
+                last_name=item['last_name'],
+                first_name=item['first_name'],
+                middle_name=item['middle_name'],
+                birth=iso_to_date(item['birth']),
+                gender=item['gender'],
+                from_date=iso_to_date(item['date_from']),
+                to_date=iso_to_date(item['date_to']),
+                org=Org.get_from_dict(data=item['org']) if item.get('org') else None,
+                pay_method=item['pay_method'],
+                exam_type=item['exam_type'],
+                post=item['post'],
+                shop=item['shop'],
+                law_items=[LawItem.get_from_dict(l_i) for l_i in item.get('law_items', [])],
+                confirm_date=iso_to_date(item['confirm_dt']),
+            )
+            directions_expected.append(direction)
+
+        self.assertEqual(response.context_data['object_list'], directions_expected)
+
         initial =  {
             'date_from': datetime.date.today()
         }
@@ -102,10 +136,31 @@ class TestSearch(BaseTestCase):
     @mock.patch.object(Mis, 'request')
     def test_get_filter_params(self, mock_request):
         mock_request.return_value = self.get_result_mis()
+
         params = self.get_params()
         response = self.client.get(self.get_url(), params)
+        directions_expected = []
+        for item in mock_request.return_value['results']:
+            direction = Direction(
+                number=item['id'],
+                last_name=item['last_name'],
+                first_name=item['first_name'],
+                middle_name=item['middle_name'],
+                birth=iso_to_date(item['birth']),
+                gender=item['gender'],
+                from_date=iso_to_date(item['date_from']),
+                to_date=iso_to_date(item['date_to']),
+                org=Org.get_from_dict(data=item['org']) if item.get('org') else None,
+                pay_method=item['pay_method'],
+                exam_type=item['exam_type'],
+                post=item['post'],
+                shop=item['shop'],
+                law_items=[LawItem.get_from_dict(l_i) for l_i in item.get('law_items', [])],
+                confirm_date=iso_to_date(item['confirm_dt']),
+            )
+            directions_expected.append(direction)
 
-        self.assertEqual(response.context_data['object_list'], mock_request.return_value['results'])
+        self.assertEqual(response.context_data['object_list'], directions_expected)
 
         params['confirmed'] = None
         params['date_from'] = None
@@ -144,7 +199,7 @@ class TestSearch(BaseTestCase):
             'post': 'Тестировщик',
             'shop': 'Тест',
             'exam_type': 'Периодический',
-            'law_items': '3.4.2 прил.1, 3.5 прил.1',
+            'law_items': '3.4.2, 3.5',
             'date': 'с 20.02.2021 по 31.12.2021',
             'confirm_dt': '-'
         }
