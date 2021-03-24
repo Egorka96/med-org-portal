@@ -122,6 +122,9 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             if initial.get('pay_method'):
                 initial['pay_method'] = initial['pay_method']['id']
 
+            if initial.get('insurance_policy'):
+                initial['insurance_number'] = initial['insurance_policy']['number']
+
         return initial
 
     def get_form_kwargs(self):

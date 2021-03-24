@@ -7,6 +7,7 @@ import requests
 from django.conf import settings
 from django.utils.timezone import now
 from djutils.date_utils import iso_to_date
+from mis.insurance_policy import InsurancePolicy
 
 from mis.law_item import LawItem
 from mis.org import Org
@@ -32,6 +33,7 @@ class Direction:
     law_items: List[LawItem] = None
     pay_method: dict = None
     confirm_date: datetime.date = None
+    insurance_policy: InsurancePolicy = None
 
     def __str__(self):
         fio = self.get_fio()
@@ -64,6 +66,8 @@ class Direction:
             shop=data['shop'],
             law_items=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', [])],
             confirm_date=iso_to_date(data['confirm_dt']),
+            insurance_policy=InsurancePolicy.get_from_dict(data=data['insurance_policy'])
+                             if data.get('insurance_policy') else None
         )
 
     @classmethod
@@ -106,6 +110,11 @@ class Direction:
         for field_name in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
             params['law_items'].extend(params.get(field_name, []))
 
+        if params.get('insurance_number'):
+            params['insurance_policy'] = {
+                'number': params['insurance_number']
+            }
+
         response = requests.post(url, data=params, headers=headers)
         response_data = response.json()
 
@@ -134,8 +143,16 @@ class Direction:
         for field_name in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
             params['law_items'].extend(params.get(field_name, []))
 
+        if params.get('insurance_number'):
+            params['insurance_policy'] = {
+                'number': params['insurance_number']
+            }
+
         response = requests.put(url=url, data=params, headers=headers)
         response_data = response.json()
+
+        print(params)
+        print(response_data)
 
         if response.status_code == 200:
             success = True
