@@ -4,6 +4,7 @@ from unittest import mock
 
 from core.datatools.string import random_word
 from mis.document import Document, DocumentType
+from mis.org import Org
 from mis.worker import Worker
 from swutils.date import date_to_rus
 from core.tests.base import BaseRestTestCase
@@ -38,14 +39,12 @@ class TestWorkerDocuments(BaseRestTestCase, APITestCase):
             middle_name='Андреевич',
             birth=datetime.date(2001, 11, 6),
             gender='Мужчина',
-            org=[],
+            org=Org(id=1, name='test'),
             post='',
             shop='',
-            law_items_section_1=[],
-            law_items_section_2=[],
+            law_items=[],
             documents=worker_documents
         )
-
 
     @mock.patch.object(Worker, 'get')
     def test_worker_documents(self, mock_worker_documents):

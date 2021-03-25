@@ -22,8 +22,7 @@ class Worker:
     middle_name: str = None
     post: str = None
     shop: str = None
-    law_items_section_1: List[LawItem] = None
-    law_items_section_2: List[LawItem] = None
+    law_items: List[LawItem] = None
 
     documents: List[Document] = None
 
@@ -67,7 +66,6 @@ class Worker:
             org=Org.get_from_dict(data=data['org']) if data.get('org') else None,
             post=data['post'],
             shop=data['shop'],
-            law_items_section_1=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', []) if l_i['section'] == '1'],
-            law_items_section_2=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', []) if l_i['section'] == '2'],
+            law_items=[LawItem.get_from_dict(l_i) for l_i in data.get('law_items', [])],
             documents=data.get('documents')
         )

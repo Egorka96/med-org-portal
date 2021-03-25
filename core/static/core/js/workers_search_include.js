@@ -43,31 +43,25 @@
                 if (worker.org) {
                     let orgName = worker.org.legal_name ? worker.org.legal_name : worker.org.name
                     let opt = "<option value='" + worker.org.id + "' selected'>" + orgName + "</option>"
-                    $("#id_org").html(opt)
-                    $("#id_org").val(worker.org.id).trigger('change')
+                    $("#id_org").html(opt).val(worker.org.id).trigger('change')
                 }
 
-                let lawItemsSection1 = [];
-                worker.law_items_section_1.forEach(function (lawItem) {
-                    lawItemsSection1.push(lawItem.id);
-
-                    if (!!$("#id_law_items_section_1 option[value=" + lawItem.id + "]")) {
-                        $("#id_law_items_section_1").append($("<option value=" + lawItem.id + ">" + lawItem.name + "</option>"))
+                worker.law_items.forEach(function (lawItem) {
+                    let lawItemFieldId = ''
+                    if (lawItem.law.name === '302н') {
+                        lawItemFieldId = `#id_law_items_302_section_${lawItem.section}`
+                    } else if (lawItem.law.name === '29н') {
+                        lawItemFieldId = "#id_law_items_29"
                     }
 
-                });
-
-                let lawItemsSection2 = [];
-                worker.law_items_section_2.forEach(function (lawItem) {
-                    lawItemsSection2.push(lawItem.id);
-
-                    if (!!$("#id_law_items_section_2 option[value=" + lawItem.id + "]")) {
-                        $("#id_law_items_section_2").append($("<option value=" + lawItem.id + ">" + lawItem.name + "</option>"))
+                    if (!!$(`${lawItemFieldId} option[value=${lawItem.id}]`)) {
+                        $(lawItemFieldId).append($(`<option value=${lawItem.id}>${lawItem.name}</option>`))
                     }
-                });
 
-                $("#id_law_items_section_1").val(lawItemsSection1).trigger("change.select2");
-                $("#id_law_items_section_2").val(lawItemsSection2).trigger("change.select2");
+                    let lawItems = $(lawItemFieldId).val();
+                    lawItems.push(lawItem.id)
+                    $(lawItemFieldId).val(lawItems).trigger("change.select2");
+                })
 
                 $(".worker-search-result-modal").hide()
             }

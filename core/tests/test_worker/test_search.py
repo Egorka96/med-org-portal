@@ -94,9 +94,7 @@ class TestsSearch(BaseTestCase):
                 org=org,
                 post=worker_data['post'],
                 shop=worker_data['shop'],
-                law_items_section_1=[],
-                law_items_section_2=[],
-                documents=None
+                law_items=[],
             ))
 
         self.assertEqual(workers, response.context_data['object_list'])

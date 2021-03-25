@@ -89,8 +89,7 @@ class WorkerTests(TestCase):
                 middle_name=item['middle_name'],
                 post=item['post'],
                 shop=item['shop'],
-                law_items_section_1=[],
-                law_items_section_2=[],
+                law_items=[],
             ))
 
         workers = Worker.filter(params)
@@ -194,8 +193,7 @@ class WorkerTests(TestCase):
             middle_name=response_json['middle_name'],
             post=response_json['post'],
             shop=response_json['shop'],
-            law_items_section_1=[],
-            law_items_section_2=[],
+            law_items=[],
             documents=[]
         )
 
@@ -261,8 +259,7 @@ class WorkerTests(TestCase):
             middle_name=response_json['middle_name'],
             post=response_json['post'],
             shop=response_json['shop'],
-            law_items_section_1=[],
-            law_items_section_2=[],
+            law_items=[],
             documents=[]
         )
         document1 = Document(
@@ -339,8 +336,7 @@ class WorkerTests(TestCase):
             middle_name=response_json['middle_name'],
             post=response_json['post'],
             shop=response_json['shop'],
-            law_items_section_1=[],
-            law_items_section_2=[],
+            law_items=[],
             documents=[]
         )
 
