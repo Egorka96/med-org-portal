@@ -48,6 +48,7 @@ class DirectionsExcel(Excel):
             'ФИО': 35,
             'Дата рождения': 15,
             'Пол': 15,
+            'Страховой номер': 20
         }
 
         if self.show_orgs:
@@ -71,12 +72,14 @@ class DirectionsExcel(Excel):
             law_items = ', '.join([str(l_i)
                                    for l_i in obj.law_items]) if obj.law_items else ''
             confirm_dt = date_to_rus(obj.confirm_date) if date_to_rus(obj.confirm_date) else '-'
+            insurance_policy = obj.insurance_policy.number if obj.insurance_policy else ''
 
             row = [
                 index,
                 obj.get_fio(),
                 date_to_rus(obj.birth),
                 obj.gender,
+                insurance_policy
             ]
 
             if self.show_orgs:

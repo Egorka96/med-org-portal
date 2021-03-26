@@ -4,6 +4,7 @@ from unittest import mock
 from core import models
 from core.tests.base import BaseTestCase
 from mis.direction import Direction
+from mis.org import Org
 from requests import Response
 
 
@@ -16,15 +17,23 @@ class TestPrint(BaseTestCase):
     def generate_data(self):
         self.core_user = models.User.objects.create(django_user=self.user)
 
+    @mock.patch.object(Org, 'get')
     @mock.patch.object(Direction, 'get')
-    def setUp(self, mock_request_direction):
+    def setUp(self, mock_request_direction, mock_request_org):
+        org = Org(
+            id=1,
+            name='Тест',
+            legal_name='OOO Тест'
+        )
+        mock_request_org.return_value = org
         mock_request_direction.return_value = Direction(
             number=1,
             last_name='Иван',
             first_name='Яковлев',
             gender='М',
             birth=datetime.date.today(),
-            law_items=[]
+            law_items=[],
+            org = org
         )
         super().setUp()
 
@@ -37,15 +46,23 @@ class TestPrint(BaseTestCase):
         response._content = bytes(content, encoding='utf-8')
         return response
 
+    @mock.patch.object(Org, 'get')
     @mock.patch.object(Direction, 'get')
-    def test_get(self, mock_request_direction):
+    def test_get(self, mock_request_direction, mock_request_org):
+        org = Org(
+            id=1,
+            name='Тест',
+            legal_name='OOO Тест'
+        )
+        mock_request_org.return_value = org
         mock_request_direction.return_value = Direction(
             number=1,
             last_name='Иван',
             first_name='Яковлев',
             gender='М',
             birth=datetime.date.today(),
-            law_items=[]
+            law_items=[],
+            org=org
         )
         response = self.client.get(self.get_url())
 

@@ -79,6 +79,7 @@ class TestSearch(BaseTestCase):
                     "type":"Организация",
                     "sort_priority":5.0
                 },
+                "insurance_policy": None,
                 "exam_type":"Периодический",
                 "post":"Тестировщик",
                 "shop":"Тест",
@@ -195,6 +196,7 @@ class TestSearch(BaseTestCase):
             'fio': 'Тестов Тест Тестович',
             'birth': '14.11.1982',
             'gender':'Мужской',
+            'insurance_policy': None,
             'org': "ООО \"Тестовая организация\"",
             'post': 'Тестировщик',
             'shop': 'Тест',
@@ -204,12 +206,12 @@ class TestSearch(BaseTestCase):
             'confirm_dt': '-'
         }
         result_expected = list(result_expected_dict.values())
-        result_excel = [c.value for c in wb.worksheets[0][3]][:11]
+        result_excel = [c.value for c in wb.worksheets[0][3]][:12]
 
         self.assertEqual(result_excel, result_expected)
 
-        title_list = ['№', 'ФИО', 'Дата рождения', 'Пол', 'Организация', 'Должность', 'Подразделение', 'Вид осмотра',
-                      'Пункты приказа', 'Время действия', 'Дата прохождения']
+        title_list = ['№', 'ФИО', 'Дата рождения', 'Пол', 'Страховой номер', 'Организация', 'Должность', 'Подразделение',
+                      'Вид осмотра', 'Пункты приказа', 'Время действия', 'Дата прохождения']
         result_excel_title = [c.value for c in wb.worksheets[0][2]]
 
         self.assertEqual(result_excel_title, title_list)
