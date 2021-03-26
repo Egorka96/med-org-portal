@@ -15,6 +15,7 @@ from django.views.generic.base import View
 from docx.shared import Mm
 
 from mis.direction import Direction
+from mis.org import Org
 from mis.service_client import Mis
 from core.datatools.report import get_report_period
 
@@ -264,6 +265,7 @@ class Print(PermissionRequiredMixin, core.generic.mixins.DocxMixin, View):
         context = super().get_print_context_data(**kwargs)
         context['object'] = self.get_object()
         context['user'] = self.request.user
+        context['org'] = Org.get(self.object.org.id)
 
         # добавим штрих-код заявки
         direction_barcode_path = core.datatools.barcode.create_jpg(

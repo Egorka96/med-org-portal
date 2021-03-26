@@ -10,6 +10,9 @@ class Org:
     id: int
     name: str
     legal_name: str = None
+    okved: str = None
+    phones: str = None
+    email: str = None
 
     def __str__(self):
         return self.legal_name or self.name
@@ -53,5 +56,8 @@ class Org:
             id=data['id'],
             name=data.get('name'),
             legal_name=data['legal_name'],
+            okved=data.get('okved'),
+            phones=data.get('phones'),
+            email=data.get('email'),
         )
         return org
