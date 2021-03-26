@@ -11,7 +11,7 @@ class Org:
     name: str
     legal_name: str = None
     okved: str = None
-    phones: str = None
+    phones: List[str] = None
     email: str = None
 
     def __str__(self):
