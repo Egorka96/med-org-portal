@@ -107,6 +107,7 @@ class Worker(models.Model):
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
 
+
 class WorkersOrganization(models.Model):
     worker = models.ForeignKey(Worker, on_delete=CASCADE, verbose_name='Сотрудник')
     mis_id = models.IntegerField(verbose_name='МИС id')
@@ -118,6 +119,7 @@ class WorkersOrganization(models.Model):
     class Meta:
         verbose_name = 'Сотрудник_Организация'
         verbose_name_plural = 'Сотрудник_Организация'
+
 
 class DirectionDocxTemplate(models.Model):
     name = models.CharField('Название', max_length=255, unique=True)
