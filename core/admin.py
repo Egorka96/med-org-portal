@@ -5,6 +5,7 @@ from core import models
 
 admin.site.register(models.DirectionDocxTemplate)
 
+admin.site.register(models.Status)
 
 class WorkersOrganizationAdmin(admin.TabularInline):
     model = WorkersOrganization

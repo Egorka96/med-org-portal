@@ -71,10 +71,7 @@ class Command(BaseCommand):
             if not created:
                 worker.gender = mis_wor.gender
                 worker.save()
-            worker_org = core.models.WorkersOrganization.objects.get_or_create(worker=worker, org_id=mis_wor.org.id)
-            worker_org.mis_id = mis_wor.id
-            worker_org.post = mis_wor.post
-            worker_org.shop = mis_wor.shop
+            worker_org, created = core.models.WorkersOrganization.objects.get_or_create(worker=worker, org_id=mis_wor.org.id, mis_id=mis_wor.id, post=mis_wor.post, shop=mis_wor.post)
             worker_org.save()
 
 

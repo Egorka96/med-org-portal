@@ -142,4 +142,3 @@ class DirectionDocxTemplate(models.Model):
             return []
 
         return [Org.get(org_id=org_id) for org_id in json.loads(self.org_ids)]
-
