@@ -4,7 +4,7 @@ from typing import List
 import djutils.models
 from django.db import models
 from django.contrib.auth.models import User as DjangoUser
-from django.db.models import CASCADE
+from core import consts
 
 from mis.document import DocumentType
 from mis.org import Org
@@ -98,23 +98,24 @@ class Worker(models.Model):
     last_name = models.CharField(max_length=255, verbose_name='Фамилия')
     first_name = models.CharField(max_length=255, verbose_name='Имя')
     middle_name = models.CharField(max_length=255, verbose_name='Отчество', blank=True)
-    gender = models.CharField(max_length=7, verbose_name='Пол')
+    gender = models.CharField(max_length=7, verbose_name='Пол', choices=consts.GENDER_CHOICE)
     birth = models.DateField(verbose_name='Дата рождение')
     note = models.TextField(blank=True, verbose_name='Примечание')
-
 
     class Meta:
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
 
+    def __str__(self):
+        return ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
 
-class WorkersOrganization(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=CASCADE, verbose_name='Сотрудник')
+
+class WorkerOrganization(models.Model):
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Сотрудник', related_name='worker_org')
     mis_id = models.IntegerField(verbose_name='МИС id')
     org_id = models.IntegerField(verbose_name='Организация id')
     post = models.CharField(max_length=255, verbose_name='Должность')
     shop = models.CharField(max_length=255, verbose_name='Подразделение')
-
 
     class Meta:
         verbose_name = 'Сотрудник_Организация'
