@@ -268,7 +268,7 @@ class UserEdit(OrgsMixin, DocumentTypeMixin, forms.ModelForm):
             user.core.available_document_type_ids.exclude(document_type_id__in=document_type_ids).delete()
 
 
-class WorkerSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
+class WorkerSearch(FIO, OrgsMixin, forms.Form):
     ACTIVE_CHOICES = (
         ('', '---------'),
         ('1', 'Работает'),
@@ -278,13 +278,6 @@ class WorkerSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
     is_active = forms.ChoiceField(label='Работает', choices=ACTIVE_CHOICES, required=False, initial='1')
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['date_from'].label = 'Работал с'
-        self.fields['date_from'].help_text = 'дата начала работы'
-        self.fields['date_to'].label = 'Работал по'
-        self.fields['date_to'].help_text = 'дата увольнения'
 
 
 class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):

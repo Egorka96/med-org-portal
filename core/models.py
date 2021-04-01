@@ -105,17 +105,20 @@ class Worker(models.Model):
     class Meta:
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
+        ordering = ['last_name', 'first_name', 'middle_name']
 
     def __str__(self):
         return ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
 
 
 class WorkerOrganization(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Сотрудник', related_name='worker_org')
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Сотрудник', related_name='worker_orgs')
     mis_id = models.IntegerField(verbose_name='МИС id')
     org_id = models.IntegerField(verbose_name='Организация id')
     post = models.CharField(max_length=255, verbose_name='Должность')
     shop = models.CharField(max_length=255, verbose_name='Подразделение')
+    start_work_date = models.DateField(null=True, blank=True, verbose_name='Дата приема')
+    end_work_date = models.DateField(null=True, blank=True, verbose_name='Дата уволения')
 
     class Meta:
         verbose_name = 'Сотрудник_Организация'
