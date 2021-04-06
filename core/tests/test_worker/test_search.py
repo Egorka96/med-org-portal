@@ -14,92 +14,122 @@ class TestsSearch(BaseTestCase):
     permission = 'core.view_worker'
 
     def generate_data(self):
+        super().generate_data()
         self.core_user = models.User.objects.create(django_user=self.user)
+        self.worker1 = models.Worker.objects.create(
+            last_name='Таня',
+            first_name='Морозова',
+            middle_name='Никитична',
+            gender='Женский',
+            birth=datetime.date(2003, 3, 31)
+        )
+        models.WorkerOrganization.objects.create(
+            worker=self.worker1,
+            mis_id=1,
+            org_id=1,
+            post='Повар',
+            shop='ПФП',
+            end_work_date=datetime.date(2020, 3, 31)
+        )
+        self.worker2 = models.Worker.objects.create(
+            last_name='Надя',
+            first_name='Попкова',
+            middle_name='Ивановна',
+            gender='Женский',
+            birth=datetime.date(2003, 3, 31)
+        )
+        models.WorkerOrganization.objects.create(
+            worker=self.worker2,
+            mis_id=2,
+            org_id=2,
+            post='Повар',
+            shop='ПФПА',
+        )
 
-    @mock.patch.object(Mis, 'request')
-    def setUp(self, mock_request):
-        mock_request.return_value = self.get_result_mis()
-        super().setUp()
 
-    def get_result_mis(self):
-        return {
-            "count": 1,
-            "next": None,
-            "previous": None,
-            "results": [{
-                "id": 4937,
-                "org": {
-                    "id": 449,
-                    "name": "Тестовая организация 449",
-                    "legal_name": "ООО \"Тестовая организация\"",
-                    "inn": "",
-                    "legal_address": "",
-                    "actual_address": ""
-                },
-                "law_items": [],
-                "last_name": "Яковлев",
-                "first_name": "Евгений",
-                "middle_name": "Владимирович",
-                "slug_name": "20011775ев",
-                "birth": "1995-03-13",
-                "gender": "Мужской",
-                "snils": "",
-                "start_work_date": None,
-                "end_work_date": None,
-                "end_work_decree": "",
-                "post": "",
-                "shop": "Кофейня",
-                "department": None
-                }]
-            }
-
-    def get_params(self):
-        return {
-            'first_name': ['Евгений'],
-            'last_name': ['Яковлев'],
-            'middle_name': ['Владимирович'],
-            'per_page': '100'
+    def test_search_last_name(self):
+        params = {
+            'last_name': 'Таня'
         }
-
-    @mock.patch.object(Mis, 'request')
-    def test_search(self, mock_request):
-        mock_request.return_value = self.get_result_mis()
-        params = self.get_params()
 
         response = self.client.get(self.get_url(), params)
-        expect_params = {
-            'path': '/api/workers/',
-            'user': self.core_user,
-            'params': params
+        result = models.Worker.objects.filter(last_name__istartswith=params['last_name'])
+
+        self.assertEqual(list(result), list(response.context_data['object_list']))
+
+    def test_search_first_name(self):
+        params = {
+            'first_name': 'Морозова'
         }
 
-        mock_params = mock_request.call_args_list[0].kwargs
-        mock_params['user'] = mock_params['user'].core
-        self.assertEqual(expect_params, mock_params)
+        response = self.client.get(self.get_url(), params)
+        result = models.Worker.objects.filter(first_name__istartswith=params['first_name'])
 
-        workers = []
-        for worker_data in mock_request.return_value['results']:
-            org = Org(
-                id=worker_data['org']['id'],
-                name=worker_data['org']['name'],
-                legal_name=worker_data['org']['legal_name']
-            )
-            workers.append(Worker(
-                id=worker_data['id'],
-                last_name=worker_data['last_name'],
-                first_name=worker_data['first_name'],
-                middle_name=worker_data['middle_name'],
-                birth=iso_to_date(worker_data['birth']),
-                gender=worker_data['gender'],
-                org=org,
-                post=worker_data['post'],
-                shop=worker_data['shop'],
-                law_items=[],
-            ))
+        self.assertEqual(list(result), list(response.context_data['object_list']))
 
-        self.assertEqual(workers, response.context_data['object_list'])
+    def test_search_middle_name(self):
+        params = {
+            'middle_name': 'Никитична'
+        }
+
+        response = self.client.get(self.get_url(), params)
+        result = models.Worker.objects.filter(middle_name__istartswith=params['middle_name'])
+
+        self.assertEqual(list(result), list(response.context_data['object_list']))
 
 
+    @mock.patch.object(Org, 'get')
+    def test_search_org(self, mock_org):
+        mock_org.return_value = Org(
+            id=1,
+            name='Рога',
+            legal_name='ООО Рога'
+        )
+        params = {
+            'orgs': [1]
+        }
 
+        response = self.client.get(self.get_url(), params)
+        result = models.Worker.objects.filter(worker_orgs__org_id__in=params['orgs'])
 
+        self.assertEqual(list(result), list(response.context_data['object_list']))
+    
+    def test_search_post(self):
+        params = {
+            'post': 'Повар'
+        }
 
+        response = self.client.get(self.get_url(), params)
+        result = models.Worker.objects.filter(worker_orgs__post__istartswith=params['post'])
+
+        self.assertEqual(list(result), list(response.context_data['object_list']))
+
+    def test_search_shop(self):
+        params = {
+            'shop': 'ПФП'
+        }
+
+        response = self.client.get(self.get_url(), params)
+        result = models.Worker.objects.filter(worker_orgs__shop__istartswith=params['shop'])
+
+        self.assertEqual(list(result), list(response.context_data['object_list']))
+
+    def test_search_work_false(self):
+        params = {
+            'is_active': '0',
+        }
+
+        response = self.client.get(self.get_url(), params)
+        result = models.Worker.objects.filter(worker_orgs__end_work_date__isnull=False)
+
+        self.assertEqual(list(result), list(response.context_data['object_list']))
+
+    def test_search_work_true(self):
+        params = {
+            'is_active': '1',
+        }
+
+        response = self.client.get(self.get_url(), params)
+        result = models.Worker.objects.filter(worker_orgs__end_work_date__isnull=True)
+
+        self.assertEqual(list(result), list(response.context_data['object_list']))

@@ -1,6 +1,8 @@
 import django_filters
 from django.contrib.auth import get_user_model
 
+from core import models
+
 DjangoUser = get_user_model()
 
 
@@ -21,12 +23,16 @@ class Worker(django_filters.FilterSet):
     last_name = django_filters.CharFilter(field_name='last_name', lookup_expr='icontains')
     first_name = django_filters.CharFilter(field_name='first_name', lookup_expr='icontains')
     middle_name = django_filters.CharFilter(field_name='middle_name', lookup_expr='icontains')
-    post = django_filters.CharFilter(field_name='post', lookup_expr='icontains')
-    shop = django_filters.CharFilter(field_name='shop', lookup_expr='icontains')
-    org = django_filters.CharFilter(method='filter_org')
+    post = django_filters.CharFilter(field_name='worker_orgs__post', lookup_expr='icontains')
+    shop = django_filters.CharFilter(field_name='worker_orgs__shop', lookup_expr='icontains')
+    orgs = django_filters.CharFilter(method='filter_orgs')
     is_active = django_filters.CharFilter(method='filter_is_active')
 
-    def filter_org(self, qs, name, value):
+    class Meta:
+        model = models.Worker
+        fields = '__all__'
+
+    def filter_orgs(self, qs, name, value):
         return qs.filter(worker_orgs__org_id__in=value)
 
     def filter_is_active(self, qs, name, value):

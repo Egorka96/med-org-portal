@@ -2,6 +2,7 @@ import datetime
 import json
 from unittest import mock
 
+from core import models
 from core.tests.base import BaseTestCase
 from mis.document import Document
 from mis.org import Org
@@ -14,6 +15,24 @@ from project import settings
 class TestsDocumentPrint(BaseTestCase):
     view = 'core:worker_documents_print'
     permission = 'core.view_worker'
+
+    def setUp(self):
+        super(TestsDocumentPrint, self).setUp()
+        self.worker = models.Worker.objects.create(
+            id=1,
+            last_name='Хищенко',
+            first_name='Влад',
+            middle_name='Андреевич',
+            gender='Мужчина',
+            birth=datetime.date(2001, 11, 6)
+        )
+        self.worker_org = models.WorkerOrganization.objects.create(
+            id=1,
+            worker=self.worker,
+            mis_id=1,
+            org_id=1,
+            post=''
+        )
 
     @mock.patch.object(Worker, 'get')
     @mock.patch.object(Document, 'get_content')
@@ -36,7 +55,7 @@ class TestsDocumentPrint(BaseTestCase):
             mock_request.return_value = file.read()
 
         params = {
-            'worker_mis_id': 1,
+            'worker_id': self.worker_org.mis_id,
             'document_link': '/path/mis/'
         }
         response = self.client.get(self.get_url(), params)

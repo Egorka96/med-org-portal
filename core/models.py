@@ -116,7 +116,7 @@ class WorkerOrganization(models.Model):
     mis_id = models.IntegerField(verbose_name='МИС id')
     org_id = models.IntegerField(verbose_name='Организация id')
     post = models.CharField(max_length=255, verbose_name='Должность')
-    shop = models.CharField(max_length=255, verbose_name='Подразделение')
+    shop = models.CharField(max_length=255, verbose_name='Подразделение', blank=True)
     start_work_date = models.DateField(null=True, blank=True, verbose_name='Дата приема')
     end_work_date = models.DateField(null=True, blank=True, verbose_name='Дата уволения')
 
