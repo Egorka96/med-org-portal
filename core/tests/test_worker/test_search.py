@@ -1,7 +1,7 @@
 import datetime
 from unittest import mock
 
-from core import models
+from core import models, consts
 from core.tests.base import BaseTestCase
 from djutils.date_utils import iso_to_date
 from mis.org import Org
@@ -20,7 +20,7 @@ class TestsSearch(BaseTestCase):
             last_name='Таня',
             first_name='Морозова',
             middle_name='Никитична',
-            gender='Женский',
+            gender=consts.FEMALE,
             birth=datetime.date(2003, 3, 31)
         )
         models.WorkerOrganization.objects.create(
@@ -35,7 +35,7 @@ class TestsSearch(BaseTestCase):
             last_name='Надя',
             first_name='Попкова',
             middle_name='Ивановна',
-            gender='Женский',
+            gender=consts.FEMALE,
             birth=datetime.date(2003, 3, 31)
         )
         models.WorkerOrganization.objects.create(
