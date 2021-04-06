@@ -163,13 +163,6 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
 
         return redirect(self.get_success_url())
 
-    def get_breadcrumbs(self):
-        return [
-            ('Главная', reverse('core:index')),
-            ('Направления', reverse('core:direction_list')),
-            (self.get_title(), ''),
-        ]
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['can_edit'] = True

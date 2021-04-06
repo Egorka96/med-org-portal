@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from swutils.date import date_to_rus
 
 from core.datatools.password import create_password
-from core import serializers
+from core import serializers, models
 from mis.law_item import LawItem
 from mis.org import Org
 from mis.worker import Worker
@@ -72,16 +72,20 @@ class WorkerDocuments(APIView):
         serializer = serializers.WorkerDocuments(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        worker = Worker.get(worker_id=serializer.validated_data['worker_mis_id'], user=self.request.user)
-        worker_documents = sorted(worker.documents or [], key=lambda d: d.date, reverse=True)
+        worker = serializer.validated_data['worker']
+        worker_mis_ids = worker.worker_orgs.all().values_list('mis_id', flat=True)
 
-        serialized_documents = []
-        for document in worker_documents:
-            document_dict = dataclasses.asdict(document)
-            document_dict['date'] = date_to_rus(document.date)
-            serialized_documents.append(document_dict)
+        documents = []
+        for worker_mis_id in worker_mis_ids:
+            worker_mis = Worker.get(worker_id=worker_mis_id, user=self.request.user)
+            worker_documents = sorted(worker_mis.documents or [], key=lambda d: d.date, reverse=True)
 
-        return Response({'worker_mis_id': worker.id, 'documents': serialized_documents})
+            for document in worker_documents:
+                document_dict = dataclasses.asdict(document)
+                document_dict['date'] = date_to_rus(document.date)
+                documents.append(document_dict)
+
+        return Response({'worker_id': worker.id, 'documents': documents})
 
 
 class GeneratePasswordView(APIView):

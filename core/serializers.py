@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from core import models
+
 
 class WorkerDocuments(serializers.Serializer):
-    worker_mis_id = serializers.IntegerField(help_text='ID сотрудника в МИС')
+    worker = serializers.PrimaryKeyRelatedField(queryset=models.Worker.objects.all())

@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 from unittest import mock
 
+from core import models
 from core.datatools.string import random_word
 from mis.document import Document, DocumentType
 from mis.org import Org
@@ -18,6 +19,21 @@ class TestWorkerDocuments(BaseRestTestCase, APITestCase):
     def generate_data(self):
         super().generate_data()
         self.url = reverse('core:rest_worker_documents')
+        self.worker = models.Worker.objects.create(
+            id=1,
+            last_name='Хищенко',
+            first_name='Влад',
+            middle_name='Андреевич',
+            gender='Мужчина',
+            birth=datetime.date(2001, 11, 6)
+        )
+        models.WorkerOrganization.objects.create(
+            id=1,
+            worker=self.worker,
+            mis_id=1,
+            org_id=1,
+            post=''
+        )
 
     def get_mocked_worker_documents(self):
         worker_documents  = []
@@ -50,7 +66,7 @@ class TestWorkerDocuments(BaseRestTestCase, APITestCase):
     def test_worker_documents(self, mock_worker_documents):
         mock_worker_documents.return_value = self.get_mocked_worker_documents()
 
-        params = {'worker_mis_id': 123 }
+        params = {'worker': self.worker.id}
         response = self.client.get(self.url, params)
 
         self.assertEqual(response.status_code, 200)

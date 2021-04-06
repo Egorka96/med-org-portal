@@ -7,20 +7,20 @@ from swutils.string import transliterate
 import core.generic.mixins
 import core.generic.views
 
-from core import forms
+from core import forms, filters, models
 from mis.document import Document
 from mis.service_client import Mis
 from mis.worker import Worker
 
 
-class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
-             core.generic.views.ListView):
+class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.views.ListView):
     title = 'Сотрудники'
+    model = models.Worker
     form_class = forms.WorkerSearch
     paginate_by = 100
     permission_required = 'core.view_worker'
     template_name = 'core/workers/list.html'
-    mis_request_path = Mis.WORKERS_LIST_URL
+    filter_class = filters.Worker
     load_without_params = True
 
     def get_breadcrumbs(self):
@@ -32,18 +32,25 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
     def process_response_results(self, objects):
         return [Worker.get_from_dict(obj) for obj in objects]
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user_orgs = self.request.user.core.get_orgs()
+        context['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
+
+        return context
 
 class DocumentPrint(PermissionRequiredMixin, View):
     permission_required = 'core.view_worker'
 
     def get(self, request, *args, **kwargs):
-        worker_mis_id = self.request.GET.get('worker_mis_id')
+        worker_id = self.request.GET.get('worker_id')
         document_link = self.request.GET.get('document_link')
 
-        if not worker_mis_id:
+        if not worker_id:
             return HttpResponse("Не указан сотрудник, по которому необходимо печатать документ.")
 
-        worker = Worker.get(worker_id=worker_mis_id)
+        worker = models.Worker.objects.get(id=worker_id)
         file_name = transliterate(str(worker))
         pdf_content = Document.get_content(path=document_link)
 

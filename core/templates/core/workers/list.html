@@ -38,20 +38,16 @@
 
 {% block form %}
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-6">
             {% bootstrap_field form.last_name layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
             {% bootstrap_field form.first_name layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
             {% bootstrap_field form.middle_name layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
         </div>
-        <div class="col-sm-3">
-            {% bootstrap_field form.date_from layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
-            {% bootstrap_field form.date_to layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
-            {% bootstrap_field form.is_active layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
-        </div>
-        <div class="col-sm-5">
+        <div class="col-sm-6">
             {% if show_orgs %}{% bootstrap_field form.orgs layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}{% endif %}
             {% bootstrap_field form.shop layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
             {% bootstrap_field form.post layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
+            {% bootstrap_field form.is_active layout='horizontal' horizontal_label_class='col-sm-4' horizontal_field_class='col-sm-8' %}
         </div>
     </div>
 {% endblock %}

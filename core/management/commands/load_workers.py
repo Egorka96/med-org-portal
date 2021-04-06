@@ -67,9 +67,12 @@ class Command(BaseCommand):
 
         page = 1
         while True:
+            params['page'] = page
             mis_workers = mis.worker.Worker.filter(params)
 
             for mis_worker in mis_workers:
+                if options.get('verbosity'):
+                    print(mis_worker)
                 worker, created = core.models.Worker.objects.get_or_create(
                     last_name=mis_worker.last_name,
                     first_name=mis_worker.first_name,

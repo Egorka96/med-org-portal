@@ -28,7 +28,7 @@
                 $.get({
                     url: '/rest/worker_documents/',
                     data: {
-                        worker_mis_id: workerId
+                        worker: workerId
                     },
                     success: function (response) {
                         let workerDocumentBtn = $($.find(`[data-worker-id="${workerId}"]`))
@@ -39,7 +39,7 @@
                             for (let i = 0; i < response.documents.length; i++) {
                                 let document = response.documents[i]
                                 content += `<li class="worker-documents-item">
-                                                <a href="/workers/documents/print/?worker_mis_id=${response.worker_mis_id}&document_link=${encodeURIComponent(document.document_link)}" target="_blank">
+                                                <a href="/workers/documents/print/?worker_id=${response.worker_id}&document_link=${encodeURIComponent(document.document_link)}" target="_blank">
                                                     ${document.document_type.name}
                                                 </a> 
                                                 <span class="help-block">${document.date}</span>
