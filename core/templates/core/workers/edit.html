@@ -1,0 +1,58 @@
+{% extends 'core/base_edit.html' %}
+{% load bootstrap4 %}
+
+{% block fields %}
+    <legend>Регистрация сотрудников</legend>
+    <div class="row">
+        <div class="col-sm-5 border-right">
+            {% bootstrap_field form.last_name layout='horizontal' %}
+            {% bootstrap_field form.first_name layout='horizontal' %}
+            {% bootstrap_field form.middle_name layout='horizontal' %}
+            {% bootstrap_field form.birth layout='horizontal' %}
+            {% bootstrap_field form.gender layout='horizontal' %}
+            {% bootstrap_field form.start_work_date layout='horizontal' %}
+            {% bootstrap_field form.end_work_date layout='horizontal' %}
+        </div>
+
+        <div class="col-sm-7">
+            {% bootstrap_field form.org layout='horizontal' %}
+            {% bootstrap_field form.post layout='horizontal' %}
+            {% bootstrap_field form.shop layout='horizontal' %}
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="id_law_items_section_1">Пункты приказа 302н</label>
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-sm-6 mini-indent">
+                            {% bootstrap_field form.law_items_302_section_1 show_label=False %}
+                            <div class="help-block" style="margin-top: -15px">приложение 1</div>
+                        </div>
+                        <div class="col-sm-6 mini-indent">
+                            {% bootstrap_field form.law_items_302_section_2 show_label=False %}
+                            <div class="help-block" style="margin-top: -15px">приложение 2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% bootstrap_field form.law_items_29 layout='horizontal' %}
+            {% bootstrap_field form.note layout='horizontal' %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block buttons %}
+    <div class="row">
+        <div class="col-6">
+            {% if object.pk %}
+                <a href="./delete/" class="btn btn-danger">
+                    <i class="fa fa-trash"></i> Удалить
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="col-6 text-right">
+            <button class="btn btn-success">
+                <i class="fa fa-save"></i> Сохранить
+            </button>
+        </div>
+    </div>
+{% endblock %}

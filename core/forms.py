@@ -332,3 +332,16 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Fo
             self.fields['org'].initial = org.id
             self.fields['org'].choices = [(org.id, str(org))]
             self.fields['org'].widget = forms.HiddenInput()
+
+
+class WorkerEdit(LawItems, OrgsMixin, forms.ModelForm):
+    birth = RusDateField(label='Дата рождения', initial=None)
+    start_work_date = RusDateField(label='Дата начала работы', required=False, initial=None)
+    end_work_date = RusDateField(label='Дата увольнения', required=False, initial=None)
+    shop = forms.CharField(label='Подразделение', required=False)
+    post = forms.CharField(label='Должность', required=False)
+    note = forms.TextInput()
+
+    class Meta:
+        model = models.Worker
+        fields = '__all__'
