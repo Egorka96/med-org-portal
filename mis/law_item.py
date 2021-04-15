@@ -30,7 +30,7 @@ class LawItem:
 
     @classmethod
     def get(cls, law_item_id: int) -> 'LawItem':
-        url = settings.MIS_URL + f'/api/law_items/{law_item_id}'
+        url = settings.MIS_URL + f'/api/law_items/{law_item_id}/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
         response = requests.get(url, headers=headers)
