@@ -86,15 +86,15 @@
                                 <div class="col-sm-9">
                                     <h5 class="card-title">{{ object }}</h5>
                                 <p class="card-text help-block">
-                                    <span>Должность: {% for obj in object.worker_orgs.all %}{{ obj.post|default:"Не указана" }}{% endfor %}</span>
-                                    <br> <span>Подразделение: {% for obj in object.worker_orgs.all %}{{ obj.shop|default:"Не указана"}} {% endfor %}</span>
+                                    <span>Должность: {% for obj in object.worker_orgs.all %}{{ obj.post|default:"Не указано" }}{% endfor %}</span>
+                                    <br> <span>Подразделение: {% for obj in object.worker_orgs.all %}{{ obj.shop|default:"Не указано"}} {% endfor %}</span>
                                 </p>
                                 </div>
                                 <div class="col-sm-3 text-right">
-                                    <a class="btn btn-outline-secondary" href="{% url 'core:worker_edit' object.pk %}" title="Редактировать" data-toggle="tooltip">
+                                    <a class="btn btn-outline-secondary btn btn-outline-success btn btn-sm" href="{% url 'core:worker_edit' object.pk %}" title="Редактировать" data-toggle="tooltip">
                                             <i class="fa fa-pencil"></i>
                                     </a>
-                                    <a class="btn btn-outline-secondary" href="{% url 'core:worker_delete' object.pk %}" title="Удалить" data-toggle="tooltip">
+                                    <a class="btn btn-outline-secondary btn btn-outline-danger btn btn-sm" href="{% url 'core:worker_delete' object.pk %}" title="Удалить" data-toggle="tooltip">
                                             <i class="fa  fa-close"></i>
                                     </a>
                                 </div>

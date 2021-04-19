@@ -340,7 +340,7 @@ class WorkerEdit(LawItems, OrgsMixin, forms.ModelForm):
     end_work_date = RusDateField(label='Дата увольнения', required=False, initial=None)
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
-    note = forms.TextInput()
+    note = forms.CharField(widget=forms.TextInput(), label='Примечание')
 
     class Meta:
         model = models.Worker
