@@ -12,6 +12,7 @@ import core.generic.mixins
 import core.generic.views
 
 from core import forms, filters, models
+from core.datatools.worker import load_worker
 from mis.document import Document
 from mis.service_client import Mis
 from mis.worker import Worker
@@ -137,6 +138,18 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         kwargs = super().get_form_kwargs()
         kwargs['instance'] = self.get_object()
         return kwargs
+
+    def get(self, request, *args, **kwargs):
+        pk_url_kwarg = self.kwargs.get(self.pk_url_kwarg)
+        if pk_url_kwarg:
+            worker_mis_ids = models.WorkerOrganization.objects\
+                .filter(worker=pk_url_kwarg)\
+                .values_list('mis_id', flat=True)
+            for worker_mis_id in worker_mis_ids:
+                load_worker(worker_mis_id)
+
+        return super().get(request, *args, **kwargs)
+
 
 
 class DocumentPrint(PermissionRequiredMixin, View):
