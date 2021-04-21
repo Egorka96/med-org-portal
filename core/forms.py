@@ -280,6 +280,19 @@ class WorkerSearch(FIO, OrgsMixin, forms.Form):
     is_active = forms.ChoiceField(label='Работает', choices=ACTIVE_CHOICES, required=False, initial='1')
 
 
+class WorkerEdit(LawItems, OrgsMixin, forms.ModelForm):
+    birth = RusDateField(label='Дата рождения', initial=None)
+    start_work_date = RusDateField(label='Дата начала работы', required=False, initial=None)
+    end_work_date = RusDateField(label='Дата увольнения', required=False, initial=None)
+    shop = forms.CharField(label='Подразделение', required=False)
+    post = forms.CharField(label='Должность', required=False)
+    note = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), label='Примечание')
+
+    class Meta:
+        model = models.Worker
+        fields = '__all__'
+
+
 class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
@@ -291,6 +304,7 @@ class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, f
             raise forms.ValidationError(
                     "Введите параметры фильтрации."
                 )
+
 
 class DirectionSearch(FIO, DateFromTo, OrgsMixin, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
@@ -333,15 +347,3 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Fo
             self.fields['org'].choices = [(org.id, str(org))]
             self.fields['org'].widget = forms.HiddenInput()
 
-
-class WorkerEdit(LawItems, OrgsMixin, forms.ModelForm):
-    birth = RusDateField(label='Дата рождения', initial=None)
-    start_work_date = RusDateField(label='Дата начала работы', required=False, initial=None)
-    end_work_date = RusDateField(label='Дата увольнения', required=False, initial=None)
-    shop = forms.CharField(label='Подразделение', required=False)
-    post = forms.CharField(label='Должность', required=False)
-    note = forms.CharField(widget=forms.TextInput(), label='Примечание')
-
-    class Meta:
-        model = models.Worker
-        fields = '__all__'

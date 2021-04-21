@@ -70,8 +70,43 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         else:
             return 'core.add_worker'
 
-    def get_success_url(self):
-        return reverse_lazy('core:workers')
+    def get(self, request, *args, **kwargs):
+        pk_url_kwarg = self.kwargs.get(self.pk_url_kwarg)
+        if pk_url_kwarg:
+            worker_mis_ids = models.WorkerOrganization.objects \
+                .filter(worker=pk_url_kwarg) \
+                .values_list('mis_id', flat=True)
+            for worker_mis_id in worker_mis_ids:
+                load_worker(worker_mis_id)
+
+        return super().get(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        obj = self.get_object()
+        if obj:
+            worker_org = models.WorkerOrganization.objects.get(worker=obj)
+            initial['org'] = worker_org.org_id
+            initial['post'] = worker_org.post
+            initial['shop'] = worker_org.shop
+            initial['start_work_date'] = worker_org.start_work_date
+            initial['end_work_date'] = worker_org.end_work_date
+
+            worker_mis = Worker.get(worker_org.mis_id)
+            if worker_mis.law_items:
+                for l_i in worker_mis.law_items:
+                    field_name = f'law_items_{l_i.law.name.replace("н", "")}'
+                    if l_i.law.name == '302н':
+                        field_name += f'_section_{l_i.section}'
+
+                    initial.setdefault(field_name, []).append(l_i.id)
+
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['instance'] = self.get_object()
+        return kwargs
 
     def form_valid(self, form):
         worker = form.save()
@@ -104,27 +139,8 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
 
         return redirect(self.get_success_url())
 
-    def get_initial(self):
-        initial = super().get_initial()
-        obj = self.get_object()
-        if obj:
-            worker_org = models.WorkerOrganization.objects.get(worker=obj)
-            initial['org'] = worker_org.org_id
-            initial['post'] = worker_org.post
-            initial['shop'] = worker_org.shop
-            initial['start_work_date'] = worker_org.start_work_date
-            initial['end_work_date'] = worker_org.end_work_date
-
-            worker_mis = Worker.get(worker_org.mis_id)
-            if worker_mis.law_items:
-                for l_i in worker_mis.law_items:
-                    field_name = f'law_items_{l_i.law.name.replace("н", "")}'
-                    if l_i.law.name == '302н':
-                        field_name += f'_section_{l_i.section}'
-
-                    initial.setdefault(field_name, []).append(l_i.id)
-
-        return initial
+    def get_success_url(self):
+        return reverse_lazy('core:workers')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -133,23 +149,6 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             context['can_edit'] = False
 
         return context
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['instance'] = self.get_object()
-        return kwargs
-
-    def get(self, request, *args, **kwargs):
-        pk_url_kwarg = self.kwargs.get(self.pk_url_kwarg)
-        if pk_url_kwarg:
-            worker_mis_ids = models.WorkerOrganization.objects\
-                .filter(worker=pk_url_kwarg)\
-                .values_list('mis_id', flat=True)
-            for worker_mis_id in worker_mis_ids:
-                load_worker(worker_mis_id)
-
-        return super().get(request, *args, **kwargs)
-
 
 
 class DocumentPrint(PermissionRequiredMixin, View):
