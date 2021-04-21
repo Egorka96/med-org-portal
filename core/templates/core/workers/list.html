@@ -59,6 +59,14 @@
     </button>
 {% endblock %}
 
+{% block additional_btn %}
+    {% if perms.core.add_direction %}
+        <a class="btn btn-success" href="{% url 'core:worker_add' %}">
+            <i class="fa fa-plus"></i> Добавить
+        </a>
+    {% endif %}
+{% endblock %}
+
 {% block pre_table %}
     {% if page_obj|default:object_list %}
         <h5>Количество сотрудников: {{ page_obj.paginator.count|default:object_list.count }}</h5>
@@ -74,11 +82,23 @@
                 <div class="card card-worker">
                     <div class="card-body">
                         <div class="card-worker-info">
-                            <h5 class="card-title">{{ object }}</h5>
-                            <p class="card-text help-block">
-                                {{ object.post|default:"Не указана" }}
-                                {% if object.shop %}<br>{{ object.shop }}{% endif %}
-                            </p>
+                            <div class="row">
+                                <div class="col-sm-9">
+                                    <h5 class="card-title">{{ object }}</h5>
+                                <p class="card-text help-block">
+                                    <span>Должность: {% for obj in object.worker_orgs.all %}{{ obj.post|default:"Не указано" }}{% endfor %}</span>
+                                    <br> <span>Подразделение: {% for obj in object.worker_orgs.all %}{{ obj.shop|default:"Не указано"}} {% endfor %}</span>
+                                </p>
+                                </div>
+                                <div class="col-sm-3 text-right">
+                                    <a class="btn btn-outline-secondary btn btn-outline-success btn btn-sm" href="{% url 'core:worker_edit' object.pk %}" title="Редактировать" data-toggle="tooltip">
+                                            <i class="fa fa-pencil"></i>
+                                    </a>
+                                    <a class="btn btn-outline-secondary btn btn-outline-danger btn btn-sm" href="{% url 'core:worker_delete' object.pk %}" title="Удалить" data-toggle="tooltip">
+                                            <i class="fa  fa-close"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                         <hr>
                         <div class="card-worker-extra-info">
