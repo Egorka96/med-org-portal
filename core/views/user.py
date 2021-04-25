@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage, send_mail
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -7,6 +8,7 @@ import core.generic.mixins
 import core.generic.views
 
 from core import forms, filters
+from project import settings
 
 User = get_user_model()
 
@@ -50,6 +52,22 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         kwargs = super().get_form_kwargs()
         kwargs['instance'] = self.get_object()
         return kwargs
+
+    def form_valid(self, form):
+        email_to = form.cleaned_data['email']
+        password = form.cleaned_data['new_password']
+        login = form.cleaned_data['username']
+
+        KAK_TO_NAZVANIYE = f"""
+        Вам была создана учетная запись в личном кабинете медцентра "<название медцентра>".
+        Адрес личного кабинета - <url портала>.
+        Логин -  { login }
+        Пароль - { password }
+        """
+
+        send_mail('Регистрация успешно завершена', KAK_TO_NAZVANIYE, settings.EMAIL_HOST_USER, [email_to])
+
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
