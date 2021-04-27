@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage, send_mail
+from django.template import Template, Context
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -54,20 +55,23 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         return kwargs
 
     def form_valid(self, form):
-        email_to = form.cleaned_data['email']
-        password = form.cleaned_data['new_password']
-        login = form.cleaned_data['username']
-
-        KAK_TO_NAZVANIYE = f"""
-        Вам была создана учетная запись в личном кабинете медцентра "<название медцентра>".
-        Адрес личного кабинета - <url портала>.
-        Логин -  { login }
-        Пароль - { password }
-        """
-
-        send_mail('Регистрация успешно завершена', KAK_TO_NAZVANIYE, settings.EMAIL_HOST_USER, [email_to])
+        if email_to := form.cleaned_data['email']:
+            email_text = self._send_mail_login(form)
+            if email_text:
+                send_mail('Регистрация успешно завершена', email_text, settings.EMAIL_HOST_USER, [email_to])
 
         return super().form_valid(form)
+
+    def _send_mail_login(self, form):
+        if form.cleaned_data['username'] and form.cleaned_data['new_password']:
+            email_template = Template(settings.EMAIL_CREATE_USER_TEXT)
+            email_context = {
+                "login": form.cleaned_data['username'],
+                "password": form.cleaned_data['new_password']
+            }
+            email_text = email_template.render(Context(email_context))
+            return email_text
+        return False
 
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
