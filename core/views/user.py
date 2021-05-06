@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.views import PasswordChangeView
 from django.core.mail import EmailMessage, send_mail
 from django.template import Template, Context
 from django.urls import reverse
@@ -55,7 +57,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         return kwargs
 
     def form_valid(self, form):
-        if email_to := form.cleaned_data['email']:
+        if (email_to := form.cleaned_data['email']) and self.request.POST.get('to_send'):
             email_text = self._send_mail_login(form)
             if email_text:
                 send_mail('Регистрация успешно завершена', email_text, settings.EMAIL_HOST_USER, [email_to])
@@ -100,3 +102,15 @@ class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):
             (user, reverse('core:user_edit', kwargs={'pk': user.id})),
             (self.breadcrumb, ''),
         ]
+
+
+class PasswordChange(PasswordChangeView):
+    form_class = SetPasswordForm
+    template_name = 'core/password_change.html'
+    success_url = reverse_lazy('core:index')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        self.request.user.core.need_change_password = False
+        self.request.user.core.save()
+        return response
