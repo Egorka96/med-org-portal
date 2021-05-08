@@ -45,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.login_required.LoginRequiredMiddleware',
+    'core.middleware.password_change.PasswordChangeMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -144,10 +145,29 @@ TEMPLATES_DICT = {
 
 # время действия направления (в днях)
 # если не указано, то направление действует до конца текущего года
-DIRECTION_ACTION_DAYS = os.environ.get('DIRECTION_ACTION_DAYS', '')
+
+EMAIL_USE_TLS = int(os.environ['EMAIL_USE_TLS']) if os.environ.get('EMAIL_USE_TLS') else None
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = int(os.environ['EMAIL_PORT']) if os.environ.get('EMAIL_PORT') else None
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', '')
+
+MED_CENTER_NAME = os.environ.get('MED_CENTER_NAME')
+PORTAL_URL = os.environ.get('PORTAL_URL')
+
+EMAIL_CREATE_USER_TEXT = """
+Вам была создана учетная запись в личном кабинете медцентра "<>".
+Адрес личного кабинета - <>.
+Логин -  {{login}}
+Пароль - {{password}}
+"""
 
 try:
     from project.local_settings import *
 except ImportError:
     print("Warning: no local_settings.py")
+
+
+
 
