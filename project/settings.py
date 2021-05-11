@@ -131,6 +131,7 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/node_modules/',
     r'/login(.*)$',
     r'/logout(.*)$',
+    r'/password_forgot/',
 )
 
 MIS_URL = ''
@@ -160,6 +161,12 @@ EMAIL_CREATE_USER_TEXT = """
 Вам была создана учетная запись в личном кабинете медцентра "<>".
 Адрес личного кабинета - <>.
 Логин -  {{login}}
+Пароль - {{password}}
+"""
+
+EMAIL_FORGOT_USER_TEXT = """
+Вам была создана учетная запись в личном кабинете медцентра "<>".
+Адрес личного кабинета - <>.
 Пароль - {{password}}
 """
 
