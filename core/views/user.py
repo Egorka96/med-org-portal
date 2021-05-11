@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.views import PasswordChangeView
@@ -11,7 +12,6 @@ import core.generic.mixins
 import core.generic.views
 
 from core import forms, filters
-from project import settings
 
 User = get_user_model()
 
@@ -69,7 +69,9 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             email_template = Template(settings.EMAIL_CREATE_USER_TEXT)
             email_context = {
                 "login": form.cleaned_data['username'],
-                "password": form.cleaned_data['new_password']
+                "password": form.cleaned_data['new_password'],
+                "med_center_name": settings.MED_CENTER_NAME,
+                "portal_url": settings.PORTAL_URL,
             }
             email_text = email_template.render(Context(email_context))
             return email_text

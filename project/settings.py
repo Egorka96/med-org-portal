@@ -157,8 +157,8 @@ MED_CENTER_NAME = os.environ.get('MED_CENTER_NAME')
 PORTAL_URL = os.environ.get('PORTAL_URL')
 
 EMAIL_CREATE_USER_TEXT = """
-Вам была создана учетная запись в личном кабинете медцентра "<>".
-Адрес личного кабинета - <>.
+Вам была создана учетная запись в личном кабинете медцентра "{{ med_center_name }}".
+Адрес личного кабинета - {{ portal_url }}.
 Логин -  {{login}}
 Пароль - {{password}}
 """

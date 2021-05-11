@@ -34,5 +34,5 @@ urlpatterns = [
     path('rest/law_items/', rest.LawItems.as_view(), name='rest_law_items'),
     path('rest/generate_password/', rest.GeneratePasswordView.as_view(), name='rest_generate_password'),
 
-    path('password_change/', user.PasswordChange.as_view(), name='password_change')
+    path('required_password_change/', user.PasswordChange.as_view(), name='password_change')
 ]
