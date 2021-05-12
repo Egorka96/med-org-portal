@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.views import PasswordChangeView
 from django.core.mail import EmailMessage, send_mail
+from django.shortcuts import redirect
 from django.template import Template, Context
 from django.urls import reverse
 from django.urls import reverse_lazy
@@ -57,12 +58,15 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         return kwargs
 
     def form_valid(self, form):
+        instance = form.save()
         if (email_to := form.cleaned_data['email']) and self.request.POST.get('to_send'):
             email_text = self._send_mail_login(form)
             if email_text:
                 send_mail('Регистрация успешно завершена', email_text, settings.EMAIL_HOST_USER, [email_to])
+                instance.core.need_change_password = True
+                instance.core.save()
 
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
 
     def _send_mail_login(self, form):
         if form.cleaned_data['username'] and form.cleaned_data['new_password']:

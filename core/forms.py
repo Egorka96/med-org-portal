@@ -267,6 +267,8 @@ class UserEdit(OrgsMixin, DocumentTypeMixin, forms.ModelForm):
 
             user.core.available_document_type_ids.exclude(document_type_id__in=document_type_ids).delete()
 
+        return user
+
 
 class WorkerSearch(FIO, OrgsMixin, forms.Form):
     ACTIVE_CHOICES = (
