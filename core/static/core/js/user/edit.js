@@ -8,8 +8,6 @@
         });
     });
 
-    console.log(canSendUserCredentials)
-
     $(".btn-save").click(function () {
         if (canSendUserCredentials && $("#id_new_password").val() && $("#id_email").val()) {
             $("#needSendPasswordEmailModal").modal('show')
