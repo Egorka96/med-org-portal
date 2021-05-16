@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 
-class PasswordChangeMiddleware(object):
+class PasswordChangeRequiredMiddleware(object):
     def __init__(self, get_response):
         self.exceptions = tuple(re.compile(url) for url in settings.LOGIN_REQUIRED_URLS_EXCEPTIONS)
         self.get_response = get_response
@@ -19,9 +19,7 @@ class PasswordChangeMiddleware(object):
             for url in self.exceptions:
                 if url.match(request.path):
                     return None
-                elif request.path == reverse('core:password_change'):
+                elif request.path == reverse('core:password_change_required'):
                     return None
 
-            return redirect('{0}?next={1}'.format(
-                reverse('core:password_change'), request.path
-            ))
+            return redirect(f"{reverse('core:password_change_required')}?next={request.path}")

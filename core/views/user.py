@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.views import PasswordChangeView
@@ -59,27 +60,30 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
 
     def form_valid(self, form):
         instance = form.save()
-        if (email_to := form.cleaned_data['email']) and self.request.POST.get('to_send'):
-            email_text = self._send_mail_login(form)
-            if email_text:
-                send_mail('Регистрация успешно завершена', email_text, settings.EMAIL_HOST_USER, [email_to])
-                instance.core.need_change_password = True
-                instance.core.save()
+        if self.request.POST.get('send_email_user_credentials'):
+            self._send_user_credentials(form, instance)
 
         return redirect(self.get_success_url())
 
-    def _send_mail_login(self, form):
-        if form.cleaned_data['username'] and form.cleaned_data['new_password']:
-            email_template = Template(settings.EMAIL_CREATE_USER_TEXT)
-            email_context = {
-                "login": form.cleaned_data['username'],
-                "password": form.cleaned_data['new_password'],
-                "med_center_name": settings.MED_CENTER_NAME,
-                "portal_url": settings.PORTAL_URL,
-            }
-            email_text = email_template.render(Context(email_context))
-            return email_text
-        return False
+    def _send_user_credentials(self, form, user):
+        email_template = Template(settings.EMAIL_USER_CREDENTIALS_TEXT)
+        email_context = {
+            "login": form.cleaned_data['username'],
+            "password": form.cleaned_data['new_password'],
+            "med_center_name": settings.MED_CENTER_NAME,
+            "portal_url": settings.PORTAL_URL,
+        }
+        send_mail(
+            f'Регистрация пользователя в личном кабинете медцентра "{settings.MED_CENTER_NAME}"',
+            email_template.render(Context(email_context)),
+            settings.EMAIL_HOST_USER,
+            [form.cleaned_data['email']]
+        )
+
+        user.core.need_change_password = True
+        user.core.save()
+
+        messages.success(self.request, f'Учетные данные пользователя отправлены на почту {form.cleaned_data["email"]}')
 
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
@@ -110,9 +114,9 @@ class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):
         ]
 
 
-class PasswordChange(PasswordChangeView):
+class PasswordChangeRequired(PasswordChangeView):
     form_class = SetPasswordForm
-    template_name = 'core/password_change.html'
+    template_name = 'core/required_password_change.html'
     success_url = reverse_lazy('core:index')
 
     def form_valid(self, form):

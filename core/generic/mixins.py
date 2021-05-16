@@ -119,18 +119,16 @@ class RestListMixin:
 
 
 class FormMixin(DjangoFormMixin):
-    data_method = None
+    data_method = 'GET'
 
     def get_form_kwargs(self):
         kwargs = {
             'initial': self.get_initial(),
             'prefix': self.get_prefix(),
+            'data': getattr(self.request, self.data_method.upper()) or None,
+            'files': self.request.FILES or None
         }
 
-        kwargs.update({
-            'data': getattr(self.request, self.data_method.upper() if self.data_method else 'GET') or None,
-            'files': self.request.FILES or None
-        })
         return kwargs
 
 

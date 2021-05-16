@@ -4,6 +4,12 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def exists_user_password_change_required_false(apps, schema_editor):
+    """ Для существующих пользователей оставим необязательность смены пароля """
+    User = apps.get_model('core', 'User')
+    User.objects.all().update(need_change_password=False)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -26,4 +32,5 @@ class Migration(migrations.Migration):
             name='worker',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='worker_orgs', to='core.Worker', verbose_name='Сотрудник'),
         ),
+        migrations.RunPython(exists_user_password_change_required_false, reverse_code=migrations.RunPython.noop)
     ]
