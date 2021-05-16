@@ -238,6 +238,21 @@ class UserEdit(OrgsMixin, DocumentTypeMixin, forms.ModelForm):
                                         'доступным организациям'
         self.fields['document_types'].help_text = 'какие виды документов доступны пользователю для печати'
 
+    def clean_email(self):
+        value = self.cleaned_data.get('email')
+        if not value:
+            return
+
+        # будем требовать, чтобы email пользователей был уникален
+        email_users = User.objects.filter(email=value)
+        if self.instance:
+            email_users = email_users.exclude(id=self.instance.id)
+
+        if email_users:
+            raise forms.ValidationError(f'Указанный email уже связан с пользователем "{email_users.first()}"')
+
+        return value
+
     def save(self, *args, **kwargs):
         new_password = self.cleaned_data.get('new_password')
 
