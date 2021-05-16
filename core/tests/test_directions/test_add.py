@@ -16,9 +16,6 @@ class TestCreate(BaseTestCase):
     view = 'core:direction_add'
     permission = 'core.add_direction'
 
-    def generate_data(self):
-        self.core_user = models.User.objects.create(django_user=self.user)
-
     @mock.patch.object(PayMethod, 'filter')
     def setUp(self, mock_request):
         mock_request.return_value = []

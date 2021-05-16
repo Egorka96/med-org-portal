@@ -12,8 +12,6 @@ class TestDelete(BaseTestCase):
     permission = 'auth.delete_user'
 
     def generate_data(self):
-        self.core_user = models.User.objects.create(django_user=self.user)
-
         self.test_user = User.objects.create(
             username='new_user',
             password='123456'

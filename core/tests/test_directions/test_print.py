@@ -14,9 +14,6 @@ class TestPrint(BaseTestCase):
     direction_number = 1
     MIS_URL = 'http://127.0.0.1:8000'
 
-    def generate_data(self):
-        self.core_user = models.User.objects.create(django_user=self.user)
-
     @mock.patch.object(Org, 'get')
     @mock.patch.object(Direction, 'get')
     def setUp(self, mock_request_direction, mock_request_org):

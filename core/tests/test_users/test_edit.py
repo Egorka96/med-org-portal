@@ -29,8 +29,6 @@ class TestEdit(BaseTestCase):
         super().setUp()
 
     def generate_data(self):
-        self.core_user = models.User.objects.create(django_user=self.user)
-
         self.permission_group = AuthGroup.objects.create(name='Testing permission group')
         self.auth_permission = AuthPermission.objects.get(id=1)
         self.permission_group.permissions.add(self.auth_permission)

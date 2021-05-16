@@ -15,7 +15,6 @@ class TestsSearch(BaseTestCase):
 
     def generate_data(self):
         super().generate_data()
-        self.core_user = models.User.objects.create(django_user=self.user)
         self.worker1 = models.Worker.objects.create(
             last_name='Таня',
             first_name='Морозова',
