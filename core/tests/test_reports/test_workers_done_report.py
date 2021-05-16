@@ -16,9 +16,6 @@ class TestWorkersDoneReport(BaseTestCase):
     view = 'core:workers_done_report'
     permission = 'core.view_workers_done_report'
 
-    def generate_data(self):
-        self.core_user = models.User.objects.create(django_user=self.user)
-
     def get_response(self, content='', status_code=200):
         response = Response()
         response.status_code = status_code

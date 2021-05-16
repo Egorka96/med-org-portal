@@ -83,7 +83,6 @@ class RestListMixin:
             if form.is_valid() or (not form.is_bound and (filter_params or self.load_without_params)):
                 request_params = filter_params
                 request_params['per_page'] = self.request.GET.get('per_page', self.paginate_by)
-
                 response_data = Mis().request(
                     path=self.mis_request_path,
                     user=self.request.user,
@@ -99,7 +98,7 @@ class RestListMixin:
 
         return self.object_list
 
-    def process_response_results(self, objects: List[Dict]) -> List:
+    def process_response_results(self, objects: List[Dict]) -> List[Dict]:
         return objects
 
     def get_context_data(self, **kwargs):

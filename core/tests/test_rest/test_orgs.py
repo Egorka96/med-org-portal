@@ -16,7 +16,6 @@ class TestOrgs(BaseRestTestCase, APITestCase):
 
     def generate_data(self):
         super().generate_data()
-        self.core_user = models.User.objects.create(django_user=self.user)
         self.url = reverse('core:rest_orgs')
 
     def get_mocked_orgs(self):

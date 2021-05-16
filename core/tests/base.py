@@ -4,7 +4,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
+
 from rest_framework.test import APIRequestFactory, force_authenticate
+from core import models
 
 User = get_user_model()
 
@@ -54,6 +56,10 @@ class BaseTestCase(TestCase):
         self.user = User.objects.create(
             username=self.username,
             password=self.password,
+        )
+        self.core_user = models.User.objects.create(
+            django_user=self.user,
+            need_change_password=False
         )
         self.user_config()
         self.client.force_login(self.user)
@@ -165,6 +171,10 @@ class BaseRestTestCase(TestCase):
         self.user = User.objects.create(
             username=self.username,
             password=self.password,
+        )
+        self.core_user = models.User.objects.create(
+            django_user=self.user,
+            need_change_password=False
         )
         self.user_config()
 

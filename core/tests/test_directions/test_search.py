@@ -5,22 +5,16 @@ import os
 from core import models
 from core.tests.base import BaseTestCase
 from mis.direction import Direction
-from mis.law_item import LawItem, Law
+from mis.law_item import LawItem
 from mis.org import Org
 from mis.service_client import Mis
-from requests import Response
 from openpyxl import load_workbook
-from swutils.date import date_to_rus
 from djutils.date_utils import iso_to_date
-import dataclasses
 
 
 class TestSearch(BaseTestCase):
     view = 'core:direction_list'
     permission = 'core.view_direction'
-
-    def generate_data(self):
-        self.core_user = models.User.objects.create(django_user=self.user)
 
     @mock.patch.object(Mis, 'request')
     def setUp(self, mock_request):

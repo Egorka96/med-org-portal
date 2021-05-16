@@ -32,7 +32,6 @@ class TestDelete(BaseTestCase):
         )
         super().setUp()
 
-
     def get_url_kwargs(self):
         return {'number': self.direction_number}
 
