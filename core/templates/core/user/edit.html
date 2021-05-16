@@ -1,5 +1,6 @@
 {% extends 'core/base_edit.html' %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block css %}
     {{ block.super }}
@@ -8,25 +9,6 @@
             margin-top: 20px;
         }
     </style>
-{% endblock %}
-
-{% block buttons %}
-            <div class="row">
-                <div class="col-6">
-                    {% if object.id %}
-                        <a href="./delete/" class="btn btn-danger">
-                            <i class="fa fa-trash"></i> Удалить
-                        </a>
-                    {% endif %}
-                </div>
-
-                <div class="col-6 text-right">
-                    <button class="btn btn-success" data-toggle="modal" data-target="#needSendPasswordEmailModal" type="button">
-                        <i class="fa fa-save"></i> Сохранить
-                    </button>
-                </div>
-            </div>
-
 {% endblock %}
 
 {% block fields %}
@@ -63,36 +45,56 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="needSendPasswordEmailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-       <div class="modal-dialog" role="document">
-         <div class="modal-content">
-           <div class="modal-header">
-             <h5 class="modal-title" id="exampleModalLabel">Отправить письмо с учетными данными (логин и пароль) на электронную почту пользователя?</h5>
-             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-             </button>
-           </div>
-           <div class="modal-footer">
-             <button type="submit" class="btn btn-secondary" name="not_to_send">Не отправять</button>
-             <button type="submit" class="btn btn-primary" name="to_send" value="1">Отправлять</button>
-           </div>
-         </div>
-       </div>
-    </div>
+    {% if can_send_email_user_credentials %}
+        <!-- Modal -->
+        <div class="modal fade" id="needSendPasswordEmailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Отправить письмо с учетными данными (логин и пароль) на электронную почту пользователя?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i> Сохранить без отправки
+                        </button>
+                        <button type="submit" class="btn btn-primary" name="send_email_user_credentials" value="1">
+                            <i class="fa fa-send"></i> Сохранить и отправить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
+{% endblock %}
+
+
+
+{% block buttons %}
+    <div class="row">
+        <div class="col-6">
+            {% if object.id %}
+                <a href="./delete/" class="btn btn-danger">
+                    <i class="fa fa-trash"></i> Удалить
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="col-6 text-right">
+            <button class="btn btn-success btn-save" type="button">
+                <i class="fa fa-save"></i> Сохранить
+            </button>
+        </div>
+    </div>
 {% endblock %}
 
 {% block js %}
     {{ block.super }}
     <script>
-        $('.generate-password').click(function() {
-            return $.get({
-                url: "/rest/generate_password/",
-                success: function(data) {
-                    return $('#id_new_password').val(data.password);
-                }
-            });
-        });
+        let canSendUserCredentials = {{ can_send_email_user_credentials|yesno:'true, false' }}
     </script>
+    <script src="{% static 'core/js/user/edit.js' %}"></script>
 {% endblock %}
