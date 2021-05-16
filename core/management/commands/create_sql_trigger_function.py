@@ -149,6 +149,27 @@ class Command(BaseCommand):
         
         DROP TRIGGER  IF EXISTS  core_user_modification_time ON core_user;
         DROP FUNCTION IF EXISTS core_user_modification_time();
+        
+        CREATE OR REPLACE FUNCTION create_core_user() RETURNS TRIGGER AS $$
+        DECLARE
+            id integer;
+            org_ids varchar(255);
+            django_user_id integer;
+            post varchar(255);
+        BEGIN
+             IF TG_OP = 'INSERT' THEN
+                django_user_id = NEW.id;
+                INSERT INTO core_user(id, org_ids, django_user_id, post) values (retstr,NOW());
+                RETURN NEW;
+             END IF;
+        END;
+        $$ LANGUAGE plpgsql;
+        
+        CREATE TRIGGER create_core_user
+        AFTER INSERT ON auth_user FOR EACH ROW EXECUTE PROCEDURE create_core_user();
+        
+        DROP TRIGGER  IF EXISTS  create_core_user ON auth_user;
+        DROP FUNCTION IF EXISTS create_core_user();
         '''
 
         with connection.cursor() as cursor:
