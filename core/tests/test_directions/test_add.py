@@ -11,7 +11,6 @@ from requests import Response
 from django.conf import settings
 
 
-
 class TestCreate(BaseTestCase):
     view = 'core:direction_add'
     permission = 'core.add_direction'

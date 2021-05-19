@@ -4,6 +4,7 @@ from core import models
 
 admin.site.register(models.DirectionDocxTemplate)
 admin.site.register(models.Status)
+admin.site.register(models.User)
 
 
 class WorkerOrganizationAdmin(admin.TabularInline):

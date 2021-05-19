@@ -131,6 +131,7 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/node_modules/',
     r'/login(.*)$',
     r'/logout(.*)$',
+    r'/password_forgot/',
 )
 
 MIS_URL = ''
@@ -162,6 +163,12 @@ EMAIL_USER_CREDENTIALS_TEXT = """
     Адрес личного кабинета - {{ portal_url }}.
     Логин -  {{ login }}
     Пароль - {{ password }}
+"""
+
+EMAIL_FORGOT_USER_TEXT = """
+Вам была создана учетная запись в личном кабинете медцентра "{{ med_center_name }}".
+Адрес личного кабинета - {{ portal_url }}.
+Пароль - {{password}}
 """
 
 try:

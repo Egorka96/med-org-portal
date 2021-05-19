@@ -47,7 +47,7 @@ class TestDelete(BaseTestCase):
             'headers': {'Authorization': f'Token {settings.MIS_TOKEN}'}
         }
 
-        self.assertEqual (expect_params, mock_request.call_args_list[0].kwargs)
+        self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
 
     @mock.patch.object(Direction, 'get')
     @mock.patch('requests.delete')
@@ -57,7 +57,7 @@ class TestDelete(BaseTestCase):
             'id': self.direction_number,
             'error': 'test_error'
         }
-        mock_request_direction.return_value =  Direction(
+        mock_request_direction.return_value = Direction(
             number=1,
             last_name='Иван',
             first_name='Яковлев',
