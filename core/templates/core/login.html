@@ -10,7 +10,9 @@
                 {% csrf_token %}
                 {% bootstrap_form form %}
                 <button type="submit" class="btn btn-primary btn-block btn-login">Войти</button>
-                <a href="{% url 'core:password_forgot' %}">Забыли пароль?</a>
+                {% if can_send_email_user_credentials %}
+                    <a href="{% url 'core:password_forgot' %}" style="margin: 240px">Забыли пароль?</a>
+                {% endif %}
             </form>
         </div>
     </div>

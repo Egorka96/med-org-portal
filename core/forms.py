@@ -353,7 +353,7 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Fo
 
 
 class PasswordForgotForm(forms.Form):
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(required=True)
 
     def clean_email(self):
         value = self.cleaned_data.get('email')
@@ -363,7 +363,7 @@ class PasswordForgotForm(forms.Form):
 
         if user_qs:
             if user_qs.count() > 1:
-                err_msg = "У этой почты множество аккаунтов."
+                err_msg = " С указанным email связаны несколько учетных записей."
         else:
             err_msg = "Этого пользователя не существует."
 
