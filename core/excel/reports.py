@@ -76,8 +76,7 @@ class WorkersDoneExcel(Excel):
         object_rows = []
 
         for index, obj in enumerate(self.objects, start=1):
-            law_items = ', '.join([f"{l_i['name']} прил.{l_i['section']}"
-                                   for l_i in obj['prof'][0]['law_items']]) if obj.get('prof') else ''
+            law_items = ', '.join([l_i['display'] for l_i in obj['prof'][0]['law_items']]) if obj.get('prof') else ''
 
             row = [
                 index,

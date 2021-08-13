@@ -26,12 +26,10 @@ class LawItem:
     section: str
     law: Law
     description: str
+    display: str
 
     def __str__(self):
-        label = f'п. {self.name}'
-        if self.law.name == '302н':
-            label += f' прил.{self.section}'
-        return label
+        return self.display
 
     @classmethod
     def filter_raw(cls, params: Dict = None):

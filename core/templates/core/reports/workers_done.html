@@ -71,7 +71,7 @@
     <td>{{ object.main_services|join:', ' }}</td>
     <td>
         {% for law_item in object.prof.0.law_items %}
-            {{ law_item.name }} прил.{{ law_item.section }}{% if not forloop.last %}, {% endif %}
+            {{ law_item.display }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </td>
     {% if perms.core.view_money %}<td>{{ object.total_cost }}</td>{% endif %}
