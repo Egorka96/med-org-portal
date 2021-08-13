@@ -1,15 +1,16 @@
 import datetime
 import json
 from unittest import mock
-
-import core.forms
-from core import models
-from core.tests.base import BaseTestCase
-from djutils.date_utils import rus_to_date
-from mis.pay_method import PayMethod
 from requests import Response
-from django.conf import settings
 
+from django.conf import settings
+from djutils.date_utils import rus_to_date
+
+from core import forms
+from core.tests.base import BaseTestCase
+
+from mis.law_item import Law
+from mis.pay_method import PayMethod
 
 
 class TestCreate(BaseTestCase):
@@ -17,8 +18,10 @@ class TestCreate(BaseTestCase):
     permission = 'core.add_direction'
 
     @mock.patch.object(PayMethod, 'filter')
-    def setUp(self, mock_request):
+    @mock.patch.object(Law, 'filter')
+    def setUp(self, mock_law, mock_request):
         mock_request.return_value = []
+        mock_law.return_value = [Law(id=1, name='29н')]
         super().setUp()
 
     def get_params(self):
@@ -49,11 +52,13 @@ class TestCreate(BaseTestCase):
 
     @mock.patch('requests.post')
     @mock.patch.object(PayMethod, 'filter')
-    def test_create(self, mock_request_pay_method, mock_request):
+    @mock.patch.object(Law, 'filter')
+    def test_create(self, mock_law, mock_request_pay_method, mock_request):
         params = self.get_params()
         response_json = {'id': 1}
         mock_request_pay_method.return_value = []
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=201)
+        mock_law.return_value = [Law(id=1, name='29н')]
 
         params = {key: value for key, value in params.items() if value}
         response = self.client.post(self.get_url(), params)
@@ -69,8 +74,9 @@ class TestCreate(BaseTestCase):
         self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
 
     @mock.patch('requests.post')
-    @mock.patch.object(core.forms, 'MisPayMethod')
-    def test_form_invalid(self, mock_request_pay_method, mock_request):
+    @mock.patch.object(forms, 'MisPayMethod')
+    @mock.patch.object(Law, 'filter')
+    def test_form_invalid(self, mock_law, mock_request_pay_method, mock_request):
         response_json = {
             'id': 1,
             'error': 'test_error'
@@ -78,6 +84,7 @@ class TestCreate(BaseTestCase):
         params = self.get_params()
         params['pay_method'] = 1
         mock_request_pay_method.return_value = [('', '----------'), (1, 'test'), (2, 'test2')]
+        mock_law.return_value = [Law(id=1, name='29н')]
 
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=400)
         response = self.client.post(self.get_url(), params)

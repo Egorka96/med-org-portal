@@ -1,15 +1,17 @@
 import datetime
 import json
 from unittest import mock
-
-import core.forms
-from core import models
-from django.test import override_settings
-from mis.pay_method import PayMethod
-from core.tests.base import BaseTestCase
-from mis.direction import Direction
 from requests import Response
+
 from django.conf import settings
+from django.test import override_settings
+
+from mis.law_item import Law
+from mis.pay_method import PayMethod
+from mis.direction import Direction
+
+from core.tests.base import BaseTestCase
+from core import forms
 
 
 class TestEdit(BaseTestCase):
@@ -20,7 +22,9 @@ class TestEdit(BaseTestCase):
 
     @mock.patch.object(PayMethod, 'filter')
     @mock.patch.object(Direction, 'get')
-    def setUp(self, mock_request_direction, mock_request_pay_method):
+    @mock.patch.object(Law, 'filter')
+    def setUp(self, mock_law, mock_request_direction, mock_request_pay_method):
+        mock_law.return_value = [Law(id=1, name='29н')]
         mock_request_pay_method.return_value = []
         mock_request_direction.return_value = Direction(
             number=1,
@@ -111,10 +115,13 @@ class TestEdit(BaseTestCase):
         }
 
     @mock.patch('requests.request')
-    @mock.patch.object(core.forms, 'MisPayMethod')
-    @mock.patch.object(core.forms, 'LawItem')
-    @mock.patch.object(core.forms, 'Org')
-    def test_get_initial(self, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request):
+    @mock.patch.object(forms, 'MisPayMethod')
+    @mock.patch.object(forms, 'LawItem')
+    @mock.patch.object(forms, 'Org')
+    @mock.patch.object(Law, 'filter')
+    def test_get_initial(self, mock_law, mock_request_org, mock_request_law_items,
+                         mock_request_pay_method, mock_request):
+        mock_law.return_value = [Law(id=1, name='29н')]
         mock_request_org.return_value = [(908, 'test')]
         mock_request_law_items.return_value = [(601, 'test'), (602, 'test2')]
         mock_request_pay_method.return_value = [('', '----------'), (1, 'test'), (2, 'test2')]
@@ -146,12 +153,14 @@ class TestEdit(BaseTestCase):
         self.assertEqual(expect_params, response.context_data['form'].initial)
 
     @mock.patch('requests.put')
-    @mock.patch.object(core.forms, 'MisPayMethod')
-    @mock.patch.object(core.forms, 'LawItem')
-    @mock.patch.object(core.forms, 'Org')
+    @mock.patch.object(forms, 'MisPayMethod')
+    @mock.patch.object(forms, 'LawItem')
+    @mock.patch.object(forms, 'Org')
     @mock.patch.object(Direction, 'get')
+    @mock.patch.object(Law, 'filter')
     @override_settings(MIS_URL=MIS_URL)
-    def test_post(self, mock_request_direction, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request_put):
+    def test_post(self, mock_law, mock_request_direction, mock_request_org, mock_request_law_items,
+                  mock_request_pay_method, mock_request_put):
         result_mis = self.get_result_mis()
         response_json = {'id': 1}
         mock_request_put.return_value = self.get_response(content=json.dumps(response_json))
@@ -166,6 +175,7 @@ class TestEdit(BaseTestCase):
             birth=result_mis['birth'],
             gender=result_mis['gender'],
         )
+        mock_law.return_value = [Law(id=1, name='29н')]
 
         params = self.get_params()
         response = self.client.post(self.get_url(), params)
@@ -182,12 +192,14 @@ class TestEdit(BaseTestCase):
         self.assertEqual(mock_request_put.call_args_list[0].kwargs, expect_params)
 
     @mock.patch('requests.put')
-    @mock.patch.object(core.forms, 'MisPayMethod')
-    @mock.patch.object(core.forms, 'LawItem')
-    @mock.patch.object(core.forms, 'Org')
+    @mock.patch.object(forms, 'MisPayMethod')
+    @mock.patch.object(forms, 'LawItem')
+    @mock.patch.object(forms, 'Org')
     @mock.patch.object(Direction, 'get')
+    @mock.patch.object(Law, 'filter')
     @override_settings(MIS_URL=MIS_URL)
-    def test_post_confirm_date(self, mock_request_direction, mock_request_org, mock_request_law_items, mock_request_pay_method, mock_request_put):
+    def test_post_confirm_date(self, mock_law, mock_request_direction, mock_request_org, mock_request_law_items,
+                               mock_request_pay_method, mock_request_put):
         result_mis = self.get_result_mis()
         response_json = {'id': 1}
         mock_request_put.return_value = self.get_response(content=json.dumps(response_json))
@@ -203,6 +215,7 @@ class TestEdit(BaseTestCase):
             gender=result_mis['gender'],
             confirm_date=datetime.date(2021, 4, 3),
         )
+        mock_law.return_value = [Law(id=1, name='29н')]
 
         params = self.get_params()
         response = self.client.post(self.get_url(), params)
@@ -211,6 +224,3 @@ class TestEdit(BaseTestCase):
             response.context['messages']._loaded_data[0].message,
             'Редактирование направления запрещено: по нему уже создана заявка на осмотр в медицинской информационной системе'
         )
-
-
-
