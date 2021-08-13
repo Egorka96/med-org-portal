@@ -31,13 +31,13 @@
 
 {% block table_head %}
     <th>№</th>
-    <th>Дата осмотра</th>
     <th>ФИО</th>
     <th>Дата рождения</th>
     <th>Пол</th>
     <th>Подразделение</th>
     <th>Должность</th>
     {% if show_orgs %}<th>Организация</th>{% endif %}
+    <th>Даты осмотра</th>
     <th>Вид осмотра</th>
     <th>Пункты приказа</th>
     {% if perms.core.view_money %}<th>Стоимость</th>{% endif %}
@@ -47,35 +47,37 @@
 
 {% block table_body %}
     <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
-    <td>
-        {% for date in object.dates %}
-            {{ date|iso_to_date }}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    </td>
     <td>{{ object.client.fio }}</td>
-    <td>{{ object.client.birth|iso_to_date }}</td>
-    <td>{{ object.client.gender }}</td>
-    <td>{{ object.prof.0.shop }}</td>
-    <td>
+    <td class="small">{{ object.client.birth|iso_to_date }}</td>
+    <td class="small">{{ object.client.gender }}</td>
+    <td class="small">{{ object.prof.0.shop }}</td>
+    <td class="small">
         {% for post in object.posts %}
             {{ post }} {% if not forloop.last %}, {% endif %}
         {% endfor %}
     </td>
     {% if show_orgs %}
-        <td>
+        <td class="small">
             {% for org in object.orgs %}
-                {{ org.legal_name|default:org.name }}
+                <span {% if org.legal_name|default:org.name|length > 30 %}data-toggle="tooltip" title="{{ org.legal_name|default:org.name }}"{% endif %}>
+                    {{ org.legal_name|default:org.name|truncatechars:30 }}
+                </span>
             {% endfor %}
         </td>
     {% endif %}
-    <td>{{ object.main_services|join:', ' }}</td>
-    <td>
+    <td class="small">
+        {% for date in object.dates %}
+            {{ date|iso_to_date }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </td>
+    <td class="small">{{ object.main_services|join:', ' }}</td>
+    <td class="small">
         {% for law_item in object.prof.0.law_items %}
             {{ law_item.display }}{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </td>
-    {% if perms.core.view_money %}<td>{{ object.total_cost }}</td>{% endif %}
-    <td>
+    {% if perms.core.view_money %}<td class="small">{{ object.total_cost }}</td>{% endif %}
+    <td class="small">
         {% if object.prof.0.prof_conclusion.conclusion %}
             <span data-toggle="tooltip"
                     {% if object.prof.0.prof_conclusion.no_contraindications %}
@@ -96,5 +98,5 @@
             </span>
         {% endif %}
     </td>
-    <td>{{ object.prof.0.note }}</td>
+    <td class="small">{{ object.prof.0.note }}</td>
 {% endblock %}
