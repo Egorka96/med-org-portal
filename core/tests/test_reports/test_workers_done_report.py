@@ -1,15 +1,16 @@
 import json
 import os
-from unittest import mock
 
-import core.forms
-from core import models
-from core.tests.base import BaseTestCase
-from djutils.date_utils import iso_to_date
+from unittest import mock
 from requests import Response
-from django.conf import settings
 from openpyxl import load_workbook
+
+from django.conf import settings
+from djutils.date_utils import iso_to_date
 from swutils.date import date_to_rus
+
+from core import forms
+from core.tests.base import BaseTestCase
 
 
 class TestWorkersDoneReport(BaseTestCase):
@@ -23,8 +24,10 @@ class TestWorkersDoneReport(BaseTestCase):
         return response
 
     @mock.patch('requests.request')
-    @mock.patch.object(core.forms.Mis, 'is_out_used')
-    def setUp(self, mock_request_is_out_used, mock_request):
+    @mock.patch.object(forms.Mis, 'is_out_used')
+    @mock.patch.object(forms, 'MisPayMethod')
+    def setUp(self, mock_request_pay_method, mock_request_is_out_used, mock_request):
+        mock_request_pay_method.return_value = [('', '----------'), (1, 'test'), (2, 'test2')]
         mock_request.return_value = self.get_response(content=json.dumps(self.get_result_mis()))
         mock_request_is_out_used.return_value = True
         super().setUp()
@@ -76,6 +79,7 @@ class TestWorkersDoneReport(BaseTestCase):
                         "name": "15",
                         "section": "2",
                         "factors": "",
+                        "display": "15 прил.2",
                     }],
                     "shop": "",
                     "main_services": "Предварительный ПРОФ осмотр"
@@ -108,10 +112,12 @@ class TestWorkersDoneReport(BaseTestCase):
         }
 
     @mock.patch('requests.request')
-    @mock.patch.object(core.forms.Mis, 'is_out_used')
-    def test_object_list(self, mock_request_is_out_used, mock_request):
+    @mock.patch.object(forms.Mis, 'is_out_used')
+    @mock.patch.object(forms, 'MisPayMethod')
+    def test_object_list(self, mock_request_pay_method, mock_request_is_out_used, mock_request):
         mock_request_is_out_used.return_value = True
         mock_request.return_value = self.get_response(content=json.dumps(self.get_result_mis()))
+        mock_request_pay_method.return_value = [('', '----------'), (1, 'test'), (2, 'test2')]
         params = self.get_params()
 
         response = self.client.get(self.get_url(), params)
@@ -129,8 +135,10 @@ class TestWorkersDoneReport(BaseTestCase):
         self.assertEqual(expect_params, mock_request.call_args_list[0].kwargs)
 
     @mock.patch('requests.request')
-    @mock.patch.object(core.forms.Mis, 'is_out_used')
-    def test_object_list_null(self, mock_request_is_out_used, mock_request):
+    @mock.patch.object(forms.Mis, 'is_out_used')
+    @mock.patch.object(forms, 'MisPayMethod')
+    def test_object_list_null(self, mock_request_pay_method, mock_request_is_out_used, mock_request):
+        mock_request_pay_method.return_value = [('', '----------'), (1, 'test'), (2, 'test2')]
         mock_request_is_out_used.return_value = True
         mock_request.return_value = self.get_response(content=json.dumps(self.get_result_mis()))
 
@@ -138,8 +146,10 @@ class TestWorkersDoneReport(BaseTestCase):
         self.assertFalse(response.context_data['object_list'])
 
     @mock.patch('requests.request')
-    @mock.patch.object(core.forms.Mis, 'is_out_used')
-    def test_excel(self, mock_request_is_out_used, mock_request):
+    @mock.patch.object(forms.Mis, 'is_out_used')
+    @mock.patch.object(forms, 'MisPayMethod')
+    def test_excel(self, mock_request_pay_method, mock_request_is_out_used, mock_request):
+        mock_request_pay_method.return_value = [('', '----------'), (1, 'test'), (2, 'test2')]
         mock_request_is_out_used.return_value = True
         mock_request.return_value = self.get_response(content=json.dumps(self.get_result_mis()))
 

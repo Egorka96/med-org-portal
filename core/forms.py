@@ -297,7 +297,7 @@ class WorkerSearch(FIO, OrgsMixin, forms.Form):
     is_active = forms.ChoiceField(label='Работает', choices=ACTIVE_CHOICES, required=False, initial='1')
 
 
-class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, forms.Form):
+class WorkersPastReport(FIO, DateFromTo, OrgsMixin, ExamTypeMixin, PlaceMixin, PayMethod, forms.Form):
     shop = forms.CharField(label='Подразделение', required=False)
     post = forms.CharField(label='Должность', required=False)
 
