@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 
 from core import models
-from mis.law_item import LawItem
+from mis.law_item import LawItem, Law
 from mis.org import Org
 from mis.service_client import Mis
 from mis.pay_method import PayMethod as MisPayMethod
@@ -144,6 +144,16 @@ class LawItems(forms.Form):
                     choices.append((law_item.id, law_item.name))
 
             self.fields[field].widget.choices = choices
+
+        # возьмем активные приказы из МИС
+        active_law_names = [l.name for l in Law.filter({'active': True})]
+        if '29н' not in active_law_names and not self.fields['law_items_29'].choices:
+            self.fields['law_items_29'].widget = forms.MultipleHiddenInput()
+
+        if '302н' not in active_law_names and \
+                not (self.fields['law_items_302_section_1'].widget.choices or self.fields['law_items_302_section_2'].widget.choices):
+            self.fields['law_items_302_section_1'].widget = forms.MultipleHiddenInput()
+            self.fields['law_items_302_section_2'].widget = forms.MultipleHiddenInput()
 
     def clean(self):
         law_items_302n = [*self.cleaned_data.get('law_items_302_section_1', []),

@@ -18,6 +18,15 @@ class Law:
             name=data['name'],
         )
 
+    @classmethod
+    def filter(cls, params: Dict = None) -> List['Law']:
+        response_json = Mis().request(path='/api/laws/', params=params)
+
+        laws = []
+        for item in response_json['results']:
+            laws.append(cls.get_from_dict(item))
+        return laws
+
 
 @dataclass
 class LawItem:
