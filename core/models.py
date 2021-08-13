@@ -116,14 +116,14 @@ class WorkerOrganization(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Сотрудник', related_name='worker_orgs')
     mis_id = models.IntegerField(verbose_name='МИС id')
     org_id = models.IntegerField(verbose_name='Организация id')
-    post = models.CharField(max_length=255, verbose_name='Должность')
-    shop = models.CharField(max_length=255, verbose_name='Подразделение', blank=True)
+    post = models.CharField(max_length=512, verbose_name='Должность')
+    shop = models.CharField(max_length=512, verbose_name='Подразделение', blank=True)
     start_work_date = models.DateField(null=True, blank=True, verbose_name='Дата приема')
     end_work_date = models.DateField(null=True, blank=True, verbose_name='Дата уволения')
 
     class Meta:
-        verbose_name = 'Сотрудник_Организация'
-        verbose_name_plural = 'Сотрудник_Организация'
+        verbose_name = 'Сотрудник организации'
+        verbose_name_plural = 'Сотрудники организации'
 
 
 class DirectionDocxTemplate(models.Model):

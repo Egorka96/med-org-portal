@@ -1,12 +1,13 @@
 import datetime
 from time import sleep
 
-import mis.worker
 from django.core.management import BaseCommand
 from djutils.management.commands import add_date_from_to_arguments, process_date_from_to_options
 from django.utils.timezone import now
-import core.models
 from swutils.date import iso_to_datetime
+
+import mis.worker
+from core import models
 
 
 class Command(BaseCommand):
@@ -33,8 +34,8 @@ class Command(BaseCommand):
             if not dt_to:
                 dt_to = now()
             if not dt_from:
-                dt_from_iso = core.models.Status.get_value(
-                    name=core.models.Status.WORKER_LOAD_TIME,
+                dt_from_iso = models.Status.get_value(
+                    name=models.Status.WORKER_LOAD_TIME,
                     default=datetime.datetime(2010, 1, 1, 0, 0).isoformat(sep=' ')[:19],
                 )
                 dt_from = iso_to_datetime(dt_from_iso)
@@ -42,8 +43,8 @@ class Command(BaseCommand):
             self.load_workers(options, dt_from, dt_to)
 
             if not origin_dt_from and not origin_dt_to:
-                core.models.Status.set_value(
-                    name=core.models.Status.WORKER_LOAD_TIME,
+                models.Status.set_value(
+                    name=models.Status.WORKER_LOAD_TIME,
                     value=dt_to.isoformat(sep=' ')[:19]
                 )
 
@@ -53,7 +54,6 @@ class Command(BaseCommand):
 
             if options.get('verbosity'):
                 print('Sleep 5 minutes')
-
             sleep(60 * 5)
 
             dt_from = dt_to
@@ -68,12 +68,12 @@ class Command(BaseCommand):
         page = 1
         while True:
             params['page'] = page
-            mis_workers = mis.worker.Worker.filter(params)
+            response = mis.worker.Worker.filter_with_response(params)
 
-            for mis_worker in mis_workers:
+            for mis_worker in response['results']:
                 if options.get('verbosity'):
                     print(mis_worker)
-                worker, created = core.models.Worker.objects.get_or_create(
+                worker, created = models.Worker.objects.get_or_create(
                     last_name=mis_worker.last_name,
                     first_name=mis_worker.first_name,
                     birth=mis_worker.birth,
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                 if not created:
                     worker.gender = mis_worker.gender
                     worker.save()
-                worker_org, created = core.models.WorkerOrganization.objects.get_or_create(
+                worker_org, created = models.WorkerOrganization.objects.get_or_create(
                     worker=worker,
                     org_id=mis_worker.org.id,
                     mis_id=mis_worker.id,
@@ -99,5 +99,7 @@ class Command(BaseCommand):
                     worker_org.shop = mis_worker.shop
                     worker_org.save()
                 worker_org.save()
-            page += 1
 
+            if not response.get('next'):
+                break
+            page += 1

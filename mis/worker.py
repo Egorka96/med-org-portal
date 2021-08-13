@@ -30,11 +30,19 @@ class Worker:
         return ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
 
     @classmethod
-    def filter(cls, params: Dict = None, user=None) -> List['Worker']:
+    def filter_with_response(cls, params: Dict = None, user: 'core.models.DjangoUser' = None):
+        response_json = Mis().request(path='/api/workers/', params=params, user=user)
+
         workers = []
-        for item in Mis().request(path='/api/workers/', params=params, user=user)['results']:
+        for item in response_json['results']:
             workers.append(cls.get_from_dict(item))
-        return workers
+
+        response_json['results'] = workers
+        return response_json
+
+    @classmethod
+    def filter(cls, params: Dict = None, user=None) -> List['Worker']:
+        return cls.filter_with_response(params, user=user)['results']
 
     @classmethod
     def get(cls, worker_id, user=None) -> 'Worker':
