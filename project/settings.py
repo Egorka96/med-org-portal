@@ -110,6 +110,8 @@ DATE_FORMAT = 'd.m.Y'
 DATETIME_FORMAT = 'd.m.Y H:i'
 SHORT_DATETIME_FORMAT = 'd.m.Y H:i'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 DIR_FOR_TMP_FILES = '/tmp/med-org-portal/'
 
 REDIS_HOST = 'localhost'

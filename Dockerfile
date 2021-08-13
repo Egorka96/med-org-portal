@@ -1,4 +1,6 @@
-FROM python:3.8-slim-buster
+# docker build -t egorkaraz/med-org-portal:VERSION .
+# docker push egorkaraz/med-org-portal:VERSION
+FROM python:3.9-slim-buster
 
 ENV DEBIAN_FRONTEND=noninteractive
 

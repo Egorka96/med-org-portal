@@ -11,6 +11,8 @@
             $('#id_org, #id_orgs').select2({
                 language: "ru",
                 theme: "bootstrap",
+                allowClear: true,
+                placeholder: "",
                 ajax: {
                     url: ORG_REST_URL,
                     dataType: 'json',

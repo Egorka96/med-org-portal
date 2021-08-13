@@ -1,14 +1,14 @@
 {
   "dependencies": {
-    "bootstrap": "4.3.1",
-    "jquery": "3.5.0",
-    "jquery-ui": "^1.10.2",
-    "jquery-ui-dist": "^1.12.0",
-    "jquery.maskedinput": "^1.4.1",
-    "jquery-toast-plugin": "^1.3.1",
-    "popper.js": "1.14.3",
+    "bootstrap": "4.6.0",
+    "jquery": "3.6.0",
+    "jquery-ui": "1.12.1",
+    "jquery-ui-dist": "1.12.1",
+    "jquery.maskedinput": "1.4.1",
+    "jquery-toast-plugin": "1.3.2",
+    "popper.js": "1.16.1",
     "font-awesome": "4.7.0",
-    "select2": "4.0.3",
+    "select2": "4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "vue": "2.6.10"
   }
