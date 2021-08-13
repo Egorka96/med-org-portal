@@ -26,8 +26,8 @@ class TestSearch(BaseTestCase):
             "count": 5,
             "next": None,
             "previous": None,
-            "results":[{
-                "id":17719,
+            "results": [{
+                "id": 17719,
                 "last_name":"Тестов",
                 "first_name":"Тест",
                 "middle_name":"Тестович",
@@ -46,14 +46,14 @@ class TestSearch(BaseTestCase):
                 "law_items":[
                     {
                         "id":601,
-                        "name":"3.4.2",
-                        "section":"1",
-                        "description":"Общая вибрация ",
-                         "law": {
+                        "name": "3.4.2",
+                        "section": "1",
+                        "description": "Общая вибрация ",
+                        "law": {
                             "id": 5,
                             "name": "29н"
                         },
-                        "display":"3.4.2 прил.1"
+                        "display": "3.4.2"
                     },
                     {
                         "id":602,
@@ -64,7 +64,7 @@ class TestSearch(BaseTestCase):
                             "id": 5,
                             "name": "29н"
                         },
-                        "display":"3.5 прил.1"
+                        "display": "3.5"
                     },
                 ],
                 "pay_method": {
@@ -195,7 +195,7 @@ class TestSearch(BaseTestCase):
             'post': 'Тестировщик',
             'shop': 'Тест',
             'exam_type': 'Периодический',
-            'law_items': 'п. 3.4.2, п. 3.5',
+            'law_items': '3.4.2, 3.5',
             'date': 'с 20.02.2021 по 31.12.2021',
             'confirm_dt': '-'
         }
@@ -215,6 +215,3 @@ class TestSearch(BaseTestCase):
 
         self.assertEqual(result_excel_header, header_list)
         os.remove(filepath)
-
-
-

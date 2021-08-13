@@ -26,6 +26,7 @@ class LawItemTests(TestCase):
                 'name': 'test 1',
                 'section': 'test 1',
                 'description': 'test 1',
+                'display': 'test 1 test 1',
                 'law': {
                     'id': 1,
                     'name': '302н'
@@ -36,6 +37,7 @@ class LawItemTests(TestCase):
                 'name': 'test 2',
                 'section': 'test 2',
                 'description': 'test 2',
+                'display': 'test 2',
                 'law': {
                     'id': 2,
                     'name': '29н'
@@ -46,6 +48,7 @@ class LawItemTests(TestCase):
                 'name': 'test 3',
                 'section': 'test 3',
                 'description': 'test 3',
+                'display': 'test3 test3',
                 'law': {
                     'id': 1,
                     'name': '302н'
@@ -61,7 +64,8 @@ class LawItemTests(TestCase):
                 name=item['name'],
                 section=item['section'],
                 law=Law(id=item['law']['id'], name=item['law']['name']),
-                description=item['description']
+                description=item['description'],
+                display=item['display']
             ))
 
         filter_params = {'name': 'test 3'}
@@ -86,6 +90,7 @@ class LawItemTests(TestCase):
             'id': 1,
             'name': 'test 3',
             'section': 'test 3',
+            'display': 'test 3 test 3',
             'description': 'test 3',
                 'law': {
                     'id': 1,
@@ -99,7 +104,8 @@ class LawItemTests(TestCase):
             name=response_json['name'],
             section=response_json['section'],
             law=Law(id=response_json['law']['id'], name=response_json['law']['name']),
-            description=response_json['description']
+            description=response_json['description'],
+            display=response_json['display']
         )
 
         law_items = LawItem.get(law_item_id)

@@ -64,4 +64,5 @@ class LawItem:
             section=data['section'],
             law=Law.get_from_dict(data['law']),
             description=data.get('description'),
+            display=data['display'],
         )

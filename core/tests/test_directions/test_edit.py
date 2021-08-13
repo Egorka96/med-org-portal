@@ -40,10 +40,10 @@ class TestEdit(BaseTestCase):
             'birth': datetime.date(2021, 3, 2).isoformat(),
             'exam_type': 'Периодический',
             'pay_method': {
-                "id":1,
-                "name":"Организация",
-                "type":"Организация",
-                "sort_priority":5.0,
+                "id": 1,
+                "name": "Организация",
+                "type": "Организация",
+                "sort_priority": 5.0,
             },
             'gender': '',
             'post': '',
@@ -51,26 +51,29 @@ class TestEdit(BaseTestCase):
             'date_from': datetime.date.today().isoformat(),
             'date_to': datetime.date(2021, 12, 31).isoformat(),
             'confirm_dt': datetime.date(2021, 10, 31).isoformat(),
-            "org":{
-                "id":908,
+            "org": {
+                "id": 908,
                 "legal_name":"ООО \"Тестовая организация\""
             },
-            "law_items":[
+            "law_items": [
                 {
-                    "id":601,
-                    "name":"3.4.2",
-                    "section":"1",
-                    "description":"Общая вибрация ",
+                    "id": 601,
+                    "name": "3.4.2",
+                    "section": "1",
+                    "description": "Общая вибрация ",
+                    "display": "3.4.2 прил.1",
                     "law": {
                         "id": 1,
                         "name": "302н",
                     },
                 },
                 {
-                    "id":602,
-                    "name":"3.5",
-                    "section":"2",
-                    "description":"Производственный шум на рабочих местах с вредными и (или) опасными условиями труда, на которых имеется технологическое оборудование, являющееся источником шума.",
+                    "id": 602,
+                    "name": "3.5",
+                    "section": "2",
+                    "description": "Производственный шум на рабочих местах с вредными и (или) опасными условиями труда, "
+                                   "на которых имеется технологическое оборудование, являющееся источником шума.",
+                    "display": "3.5 прил.1",
                     "law": {
                         "id": 1,
                         "name": "302н",

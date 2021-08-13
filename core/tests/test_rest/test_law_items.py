@@ -27,7 +27,8 @@ class TestLawItems(BaseRestTestCase, APITestCase):
                 name=random_word(10),
                 section=random_word(10),
                 law=law,
-                description=random_word(10)
+                description=random_word(10),
+                display=random_word(10),
             )
             law_items.append(dataclasses.asdict(law_item))
 
