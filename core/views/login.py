@@ -19,7 +19,6 @@ class Login(LoginView):
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
         c['can_send_email_user_credentials'] = hasattr(settings, 'EMAIL_HOST_USER')
-
         return c
 
 

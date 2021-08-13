@@ -365,7 +365,7 @@ class PasswordForgotForm(forms.Form):
             if user_qs.count() > 1:
                 err_msg = " С указанным email связаны несколько учетных записей."
         else:
-            err_msg = "Этого пользователя не существует."
+            err_msg = "Пользователь с указанным email не найден"
 
         if err_msg:
             raise forms.ValidationError(err_msg)
