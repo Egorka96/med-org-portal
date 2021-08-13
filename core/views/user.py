@@ -1,15 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import SetPasswordForm
 from django.core.mail import EmailMessage, send_mail
 from django.shortcuts import redirect
 from django.template import Template, Context
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.views.generic import TemplateView
-from core.datatools.password import create_password
 
 import core.generic.mixins
 import core.generic.views
@@ -89,7 +86,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
         c['user'] = self.request.user
-        c['can_send_email_user_credentials'] = hasattr(settings, 'EMAIL_USER_CREDENTIALS_TEXT')
+        c['can_send_email_user_credentials'] = getattr(settings, 'EMAIL_HOST_USER', None)
         return c
 
     def get_breadcrumbs(self):
