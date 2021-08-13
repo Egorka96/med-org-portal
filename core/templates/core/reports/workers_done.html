@@ -2,6 +2,42 @@
 {% load bootstrap4 %}
 {% load djutils %}
 
+{% block css %}
+    {{ block.super }}
+    <style>
+        .table-container {
+            position: relative;
+            overflow: auto;
+            border-collapse: separate; /* Don't collapse */
+        }
+
+        th {
+            background: white;
+            position: sticky;
+            top: 0; /* Don't forget this, required for the stickiness */
+            z-index: 10;
+            box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        .sticky-col {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            background-color: #e8e8e8;
+        }
+
+        .first-col {
+            width: 10px;
+            left: 0;
+        }
+
+        .second-col {
+            width: 150px;
+            left: 30px;
+        }
+    </style>
+{% endblock %}
+
 {% block form %}
     <div class="row">
         <div class="col-sm-4">
@@ -31,8 +67,8 @@
 {% endblock pre_table %}
 
 {% block table_head %}
-    <th>№</th>
-    <th>ФИО</th>
+    <th class="sticky-col first-col">№</th>
+    <th class="sticky-col second-col">ФИО</th>
     <th>Дата рождения</th>
     <th>Пол</th>
     <th>Подразделение</th>
@@ -47,8 +83,8 @@
 {% endblock %}
 
 {% block table_body %}
-    <td>{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
-    <td>{{ object.client.fio }}</td>
+    <td class="sticky-col first-col">{{ page_obj.start_index|default:1|add:forloop.counter0 }}</td>
+    <td class="sticky-col second-col">{{ object.client.fio }}</td>
     <td class="small">{{ object.client.birth|iso_to_date }}</td>
     <td class="small">{{ object.client.gender }}</td>
     <td class="small">{{ object.prof.0.shop }}</td>
@@ -100,4 +136,11 @@
         {% endif %}
     </td>
     <td class="small">{{ object.prof.0.note }}</td>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        $(".report-table").removeClass("table-striped table-hover")
+    </script>
 {% endblock %}
