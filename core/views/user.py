@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth.views import PasswordChangeView
 from django.core.mail import EmailMessage, send_mail
 from django.shortcuts import redirect
 from django.template import Template, Context
@@ -13,7 +11,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 import core.generic.mixins
 import core.generic.views
 
-from core import forms, filters
+from core import forms, filters, models
 
 User = get_user_model()
 
@@ -88,7 +86,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
         c['user'] = self.request.user
-        c['can_send_email_user_credentials'] = hasattr(settings, 'EMAIL_USER_CREDENTIALS_TEXT')
+        c['can_send_email_user_credentials'] = getattr(settings, 'EMAIL_HOST_USER', None)
         return c
 
     def get_breadcrumbs(self):
@@ -113,15 +111,3 @@ class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):
             (user, reverse('core:user_edit', kwargs={'pk': user.id})),
             (self.breadcrumb, ''),
         ]
-
-
-class PasswordChangeRequired(PasswordChangeView):
-    form_class = SetPasswordForm
-    template_name = 'core/required_password_change.html'
-    success_url = reverse_lazy('core:index')
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        self.request.user.core.need_change_password = False
-        self.request.user.core.save()
-        return response

@@ -1,9 +1,9 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User as DjangoUserModel
+
 
 from core import models
-
-admin.site.register(models.DirectionDocxTemplate)
-admin.site.register(models.Status)
 
 
 class WorkerOrganizationAdmin(admin.TabularInline):
@@ -15,3 +15,17 @@ class WorkerOrganizationAdmin(admin.TabularInline):
 @admin.register(models.Worker)
 class WorkerAdmin(admin.ModelAdmin):
     inlines = [WorkerOrganizationAdmin]
+
+
+class UserInline(admin.TabularInline):
+    model = models.User
+
+
+class ExtendedUser(UserAdmin):
+    inlines = UserAdmin.inlines + [UserInline]
+
+
+admin.site.register(models.DirectionDocxTemplate)
+admin.site.register(models.Status)
+admin.site.unregister(DjangoUserModel)
+admin.site.register(DjangoUserModel, ExtendedUser)

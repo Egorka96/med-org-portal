@@ -360,3 +360,24 @@ class DirectionEdit(FIO, OrgsMixin, ExamTypeMixin, LawItems, PayMethod, forms.Fo
             self.fields['org'].initial = org.id
             self.fields['org'].choices = [(org.id, str(org))]
             self.fields['org'].widget = forms.HiddenInput()
+
+
+class PasswordForgotForm(forms.Form):
+    email = forms.EmailField(required=True)
+
+    def clean_email(self):
+        value = self.cleaned_data.get('email')
+
+        user_qs = models.User.objects.filter(django_user__email=value)
+        err_msg = ''
+
+        if user_qs:
+            if user_qs.count() > 1:
+                err_msg = " С указанным email связаны несколько учетных записей."
+        else:
+            err_msg = "Пользователь с указанным email не найден"
+
+        if err_msg:
+            raise forms.ValidationError(err_msg)
+
+        return value

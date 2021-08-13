@@ -45,7 +45,6 @@ class TestsSearch(BaseTestCase):
             shop='ПФПА',
         )
 
-
     def test_search_last_name(self):
         params = {
             'last_name': 'Таня'

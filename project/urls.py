@@ -7,14 +7,14 @@ from django.views.generic import TemplateView
 
 import core.urls
 import background_tasks.urls
-
+from core.views.login import Login
 
 urlpatterns = [
     path('', include(core.urls, namespace='core')),
     path('background_tasks/', include(background_tasks.urls, namespace='background_tasks')),
     path('admin/', admin.site.urls),
 
-    path('login/', LoginView.as_view(template_name='core/login.html'), name='login'),
+    path('login/', Login.as_view(), name='login'),
     path('logout/', logout_then_login, {'login_url': '/login/?next=/'}, name='logout'),
 
     path('password_change/', PasswordChangeView.as_view(template_name='core/password_change.html',

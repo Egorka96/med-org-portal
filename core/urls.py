@@ -1,6 +1,6 @@
 from django.urls import path
 
-from core.views import index
+from core.views import index, login
 from core.views import user
 from core.views import worker
 from core.views import reports
@@ -34,5 +34,6 @@ urlpatterns = [
     path('rest/law_items/', rest.LawItems.as_view(), name='rest_law_items'),
     path('rest/generate_password/', rest.GeneratePasswordView.as_view(), name='rest_generate_password'),
 
-    path('password_change_required/', user.PasswordChangeRequired.as_view(), name='password_change_required')
+    path('password_change_required/', login.PasswordChangeRequired.as_view(), name='password_change_required'),
+    path('password_forgot/', login.PasswordForgot.as_view(), name='password_forgot')
 ]

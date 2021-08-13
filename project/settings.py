@@ -131,6 +131,7 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/node_modules/',
     r'/login(.*)$',
     r'/logout(.*)$',
+    r'/password_forgot/',
 )
 
 MIS_URL = ''
@@ -162,6 +163,13 @@ EMAIL_USER_CREDENTIALS_TEXT = """
     Адрес личного кабинета - {{ portal_url }}.
     Логин -  {{ login }}
     Пароль - {{ password }}
+"""
+
+EMAIL_FORGOT_USER_TEXT = """
+    Ваш email адрес был указан для сброса текущего пароля в личном кабинете {{ med_center_name }}".
+    Адрес личного кабинета - {{ portal_url }}.
+    Ваш новый временный пароль - новый_пароль. - {{password}}.
+    При первом входе в личный кабинет, система попросит вас придумать свой новый пароль.
 """
 
 try:

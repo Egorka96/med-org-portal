@@ -12,7 +12,6 @@ from core.tests.base import BaseTestCase
 from mis.law_item import Law
 from mis.pay_method import PayMethod
 
-
 class TestCreate(BaseTestCase):
     view = 'core:direction_add'
     permission = 'core.add_direction'
