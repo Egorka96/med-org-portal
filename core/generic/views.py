@@ -62,16 +62,20 @@ class ListView(mixins.ExcelMixin, mixins.BreadcrumbsMixin, mixins.TitleMixin, Dj
         context['page_has_right'] = has_right
         return context
 
-    def get_queryset(self):
-        queryset = self.model.objects.all()
+    def get_filter_params(self):
         form = self.get_form()
-
         if form.is_valid():
-            queryset = self.filter_class(
-                data=self.request.GET,
-                queryset=queryset,
-                request=self.request,
-            ).qs
+            filter_params = form.cleaned_data
+        else:
+            filter_params = self.get_initial()
+
+        return filter_params
+
+    def get_queryset(self):
+        queryset = self.filter_class(
+            data=self.get_filter_params(),
+            request=self.request,
+        ).qs
         return queryset.distinct()
 
 

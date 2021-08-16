@@ -1,3 +1,5 @@
+import json
+
 import django_filters
 from django.contrib.auth import get_user_model
 
@@ -25,12 +27,21 @@ class Worker(django_filters.FilterSet):
     middle_name = django_filters.CharFilter(field_name='middle_name', lookup_expr='icontains')
     post = django_filters.CharFilter(field_name='worker_orgs__post', lookup_expr='icontains')
     shop = django_filters.CharFilter(field_name='worker_orgs__shop', lookup_expr='icontains')
-    orgs = django_filters.CharFilter(method='filter_orgs')
+    orgs = django_filters.Filter(method='filter_orgs')
     is_active = django_filters.CharFilter(method='filter_is_active')
 
     class Meta:
         model = models.Worker
         fields = '__all__'
+
+    @property
+    def qs(self):
+        qs = super().qs
+        if self.request and self.request.user:
+            if org_ids := self.request.user.core.get_org_ids():
+                qs = qs.filter(worker_orgs__org_id__in=org_ids)
+
+        return qs
 
     def filter_orgs(self, qs, name, value):
         return qs.filter(worker_orgs__org_id__in=value)

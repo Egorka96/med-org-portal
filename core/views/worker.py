@@ -9,8 +9,6 @@ import core.generic.views
 
 from core import forms, filters, models
 from mis.document import Document
-from mis.service_client import Mis
-from mis.worker import Worker
 
 
 class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.views.ListView):
@@ -29,9 +27,6 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
             (self.title, ''),
         ]
 
-    def process_response_results(self, objects):
-        return [Worker.get_from_dict(obj) for obj in objects]
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -39,6 +34,7 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
         context['show_orgs'] = False if user_orgs and len(user_orgs) < 2 else True
 
         return context
+
 
 class DocumentPrint(PermissionRequiredMixin, View):
     permission_required = 'core.view_worker'

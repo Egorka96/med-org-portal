@@ -73,11 +73,16 @@ class User(models.Model):
             initials += '%s.' % parts[1][0]
         return initials
 
+    def get_org_ids(self):
+        if not self.org_ids:
+            return []
+        return json.loads(self.org_ids)
+
     def get_orgs(self) -> List[Org]:
         if not self.org_ids:
             return []
 
-        return [Org.get(org_id=org_id) for org_id in json.loads(self.org_ids)]
+        return [Org.get(org_id=org_id) for org_id in self.get_org_ids()]
 
     def get_available_document_types(self) -> List[DocumentType]:
         user_doc_type_ids = self.available_document_type_ids.values_list('document_type_id', flat=True)
