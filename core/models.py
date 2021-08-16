@@ -111,6 +111,12 @@ class Worker(models.Model):
     def __str__(self):
         return ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))
 
+    def get_posts(self):
+        return ', '.join(set(self.worker_orgs.exclude(post="").values_list('post', flat=True)))
+
+    def get_shops(self):
+        return ', '.join(set(self.worker_orgs.exclude(shop="").values_list('shop', flat=True)))
+
 
 class WorkerOrganization(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Сотрудник', related_name='worker_orgs')

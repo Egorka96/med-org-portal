@@ -76,8 +76,8 @@
                         <div class="card-worker-info">
                             <h5 class="card-title">{{ object }}</h5>
                             <p class="card-text help-block">
-                                {{ object.post|default:"Не указана" }}
-                                {% if object.shop %}<br>{{ object.shop }}{% endif %}
+                                {{ object.get_posts|default:"Не указана" }}
+                                {% if object.get_shops %}<br>{{ object.get_shops }}{% endif %}
                             </p>
                         </div>
                         <hr>
