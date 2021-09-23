@@ -10,7 +10,10 @@ class Org:
     id: int
     name: str
     legal_name: str = None
+    legal_address: str = None
     okved: str = None
+    okpo: str = None
+    ogrn: str = None
     phones: List[str] = None
     email: str = None
 
@@ -56,7 +59,10 @@ class Org:
             id=data['id'],
             name=data.get('name'),
             legal_name=data['legal_name'],
+            legal_address=data.get('legal_address'),
             okved=data.get('okved'),
+            okpo=data.get('okpo'),
+            ogrn=data.get('ogrn'),
             phones=data.get('phones'),
             email=data.get('email'),
         )
