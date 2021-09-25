@@ -24,7 +24,7 @@ class Login(LoginView):
 
 class PasswordChangeRequired(PasswordChangeView):
     form_class = SetPasswordForm
-    template_name = 'core/required_password_change.html'
+    template_name = 'core/password_change.html'
     success_url = reverse_lazy('core:index')
 
     def form_valid(self, form):
