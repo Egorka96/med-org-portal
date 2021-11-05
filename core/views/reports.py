@@ -74,3 +74,12 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
                     obj['main_services'].append(o.get('main_services'))
 
         return objects
+
+    def get_context_data(self, **kwargs):
+        c = super().get_context_data(**kwargs)
+
+        objects = c['page_obj'].object_list if c.get('page_obj') else c['object_list']
+
+        # если среди объектов есть ЛМК заявки, будем выводить доп столбцы про ЛМК
+        c['use_lmk'] = any(obj.get('lmk') for obj in objects)
+        return c
