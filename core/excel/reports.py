@@ -17,6 +17,8 @@ class WorkersDoneExcel(Excel):
         if not self.objects:
             self.objects = self.get_objects()
 
+        self.use_lmk = any(obj.get('lmk') for obj in self.objects)
+
     def get_objects(self):
         objects = []
 
@@ -65,11 +67,16 @@ class WorkersDoneExcel(Excel):
         if self.show_cost:
             head_static_sizes['Стоимость'] = 10
 
-        head_static_sizes.update({
-            'Заключение профпатолога': 50,
-            'Примечание': 50,
-        })
+        head_static_sizes['Заключение профпатолога'] = 50
+        if self.use_lmk:
+            head_static_sizes.update({
+                'Номер бланка ЛМК': 20,
+                'Дата бланка ЛМК': 12,
+                'Вид аттестации': 15,
+                'Дата аттестации': 12
+            })
 
+        head_static_sizes['Примечание'] = 50
         return head_static_sizes
 
     def get_object_rows(self):
@@ -98,10 +105,16 @@ class WorkersDoneExcel(Excel):
             if self.show_cost:
                 row.append(obj['total_cost'])
 
-            row.extend([
-                obj['prof'][0]['prof_conclusion']['conclusion'] if obj.get('prof') else '',
-                obj['prof'][0].get('note') if obj.get('prof') else ''
-            ])
+            row.append(obj['prof'][0]['prof_conclusion']['conclusion'] if obj.get('prof') else '')
+            if self.use_lmk:
+                row.extend([
+                    ', '.join(f"{b['number']} {b['reg_number']}" for b in obj['lmk_blanks']),
+                    ', '.join(date_to_rus(iso_to_date(b['date'])) for b in obj['lmk_blanks']),
+                    ', '.join('Первичная' if att['is_first'] else 'Периодическая' for att in obj['lmk_attestations']),
+                    ', '.join(date_to_rus(iso_to_date(att['date'])) for att in obj['lmk_attestations']),
+                ])
+
+            row.append(obj['prof'][0].get('note') if obj.get('prof') else '')
             object_rows.append(row)
 
         return object_rows

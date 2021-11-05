@@ -79,6 +79,12 @@
     <th>Пункты приказа</th>
     {% if perms.core.view_money %}<th>Стоимость</th>{% endif %}
     <th>Заключение профпатолога</th>
+    {% if use_lmk %}
+        <th>Номер бланка ЛМК</th>
+        <th>Дата бланка ЛМК</th>
+        <th>Вид аттестации</th>
+        <th>Дата аттестации</th>
+    {% endif %}
     <th>Примечание</th>
 {% endblock %}
 
@@ -135,6 +141,28 @@
             </span>
         {% endif %}
     </td>
+    {% if use_lmk %}
+        <td class="small">
+            {% for lmk_blank in object.lmk_blanks %}
+                {{ lmk_blank.number }} {{ lmk_blank.reg_number }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+        <td class="small">
+            {% for lmk_blank in object.lmk_blanks %}
+                {{ lmk_blank.date|iso_to_date }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+        <td class="small">
+            {% for attestation in object.lmk_attestations %}
+                {% if attestation.is_first %}Первичная{% else %}Периодическая{% endif %}
+            {% endfor %}
+        </td>
+        <td class="small">
+            {% for attestation in object.lmk_attestations %}
+                {{ attestation.date|iso_to_date }}
+            {% endfor %}
+        </td>
+    {% endif %}
     <td class="small">{{ object.prof.0.note }}</td>
 {% endblock %}
 
