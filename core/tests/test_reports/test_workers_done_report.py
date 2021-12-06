@@ -108,7 +108,8 @@ class TestWorkersDoneReport(BaseTestCase):
             'per_page': '50',
             'post': [''],
             'shop': [''],
-            'group_clients': True
+            'group_clients': True,
+            'sort': 'date',
         }
 
     @mock.patch('requests.request')
