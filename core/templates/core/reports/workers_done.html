@@ -68,13 +68,13 @@
 
 {% block table_head %}
     <th class="sticky-col first-col">№</th>
-    <th class="sticky-col second-col">ФИО</th>
+    {% sort_th 'fio' 'ФИО' %}
     <th>Дата рождения</th>
     <th>Пол</th>
     <th>Подразделение</th>
     <th>Должность</th>
     {% if show_orgs %}<th>Организация</th>{% endif %}
-    <th>Даты осмотра</th>
+    {% sort_th 'date' 'Даты осмотра' %}
     <th>Вид осмотра</th>
     <th>Пункты приказа</th>
     {% if perms.core.view_money %}<th>Стоимость</th>{% endif %}
@@ -170,5 +170,8 @@
     {{ block.super }}
     <script>
         $(".report-table").removeClass("table-striped table-hover")
+        $(".sortable").click(function () {
+            $("#loading").show()
+        })
     </script>
 {% endblock %}

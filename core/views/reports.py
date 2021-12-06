@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse
+from djutils.views.generic import SortMixin
 
 import core.generic.mixins
 import core.generic.views
@@ -11,7 +12,7 @@ from core.excel.reports import WorkersDoneExcel
 from mis.service_client import Mis
 
 
-class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
+class WorkersDoneReport(PermissionRequiredMixin, SortMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
                         core.generic.views.ListView):
     title = 'Отчет по прошедшим'
     form_class = forms.WorkersPastReport
@@ -20,6 +21,8 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
     excel_workbook_maker = WorkersDoneExcel
     mis_request_path = Mis.WORKERS_DONE_REPORT_URL
     template_name = settings.TEMPLATES_DICT.get("workers_done_report")
+    sort_params = ('date', 'fio')
+    sort_default = False
 
     def get_breadcrumbs(self):
         return [
@@ -57,12 +60,16 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
 
         if self.request.GET:
             filter_params['group_clients'] = True
+            filter_params['sort'] = self.request.GET.get('sort')
         return filter_params
 
     def get_objects(self):
         self.object_list = super().get_objects()
         self.object_list = self.update_object_list(self.object_list)
         return self.object_list
+
+    def get_queryset(self):
+        return self.get_objects()
 
     def update_object_list(self, objects):
         for obj in objects:
