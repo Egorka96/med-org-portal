@@ -82,4 +82,6 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
 
         # если среди объектов есть ЛМК заявки, будем выводить доп столбцы про ЛМК
         c['use_lmk'] = any(obj.get('lmk') for obj in objects)
+        c['show_documents'] = self.request.user.core.available_document_type_ids.exists() and \
+                              self.request.user.has_perm('core.view_workers_document')
         return c

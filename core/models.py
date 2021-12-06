@@ -112,6 +112,9 @@ class Worker(models.Model):
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
         ordering = ['last_name', 'first_name', 'middle_name']
+        permissions = (
+            ('view_workers_document', 'Просмотр документов сотрудника'),
+        )
 
     def __str__(self):
         return ' '.join(filter(bool, [self.last_name, self.first_name, self.middle_name]))

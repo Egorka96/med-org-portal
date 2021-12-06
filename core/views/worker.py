@@ -36,6 +36,7 @@ class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generi
         return context
 
 
+# todo: перевезти на rest вьюху общего назначения
 class DocumentPrint(PermissionRequiredMixin, View):
     permission_required = 'core.view_worker'
 
