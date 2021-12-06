@@ -79,7 +79,7 @@ class Excel:
             status=background_tasks.consts.STATUS_COMPLETE,
         )
 
-        file_name = f"{transliterate(self.get_workbook_name(), space='_')}.xls"
+        file_name = f"{transliterate(self.get_workbook_name(), space='_')}.xlsx"
         background_task = background_tasks.models.Task.objects.get(id=self.background_task.id)
         workbook.save(file_name)
         background_task.result_attachment.save(file_name, ContentFile(content))
@@ -163,11 +163,11 @@ class Excel:
         cell_table_start = self.get_cell_address(current_row - 1, 1)
         cell_table_finish = self.get_cell_address(current_row - 1, len(self.get_headers()) - 1)
 
-        tab = Table(
-            displayName="Table1",
-            ref=f"{cell_table_start}:{cell_table_finish}"
-        )
-        sheet.add_table(tab)
+        # tab = Table(
+        #     displayName="Table1",
+        #     ref=f"{cell_table_start}:{cell_table_finish}"
+        # )
+        # sheet.add_table(tab)
 
         for row in range(current_row, len(self.objects) + current_row + 1):
             for col in range(1, len(self.get_headers()) + 1):
