@@ -191,5 +191,8 @@
 
 {% block js %}
     {{ block.super }}
+    <script>
+        let availableDocTypesCount = {{ request.user.core.available_document_type_ids.count }}
+    </script>
     <script src="{% static 'core/js/reports/workers_done.js' %}"></script>
 {% endblock %}

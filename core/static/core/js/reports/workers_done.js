@@ -18,31 +18,44 @@
                     let clientFIO = ordersDocumentBtn.data('client-fio')
                     ordersDocumentBtn.parents("td").children(".badge-loading").hide()
 
-                    // todo: проверять, если пользователю доступен всего один вид документа, до кнопка сразу должна быть ссылкой
                     if (response.length) {
-                        let content = '<ul class="orders-documents-list">'
-                        for (let i = 0; i < response.length; i++) {
-                            let document = response[i]
-                            let fileName = encodeURIComponent(`${clientFIO} ${document.doc_type.name}`)
-                            content += `
-                                <li class="orders-documents-item">
-                                    <a href="/rest/documents/print/?link=${encodeURIComponent(document.doc_link)}&name=${fileName}" target="_blank">
-                                        ${document.doc_type.name}
-                                    </a>
-                                </li>
-                            `
-                        }
-                        content += "</ul>"
+                        if (availableDocTypesCount > 1) {
+                            let content = '<ul class="orders-documents-list">'
+                            for (let i = 0; i < response.length; i++) {
+                                let document = response[i]
+                                let fileName = encodeURIComponent(`${clientFIO} ${document.doc_type.name}`)
+                                content += `
+                                    <li class="orders-documents-item">
+                                        <a href="/rest/documents/print/?link=${encodeURIComponent(document.doc_link)}&name=${fileName}" target="_blank">
+                                            ${document.doc_type.name}
+                                        </a>
+                                    </li>
+                                `
+                            }
+                            content += "</ul>"
 
-                        ordersDocumentBtn.show()
-                        ordersDocumentBtn.popover({
-                            container: 'body',
-                            trigger: 'focus',
-                            content: content,
-                            html: true,
-                            title: "Документы"
-                        })
+                            ordersDocumentBtn.popover({
+                                container: 'body',
+                                trigger: 'focus',
+                                content: content,
+                                html: true,
+                                title: "Документы"
+                            })
+                        } else {
+                            // если пользователю доступен всего один вид документа для скачивания,
+                            // то при нажатии на кнопку, сразу будем скачивать файл
+                            let document = response[0]
+                            let fileName = encodeURIComponent(`${clientFIO} ${document.doc_type.name}`)
+                            ordersDocumentBtn.click(function () {
+                                window.open(`/rest/documents/print/?link=${encodeURIComponent(document.doc_link)}&name=${fileName}`, '_blank')
+                            })
+                            ordersDocumentBtn.tooltip({
+                                container: 'body',
+                                title: `Скачать "${document.doc_type.name}"`
+                            })
+                        }
                     }
+                    ordersDocumentBtn.show()
                     loadOrdersDocuments()
                 }
             }).fail(function (response) {
