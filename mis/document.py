@@ -60,6 +60,22 @@ class Document:
         )
 
     @classmethod
+    def get_choices(cls, filter_params_str: str) -> List[Dict]:
+        url = settings.MIS_URL + '/api/document/builder/choices/?' + filter_params_str
+        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
+        response = requests.get(url=url, headers=headers)
+        response.raise_for_status()
+
+        response_json = response.json()
+        results = []
+        for item in response_json:
+            results.append({
+                'doc_type': DocumentType.get_from_dict(item['doc_type']),
+                'doc_link': item['link']
+            })
+        return results
+
+    @classmethod
     def get_content(cls, path: str) -> bytes:
         url = settings.MIS_URL + path
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}

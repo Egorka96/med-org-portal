@@ -14,16 +14,16 @@ from rest_framework.test import APITestCase
 
 
 class TestWorkerDocuments(BaseRestTestCase, APITestCase):
-    permission = 'core.view_worker'
+    permission = 'core.view_workers_document'
 
     def generate_data(self):
         super().generate_data()
         self.url = reverse('core:rest_worker_documents')
         self.worker = models.Worker.objects.create(
             id=1,
-            last_name='Хищенко',
-            first_name='Влад',
-            middle_name='Андреевич',
+            last_name='Тестов',
+            first_name='Тест',
+            middle_name='Тестович',
             gender='Мужчина',
             birth=datetime.date(2001, 11, 6)
         )
@@ -50,9 +50,9 @@ class TestWorkerDocuments(BaseRestTestCase, APITestCase):
             worker_documents.append(document)
         return Worker(
             id=1,
-            last_name='Хищенко',
-            first_name='Влад',
-            middle_name='Андреевич',
+            last_name='Тестов',
+            first_name='Тест',
+            middle_name='Тестович',
             birth=datetime.date(2001, 11, 6),
             gender='Мужчина',
             org=Org(id=1, name='test'),

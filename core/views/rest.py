@@ -2,24 +2,27 @@ import dataclasses
 import json
 from copy import copy
 
+from django.http import HttpResponse
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from swutils.date import date_to_rus
+from swutils.string import transliterate
 
 from core.datatools.password import create_password
 from core import serializers, models
 from mis.law_item import LawItem
 from mis.org import Org
 from mis.worker import Worker
+from mis.document import Document
 
 
-class ViewWorkerPermission(BasePermission):
-    message = 'Просмотр сотрудника не разрешен'
+class ViewWorkerDocumentPermission(BasePermission):
+    message = 'Просмотр документов сотрудника не разрешен'
 
     def has_permission(self, request, view):
-        return request.user.has_perm('core.view_worker')
+        return request.user.has_perm('core.view_workers_document')
 
 
 class Orgs(APIView):
@@ -64,9 +67,49 @@ class Workers(APIView):
         return Response({'results': workers_dict})
 
 
+class DocumentsChoices(APIView):
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (ViewWorkerDocumentPermission, )
+
+    def get(self, request, *args, **kwargs):
+        serializer = serializers.Documents(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        choices = Document.get_choices(serializer.validated_data['search_params'])
+
+        results = []
+        available_doc_type_ids = self.request.user.core.available_document_type_ids.\
+            values_list('document_type_id', flat=True)
+        for item in choices:
+            if item['doc_type'].id not in available_doc_type_ids:
+                continue
+
+            item['doc_type'] = dataclasses.asdict(item['doc_type'])
+            results.append(item)
+
+        return Response(results)
+
+
+class DocumentPrint(APIView):
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (ViewWorkerDocumentPermission,)
+
+    def get(self, request, *args, **kwargs):
+        serializer = serializers.DocumentPrint(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        file_name = transliterate(serializer.validated_data['name']).replace('"', '').replace("'", '')
+        pdf_content = Document.get_content(path=serializer.validated_data['link'])
+
+        # сгенерируем HttpResponse-объект с pdf
+        response = HttpResponse(pdf_content, content_type="application/pdf")
+        response['Content-Disposition'] = f'filename={file_name}.pdf'
+        return response
+
+
 class WorkerDocuments(APIView):
     authentication_classes = (SessionAuthentication,)
-    permission_classes = (ViewWorkerPermission, )
+    permission_classes = (ViewWorkerDocumentPermission, )
 
     def get(self, request, *args, **kwargs):
         serializer = serializers.WorkerDocuments(data=request.query_params)

@@ -32,18 +32,22 @@
                     },
                     success: function (response) {
                         let workerDocumentBtn = $($.find(`[data-worker-id="${workerId}"]`))
+                        let workerFIO = workerDocumentBtn.data('worker-fio')
                         workerDocumentBtn.parents("div").children(".badge-loading").hide()
 
                         if (response.documents.length) {
                             let content = '<ul class="worker-documents-list">'
                             for (let i = 0; i < response.documents.length; i++) {
                                 let document = response.documents[i]
-                                content += `<li class="worker-documents-item">
-                                                <a href="/workers/documents/print/?worker_id=${response.worker_id}&document_link=${encodeURIComponent(document.document_link)}" target="_blank">
-                                                    ${document.document_type.name}
-                                                </a> 
-                                                <span class="help-block">${document.date}</span>
-                                            </li>`
+                                let fileName = encodeURIComponent(`${workerFIO} ${document.document_type.name}`)
+                                content += `
+                                    <li class="worker-documents-item">
+                                        <a href="/rest/documents/print/?link=${encodeURIComponent(document.document_link)}&name=${fileName}" target="_blank">
+                                            ${document.document_type.name}
+                                        </a> 
+                                        <span class="help-block">${document.date}</span>
+                                    </li>
+                                    `
                             }
                             content += "</ul>"
 
