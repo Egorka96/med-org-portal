@@ -161,18 +161,18 @@ class Direction:
         response_data = response.json()
 
         if response.status_code == 200:
-            success = True
+            description_id = response_data["id"]
             description = f'Направление успешно изменено.'
         elif response.status_code == 400:
-            success = False
+            description_id = None
             description = f'Ошибка редактирования направления: {response_data.get("error", response_data)}'
         elif response.status_code > 499:
-            success = False
+            description_id = None
             description = f'Невозможно изменить направление в МИС - ошибка на сервере МИС'
         else:
             raise Exception('Unexpected status code o_O')
 
-        return success, description
+        return description_id, description
 
     @classmethod
     def delete(cls, direction_id) -> Tuple[bool, str]:

@@ -147,7 +147,7 @@ class DirectionTests(TestCase):
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=400)
 
         params = self.get_direction_params()
-        expect_result = (False, f'Ошибка создания направления: {response_json["error"]}')
+        expect_result = (None, f'Ошибка создания направления: {response_json["error"]}')
 
         direction_result = Direction.create(params)
         self.assertEqual(direction_result, expect_result)
@@ -159,7 +159,7 @@ class DirectionTests(TestCase):
         mock_request.return_value = self.get_response(content=json.dumps(response_json), status_code=500)
 
         params = self.get_direction_params()
-        expect_result = (False, 'Невозможно создать направление в МИС - ошибка на сервере МИС')
+        expect_result = (None, 'Невозможно создать направление в МИС - ошибка на сервере МИС')
 
         direction_result = Direction.create(params)
         self.assertEqual(direction_result, expect_result)
@@ -197,7 +197,7 @@ class DirectionTests(TestCase):
         params = self.get_direction_params()
         params['last_name'] = 'Яковлев'
         direction_id = params['id']
-        expect_result = (False, f'Ошибка редактирования направления: {response_json["error"]}')
+        expect_result = (None, f'Ошибка редактирования направления: {response_json["error"]}')
 
         direction_result = Direction.edit(direction_id, params)
         self.assertEqual(direction_result, expect_result)
@@ -211,7 +211,7 @@ class DirectionTests(TestCase):
         params = self.get_direction_params()
         params['last_name'] = 'Яковлев'
         direction_id = params['id']
-        expect_result = (False, 'Невозможно изменить направление в МИС - ошибка на сервере МИС')
+        expect_result = (None, 'Невозможно изменить направление в МИС - ошибка на сервере МИС')
 
         direction_result = Direction.edit(direction_id, params)
         self.assertEqual(direction_result, expect_result)
