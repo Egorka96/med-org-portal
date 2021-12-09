@@ -78,5 +78,18 @@
       ]
     ]
   }
+},
+{
+  "model": "auth.group",
+  "fields": {
+    "name": "Просмотр документов сотрудников",
+    "permissions": [
+      [
+        "view_workers_document",
+        "core",
+        "worker"
+      ]
+    ]
+  }
 }
 ]

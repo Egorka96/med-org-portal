@@ -1,4 +1,5 @@
 {% extends 'core/base_list.html' %}
+{% load static %}
 {% load bootstrap4 %}
 {% load djutils %}
 
@@ -34,6 +35,14 @@
         .second-col {
             width: 150px;
             left: 30px;
+        }
+
+        .orders-documents-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .orders-documents-item {
+            margin-bottom: 5px;
         }
     </style>
 {% endblock %}
@@ -85,6 +94,7 @@
         <th>Вид аттестации</th>
         <th>Дата аттестации</th>
     {% endif %}
+    {% if show_documents %}<th>Документы</th>{% endif %}
     <th>Примечание</th>
 {% endblock %}
 
@@ -163,15 +173,26 @@
             {% endfor %}
         </td>
     {% endif %}
+    {% if show_documents %}
+        <td>
+            <span class="badge badge-secondary badge-loading" data-toggle="tooltip" title="Загрузка информации о документах по сотруднику" data-placement="left" data-container="body">
+                Загрузка...
+            </span>
+            <button type="button" class="btn btn-outline-secondary btn-sm order-documents-btn" style="display: none"
+                    data-document-orders-params="{% for o in object.prof %}prof={{ o.id }}&{% endfor %}{% for o in object.lmk %}lmk={{ o.id }}&{% endfor %}{% for o in object.certificate %}certificate={{ o.id }}&{% endfor %}{% for o in object.heal %}heal={{ o.id }}&{% endfor %}"
+                    data-client-fio="{{ object.client.fio }}"
+            >
+                <i class="fa fa-file-pdf-o"></i>
+            </button>
+        </td>
+    {% endif %}
     <td class="small">{{ object.prof.0.note }}</td>
 {% endblock %}
 
 {% block js %}
     {{ block.super }}
     <script>
-        $(".report-table").removeClass("table-striped table-hover")
-        $(".sortable").click(function () {
-            $("#loading").show()
-        })
+        let availableDocTypesCount = {{ request.user.core.available_document_type_ids.count }}
     </script>
+    <script src="{% static 'core/js/reports/workers_done.js' %}"></script>
 {% endblock %}
