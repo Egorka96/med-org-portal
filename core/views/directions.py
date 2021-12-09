@@ -1,6 +1,7 @@
 import dataclasses
 import datetime
 import json
+import logging
 import os
 import tempfile
 
@@ -12,6 +13,7 @@ from django.core.files import File
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
+import sw_logger.consts
 from docx.shared import Mm
 
 from mis.direction import Direction
@@ -24,6 +26,9 @@ import core.generic.views
 import core.datatools.barcode
 
 from core import forms, models
+
+
+logger = logging.getLogger('db')
 
 
 class Search(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
@@ -151,12 +156,23 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
 
     def form_valid(self, form):
         if self.kwargs.get(self.pk_url_kwarg):
-            success, description = Direction.edit(direction_id=self.kwargs[self.pk_url_kwarg], params=form.cleaned_data)
+            direction_id, description = Direction.edit(direction_id=self.kwargs[self.pk_url_kwarg], params=form.cleaned_data)
         else:
-            success, description = Direction.create(params=form.cleaned_data)
+            direction_id, description = Direction.create(params=form.cleaned_data)
 
-        if success:
+        if direction_id:
             messages.success(self.request, description)
+            is_update = self.kwargs.get('pk')
+            logger.info(
+                'Направление обновлено' if is_update else 'Напраавление создано',
+                extra={
+                    'action': sw_logger.consts.ACTION_UPDATED
+                              if is_update else sw_logger.consts.ACTION_CREATED,
+                    'request': self.request,
+                    'object_id': direction_id,
+                    'object_name': 'direction', #todo: Убраь после добовления модели
+                }
+            )
         else:
             messages.error(self.request, description)
             return self.form_invalid(form)

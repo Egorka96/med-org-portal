@@ -95,7 +95,7 @@ class Direction:
         return direction
 
     @classmethod
-    def create(cls, params) -> Tuple[bool, str]:
+    def create(cls, params) -> Tuple[int, str]:
         url = settings.MIS_URL + '/api/pre_record/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
 
@@ -124,21 +124,21 @@ class Direction:
         response_data = response.json()
 
         if response.status_code == 201:
-            success = True
+            description_id = response_data["id"]
             description = f'Направление создано: Номер {response_data["id"]}'
         elif response.status_code == 400:
-            success = False
+            description_id = None
             description = f'Ошибка создания направления: {response_data["error"]}'
         elif response.status_code > 499:
-            success = False
+            description_id = None
             description = f'Невозможно создать направление в МИС - ошибка на сервере МИС'
         else:
             raise Exception('Unexpected status code o_O')
 
-        return success, description
+        return description_id, description
 
     @classmethod
-    def edit(cls, direction_id, params) -> Tuple[bool, str]:
+    def edit(cls, direction_id, params) -> Tuple[int, str]:
         url = settings.MIS_URL + f'/api/pre_record/{direction_id}/'
         headers = {
             'Authorization': f'Token {settings.MIS_TOKEN}',

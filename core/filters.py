@@ -2,6 +2,7 @@ import json
 
 import django_filters
 from django.contrib.auth import get_user_model
+import sw_logger.filters
 
 from core import models
 
@@ -50,3 +51,10 @@ class Worker(django_filters.FilterSet):
         if value:
             qs = qs.filter(worker_orgs__end_work_date__isnull=int(value))
         return qs
+
+
+class Log(sw_logger.filters.Log):
+    object_name = django_filters.MultipleChoiceFilter(choices=sw_logger.tools.get_models_choices())
+
+    class Meta(sw_logger.filters.Log.Meta):
+        fields = '__all__'

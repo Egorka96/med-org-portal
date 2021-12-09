@@ -8,6 +8,7 @@ django-bootstrap4==3.0.0
 requests==2.26.0
 psycopg2-binary==2.8.6
 sw-django-utils==0.0.53
+sw-django-logger==0.0.16
 openpyxl==3.0.7
 python-dateutil==2.8.1
 docxtpl==0.11.5
