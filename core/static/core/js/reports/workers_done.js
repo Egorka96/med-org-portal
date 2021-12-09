@@ -1,5 +1,8 @@
 (function () {
     $(".report-table").removeClass("table-striped table-hover")
+    $(".sortable").click(function () {
+        $("#loading").show()
+    })
 
     let ordersParams = $.map($('.order-documents-btn'), function (btn) {
         return $(btn).data('document-orders-params')
