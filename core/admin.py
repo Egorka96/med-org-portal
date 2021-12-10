@@ -29,3 +29,10 @@ admin.site.register(models.DirectionDocxTemplate)
 admin.site.register(models.Status)
 admin.site.unregister(DjangoUserModel)
 admin.site.register(DjangoUserModel, ExtendedUser)
+
+
+@admin.register(models.Log)
+class Log(admin.ModelAdmin):
+    search_fields = ('username', 'object_id')
+    list_display = ('message', 'created', 'object_name', 'object_id', 'username')
+    list_filter = ('created', 'username', 'object_name')

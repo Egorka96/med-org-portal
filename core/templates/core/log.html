@@ -1,0 +1,98 @@
+{% extends 'core/base_list.html' %}
+{% load bootstrap4 %}
+{% load djutils %}
+
+{% block form %}
+    {% bootstrap_form_errors form %}
+    <div class="row">
+        <div class="col-4">
+
+            <div class="form-group row">
+                <div class="col-md-3 col-form-label">{% bootstrap_label form.from_date.label %}</div>
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-sm-6">{% bootstrap_field form.from_date show_label=False %}</div>
+                        <div class="col-sm-6">{% bootstrap_field form.from_time show_label=False %}</div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="form-group row">
+                <div class="col-md-3 col-form-label">{% bootstrap_label form.to_date.label %}</div>
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-sm-6">{% bootstrap_field form.to_date show_label=False %}</div>
+                        <div class="col-sm-6">{% bootstrap_field form.to_time show_label=False %}</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-4">
+             {% bootstrap_field form.object_name layout='horizontal' %}
+             {% bootstrap_field form.object_id layout='horizontal' %}
+             {% bootstrap_field form.message layout='horizontal' %}
+        </div>
+        <div class="col-4">
+             {% bootstrap_field form.level layout='horizontal' %}
+             {% bootstrap_field form.action layout='horizontal' %}
+             {% bootstrap_field form.user_id layout='horizontal' %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block table_head %}
+    <th>#</th>
+    <th>Объект</th>
+    <th>Вид объекта</th>
+    <th>Сообщение</th>
+    <th>Изменения</th>
+    <th>Время</th>
+    <th>Пользователь</th>
+    <th>Уровень</th>
+{% endblock %}
+
+{% block tbody %}
+    {% for object in page_obj|default:object_list %}
+        <tr class="
+            {% if object.action == 'created' %}table-info
+            {% elif object.action == 'deleted' %}table-danger
+            {% elif object.action == 'updated' %}table-warning
+            {% endif %}
+        ">
+            <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td>
+                {% with object.get_model_object as log_object %}
+                    {%if log_object.get_detail_url %}
+                        <a href="{{ log_object.get_detail_url }}?next={{ request.get_full_path|urlencode }}">{{ log_object }}</a>
+                    {%else %}
+                        {{ log_object }}
+                    {% endif %}
+                {% endwith %}
+            </td>
+            <td>{{ object.object_name }}</td>
+            <td>{{ object.message }}</td>
+            <td>
+                {% for key, value in object.get_changes.items %}
+                     <li>
+                         <b>{{ key }}:</b>
+                         {{ value| default:' ' }}<br/>
+                    </li>
+                {% endfor %}
+            </td>
+            <td>{{ object.created }}</td>
+            <td>{{ object.get_user }}</td>
+            <td>
+                {% if object.level == 'INFO' %}
+                    <span class="badge badge-primary">{{ object.level }}</span>
+                {% elif object.level == 'ERROR' or object.level == 'CRITICAL' %}
+                    <span class="badge badge-danger">{{ object.level }}</span>
+                {% elif object.level == 'WARNING' %}
+                    <span class="badge badge-warning">{{ object.level }}</span>
+                {% else %}
+                    <span class="badge badge-secondary">{{ object.level }}</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock tbody %}

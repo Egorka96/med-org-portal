@@ -5,6 +5,7 @@ from core.views import user
 from core.views import worker
 from core.views import reports
 from core.views import directions
+from core.views import log
 from core.views import rest
 
 app_name = 'core'
@@ -19,6 +20,8 @@ urlpatterns = [
 
     path('workers/', worker.Search.as_view(), name='workers'),
     path('reports/workers_done_report/', reports.WorkersDoneReport.as_view(), name='workers_done_report'),
+
+    path('log/', log.Log.as_view(), name='log'),
 
     path('directions/', directions.Search.as_view(), name='direction_list'),
     path('directions/add/', directions.Edit.as_view(), name='direction_add'),
@@ -35,5 +38,5 @@ urlpatterns = [
     path('rest/generate_password/', rest.GeneratePasswordView.as_view(), name='rest_generate_password'),
 
     path('password_change_required/', login.PasswordChangeRequired.as_view(), name='password_change_required'),
-    path('password_forgot/', login.PasswordForgot.as_view(), name='password_forgot')
+    path('password_forgot/', login.PasswordForgot.as_view(), name='password_forgot'),
 ]

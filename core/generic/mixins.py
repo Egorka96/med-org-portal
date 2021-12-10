@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import tempfile
@@ -5,6 +6,7 @@ from typing import Optional, List, Dict
 from urllib.parse import quote
 
 import jinja2
+import sw_logger.consts
 from django.conf import settings
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -23,6 +25,9 @@ import background_tasks.models
 
 from core.templatetags.custom_tags import get_jinja_filters
 from mis.service_client import Mis
+
+
+logger = logging.getLogger('db')
 
 
 class RestPaginator(Paginator):
@@ -130,6 +135,35 @@ class FormMixin(DjangoFormMixin):
         }
 
         return kwargs
+
+    def post(self, request, *args, **kwargs):
+        if hasattr(super(), 'post'):
+            form = self.get_form()
+            if form.is_valid():
+                response = self.form_valid(form)
+                self.log(form)
+                return response
+            else:
+                return self.form_invalid(form)
+
+    def log(self, form):
+        if hasattr(form, 'instance') and hasattr(form.instance, 'LOG_NAME'):
+            is_update = self.kwargs.get('pk')
+            logger.info(
+                self.get_log_message(is_update),
+                extra=self.get_log_extra(form, is_update)
+            )
+
+    def get_log_message(self, is_update):
+        return 'Объект обновлен' if is_update else 'Объект создан'
+
+    def get_log_extra(self, form, is_update):
+        return {
+            'action': sw_logger.consts.ACTION_UPDATED
+                    if is_update else sw_logger.consts.ACTION_CREATED,
+            'request': self.request,
+            'object': form.instance,
+        }
 
 
 class BreadcrumbsMixin(ContextMixin):

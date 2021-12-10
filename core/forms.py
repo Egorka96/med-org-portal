@@ -11,6 +11,7 @@ from mis.org import Org
 from mis.service_client import Mis
 from mis.pay_method import PayMethod as MisPayMethod
 from mis.document import DocumentType as MisDocumentType
+import sw_logger.forms
 
 User = get_user_model()
 
@@ -381,3 +382,48 @@ class PasswordForgotForm(forms.Form):
             raise forms.ValidationError(err_msg)
 
         return value
+
+
+class Log(sw_logger.forms.Log):
+    from_date = RusDateField(label='С', required=False)
+    from_time = forms.TimeField(label='время с', required=False)
+    to_date = RusDateField(label='По', required=False)
+    to_time = forms.TimeField(label=' время по', required=False)
+
+    action = forms.MultipleChoiceField(label='Действие', required=False, choices=sw_logger.consts.ACTION_CHOICES,
+                                       widget=forms.SelectMultiple(attrs={'class': 'need-select2'}))
+    level = forms.MultipleChoiceField(label='Уровень', required=False, choices=sw_logger.consts.LOG_LEVEL_CHOICES,
+                                      widget=forms.SelectMultiple(attrs={'class': 'need-select2'}))
+    user_id = forms.ChoiceField(label='Пользователь', choices=(), required=False)
+
+    object_id = forms.IntegerField(label='ID объекта', required=False)
+    object_name = forms.MultipleChoiceField(label='Объект', required=False,
+                                            widget=forms.SelectMultiple(attrs={'class': 'need-select2'}),
+                                            choices=sw_logger.tools.get_models_choices())
+    message = forms.CharField(label='Сообщение', required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['datetime_from'].required = self.fields['datetime_to'].required = False
+
+        user_choices = [(u.id, getattr(u, 'core', u.username)) for u in models.DjangoUser.objects.all()]
+        self.fields['user_id'].choices = [('', '')] + user_choices
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        from_date = cleaned_data.get('from_date')
+        to_date = cleaned_data.get('to_date')
+        from_time = cleaned_data.get('from_time') or datetime.time(0, 0)
+        to_time = cleaned_data.get('to_time') or datetime.time(23, 59, 59)
+
+        if from_date and from_time:
+            df_from = datetime.datetime.combine(from_date, from_time)
+            cleaned_data['datetime_from'] = df_from
+
+        if to_date and to_time:
+            dt_to = datetime.datetime.combine(to_date, to_time)
+            cleaned_data['datetime_to'] = dt_to
+
+        return cleaned_data

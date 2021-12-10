@@ -2,8 +2,10 @@ import json
 from typing import List
 
 import djutils.models
+import sw_logger.models
 from django.db import models
 from django.contrib.auth.models import User as DjangoUser
+from sw_logger.tools import get_model_by_log_name
 from core import consts
 
 from mis.document import DocumentType
@@ -161,3 +163,16 @@ class DirectionDocxTemplate(models.Model):
             return []
 
         return [Org.get(org_id=org_id) for org_id in json.loads(self.org_ids)]
+
+
+class Log(sw_logger.models.Log):
+
+    class Meta:
+        ordering = ('id',)
+        verbose_name = 'Запись в журнале'
+        verbose_name_plural = 'Журнал'
+
+    def get_model_object(self, include_deleted=True):
+        model = get_model_by_log_name(self.object_name)
+        manager = 'standard_objects' if hasattr(model, 'standard_objects') and include_deleted else 'objects'
+        return getattr(model, manager).filter(id=self.object_id).first()
