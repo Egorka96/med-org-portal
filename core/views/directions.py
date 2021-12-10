@@ -164,7 +164,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             messages.success(self.request, description)
             is_update = self.kwargs.get('pk')
             logger.info(
-                'Направление обновлено' if is_update else 'Напраавление создано',
+                'Направление обновлено' if is_update else 'Направление создано',
                 extra={
                     'action': sw_logger.consts.ACTION_UPDATED
                               if is_update else sw_logger.consts.ACTION_CREATED,

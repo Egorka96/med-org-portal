@@ -23,6 +23,8 @@ urlpatterns = [
 
     path('reports/workers_done_report/', reports.WorkersDoneReport.as_view(), name='workers_done_report'),
 
+    path('log/', log.Log.as_view(), name='log'),
+
     path('directions/', directions.Search.as_view(), name='direction_list'),
     path('directions/add/', directions.Edit.as_view(), name='direction_add'),
     path('directions/<int:number>/', directions.Edit.as_view(), name='direction_edit'),
@@ -37,6 +39,4 @@ urlpatterns = [
 
     path('password_change_required/', login.PasswordChangeRequired.as_view(), name='password_change_required'),
     path('password_forgot/', login.PasswordForgot.as_view(), name='password_forgot'),
-
-    path('log/', log.Log.as_view(), name='log'),
 ]

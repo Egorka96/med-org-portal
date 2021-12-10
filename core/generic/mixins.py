@@ -136,6 +136,16 @@ class FormMixin(DjangoFormMixin):
 
         return kwargs
 
+    def post(self, request, *args, **kwargs):
+        if hasattr(super(), 'post'):
+            form = self.get_form()
+            if form.is_valid():
+                response = self.form_valid(form)
+                self.log(form)
+                return response
+            else:
+                return self.form_invalid(form)
+
     def log(self, form):
         if hasattr(form, 'instance') and hasattr(form.instance, 'LOG_NAME'):
             is_update = self.kwargs.get('pk')

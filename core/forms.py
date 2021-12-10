@@ -407,7 +407,7 @@ class Log(sw_logger.forms.Log):
 
         self.fields['datetime_from'].required = self.fields['datetime_to'].required = False
 
-        user_choices = [(u.id, getattr(u, 'pre_reg', u.username)) for u in models.DjangoUser.objects.all()]
+        user_choices = [(u.id, getattr(u, 'core', u.username)) for u in models.DjangoUser.objects.all()]
         self.fields['user_id'].choices = [('', '')] + user_choices
 
     def clean(self):
