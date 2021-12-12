@@ -57,8 +57,8 @@
                                 title: `Скачать "${document.doc_type.name}"`
                             })
                         }
+                        ordersDocumentBtn.show()
                     }
-                    ordersDocumentBtn.show()
                     loadOrdersDocuments()
                 }
             }).fail(function (response) {
