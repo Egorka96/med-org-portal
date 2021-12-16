@@ -142,6 +142,42 @@ class WorkerOrganization(models.Model):
         verbose_name_plural = 'Сотрудники организации'
 
 
+class Direction(models.Model):
+    EXAM_TYPE_CHOICE = [
+        ('Предварительный', 'Предварительный'),
+        ('Периодический', 'Периодический'),
+        ('Внеочередной', 'Внеочередной')
+    ]
+
+    worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Сотрудник', related_name='worker_directions')
+    mis_id = models.IntegerField(verbose_name='МИС id', unique=True, null=True)
+    insurance_policy = models.CharField(verbose_name='Cтраховой полис', max_length=255, blank=True)
+    org_id = models.IntegerField(verbose_name='Организация id', null=True, blank=True)
+    post = models.CharField(verbose_name='Должность', blank=True, max_length=255,)
+    shop = models.CharField(verbose_name='Подразделение', blank=True, max_length=255,)
+    exam_type = models.CharField(verbose_name='Вид осмотра', choices=EXAM_TYPE_CHOICE, max_length=255)
+    pay_method = models.CharField(verbose_name='Cпособ оплаты', max_length=255,)
+
+    class Meta:
+        verbose_name = 'Направление'
+        verbose_name_plural = 'Направление'
+
+    def __str__(self):
+        return f'Направление №{self.mis_id}'
+
+
+class DirectionLawItem(models.Model):
+    direction = models.ForeignKey(Direction, on_delete=models.PROTECT, verbose_name='Направление',)
+    law_item_mis_id = models.CharField(verbose_name='Пункты приказа', max_length=255,)
+
+    class Meta:
+        verbose_name = 'Пункты приказа'
+        verbose_name_plural = 'Пункты приказа'
+
+    def __str__(self):
+        return f'Пункт приказа {self.direction}'
+
+
 class DirectionDocxTemplate(models.Model):
     name = models.CharField('Название', max_length=255, unique=True)
     description = models.TextField('Описание', blank=True)

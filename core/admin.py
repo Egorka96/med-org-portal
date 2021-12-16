@@ -31,6 +31,18 @@ admin.site.unregister(DjangoUserModel)
 admin.site.register(DjangoUserModel, ExtendedUser)
 
 
+@admin.register(models.Direction)
+class Direction(admin.ModelAdmin):
+    list_display = ('worker', 'mis_id', 'org_id', 'post', 'shop')
+    search_fields = ('worker', 'mis_id')
+
+
+@admin.register(models.DirectionLawItem)
+class Direction(admin.ModelAdmin):
+    list_display = ('direction', 'law_item_mis_id')
+    search_fields = ('direction', 'law_item_mis_id')
+
+
 @admin.register(models.Log)
 class Log(admin.ModelAdmin):
     search_fields = ('username', 'object_id')
