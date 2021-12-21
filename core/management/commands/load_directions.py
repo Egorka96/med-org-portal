@@ -88,52 +88,52 @@ class Command(BaseCommand):
 
         response = mis.direction.Direction.filter(params)
 
-        for mis_derection in response:
+        for mis_direction in response:
             if options.get('verbosity'):
-                print(f'Направление: №{mis_derection.number}')
+                print(f'Направление: №{mis_direction.number}')
 
-                worker, created = models.Worker.objects.get_or_create(
-                    last_name=mis_derection.last_name,
-                    first_name=mis_derection.first_name,
-                    birth=mis_derection.birth,
-                    middle_name=mis_derection.middle_name,
-                    defaults={
-                        'gender': mis_derection.gender
-                    }
-                )
-                if not created:
-                    worker.gender = mis_derection.gender
-                    worker.save()
-
-                dict_direction = {
-                    'post': mis_derection.post,
-                    'shop': mis_derection.shop,
-                    'exam_type': mis_derection.exam_type,
+            worker, created = models.Worker.objects.get_or_create(
+                last_name=mis_direction.last_name,
+                first_name=mis_direction.first_name,
+                birth=mis_direction.birth,
+                middle_name=mis_direction.middle_name,
+                defaults={
+                    'gender': mis_direction.gender
                 }
-                if mis_derection.pay_method:
-                    dict_direction['pay_method'] = mis_derection.pay_method.id
-                if mis_derection.insurance_policy:
-                    dict_direction['insurance_policy'] = mis_derection.insurance_policy.number
-                if mis_derection.org:
-                    dict_direction['org_id'] = mis_derection.org.id
+            )
+            if not created:
+                worker.gender = mis_direction.gender
+                worker.save()
 
-                direction, created = models.Direction.objects.get_or_create(
-                    worker=worker,
-                    mis_id=mis_derection.number,
-                    defaults=dict_direction
+            dict_direction = {
+                'post': mis_direction.post,
+                'shop': mis_direction.shop,
+                'exam_type': mis_direction.exam_type,
+            }
+            if mis_direction.pay_method:
+                dict_direction['pay_method'] = mis_direction.pay_method.id
+            if mis_direction.insurance_policy:
+                dict_direction['insurance_policy'] = mis_direction.insurance_policy.number
+            if mis_direction.org:
+                dict_direction['org_id'] = mis_direction.org.id
+
+            direction, created = models.Direction.objects.get_or_create(
+                worker=worker,
+                mis_id=mis_direction.number,
+                defaults=dict_direction
+            )
+            if not created:
+                models.Direction.objects\
+                    .filter(id=direction.id)\
+                    .update(**dict_direction)
+
+            list_law_items_ids = []
+            for law_item in mis_direction.law_items:
+                obj, _ = models.DirectionLawItem.objects.get_or_create(
+                    direction=direction,
+                    law_item_mis_id=law_item.id
                 )
-                if not created:
-                    models.Direction.objects\
-                        .filter(id=direction.id)\
-                        .update(**dict_direction)
-
-                list_law_items_ids = []
-                for law_item in mis_derection.law_items:
-                    obj, _ = models.DirectionLawItem.objects.get_or_create(
-                        direction=direction,
-                        law_item_mis_id=law_item.name
-                    )
-                    list_law_items_ids.append(obj.id)
-                models.DirectionLawItem.objects\
-                    .filter(direction=direction)\
-                    .exclude(id__in=list_law_items_ids).delete()
+                list_law_items_ids.append(obj.id)
+            models.DirectionLawItem.objects\
+                .filter(direction=direction)\
+                .exclude(id__in=list_law_items_ids).delete()

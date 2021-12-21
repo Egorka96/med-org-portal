@@ -62,7 +62,7 @@ class Direction:
             to_date=iso_to_date(data['date_to']),
             org=Org.get_from_dict(data=data['org']) if data.get('org') else None,
             pay_method=PayMethod.get_from_dict(data=data['pay_method'])
-                            if data.get('pay_method') else None,
+                        if data.get('pay_method') else None,
             exam_type=data['exam_type'],
             post=data['post'],
             shop=data['shop'],
