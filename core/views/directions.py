@@ -182,7 +182,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             )
         else:
             direction_id, description = Direction.edit(
-                direction_id=self.kwargs[self.pk_url_kwarg],
+                direction_id=pk_url_kwarg,
                 params=form.cleaned_data
             )
             models.Direction.objects.filter(mis_id=direction_id).update(
@@ -201,14 +201,10 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
                 law_item_mis_id=law_item,
             )
             list_law_items_ids.append(obj.id)
-
-        direction_law_item_ids = models.DirectionLawItem.objects\
+        models.DirectionLawItem.objects\
             .filter(direction=direction_obj)\
-            .values_list('id', flat=True)
-        delete_list_ids = [i for i in direction_law_item_ids if not(i in list_law_items_ids)]
-
-        for direction_law_item in delete_list_ids:
-            models.DirectionLawItem.objects.filter(id=direction_law_item).delete()
+            .exclude(id__in=list_law_items_ids)\
+            .delete()
 
         if direction_id:
             messages.success(self.request, description)

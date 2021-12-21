@@ -14,6 +14,14 @@ class PayMethod:
         return self.name
 
     @classmethod
+    def get_from_dict(cls, data: dict) -> 'PayMethod':
+        return cls(
+            id=data['id'],
+            name=data['name'],
+            type=data['type']
+        )
+
+    @classmethod
     def filter(cls) -> List['PayMethod']:
         url = settings.MIS_URL + f'/api/pay_methods/'
         headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
@@ -22,9 +30,5 @@ class PayMethod:
 
         pay_methods = []
         for item in response.json():
-            pay_methods.append(cls(
-                id=item['id'],
-                name=item['name'],
-                type=item['type'],
-            ))
+            pay_methods.append(cls.get_from_dict(item))
         return pay_methods

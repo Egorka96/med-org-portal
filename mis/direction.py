@@ -11,6 +11,7 @@ from mis.insurance_policy import InsurancePolicy
 
 from mis.law_item import LawItem
 from mis.org import Org
+from mis.pay_method import PayMethod
 from mis.service_client import Mis
 
 
@@ -31,7 +32,7 @@ class Direction:
     post: str = None
     shop: str = None
     law_items: List[LawItem] = None
-    pay_method: dict = None
+    pay_method: PayMethod = None
     confirm_date: datetime.date = None
     insurance_policy: InsurancePolicy = None
 
@@ -60,7 +61,8 @@ class Direction:
             from_date=iso_to_date(data['date_from']),
             to_date=iso_to_date(data['date_to']),
             org=Org.get_from_dict(data=data['org']) if data.get('org') else None,
-            pay_method=data['pay_method'],
+            pay_method=PayMethod.get_from_dict(data=data['pay_method'])
+                            if data.get('pay_method') else None,
             exam_type=data['exam_type'],
             post=data['post'],
             shop=data['shop'],
@@ -82,11 +84,20 @@ class Direction:
         return response_json
 
     @classmethod
-    def filter(cls, params: Dict = None) -> List['Direction']:
-        directions = []
-        for item in Mis().request(path='/api/pre_record/', params=params)['results']:
-            directions.append(cls.dict_to_obj(item))
-        return directions
+    def filter(cls, params: Dict = None, user: 'core.models.DjangoUser' = None) -> List['Direction']:
+        derections = []
+        page = 1
+
+        while True:
+            params['page'] = page
+            response_json = Mis().request(path='/api/pre_record/', params=params, user=user)
+            for item in response_json['results']:
+                derections.append(cls.dict_to_obj(item))
+            if not response_json.get('next'):
+                break
+            page += 1
+
+        return derections
 
     @classmethod
     def get(cls, direction_id) -> 'Direction':

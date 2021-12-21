@@ -24,6 +24,7 @@ def docx_file_extension(value):
 
 class Status(djutils.models.OneValueModel):
     WORKER_LOAD_TIME = 'worker_load_time'
+    DIRECTION_LOAD_TIME = 'direction_load_time'
 
     class Meta:
         verbose_name = 'Статус'
@@ -156,7 +157,7 @@ class Direction(models.Model):
     post = models.CharField(verbose_name='Должность', blank=True, max_length=255,)
     shop = models.CharField(verbose_name='Подразделение', blank=True, max_length=255,)
     exam_type = models.CharField(verbose_name='Вид осмотра', choices=EXAM_TYPE_CHOICE, max_length=255)
-    pay_method = models.CharField(verbose_name='Cпособ оплаты', max_length=255,)
+    pay_method = models.IntegerField(verbose_name='Cпособ оплаты', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Направление'
