@@ -29,6 +29,13 @@ admin.site.register(models.DirectionDocxTemplate)
 admin.site.register(models.Status)
 admin.site.unregister(DjangoUserModel)
 admin.site.register(DjangoUserModel, ExtendedUser)
+admin.site.register(models.DirectionLawItem)
+
+
+@admin.register(models.Direction)
+class Direction(admin.ModelAdmin):
+    list_display = ('worker', 'mis_id', 'org_id', 'post', 'shop')
+    search_fields = ('worker', 'mis_id')
 
 
 @admin.register(models.Log)

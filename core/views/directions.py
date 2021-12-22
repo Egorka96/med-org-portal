@@ -139,9 +139,10 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         return kwargs
 
     def get_object(self):
-        object_pk = self.kwargs.get(self.pk_url_kwarg)
-        if object_pk:
-            self.object = Direction.get(direction_id=object_pk)
+        if not getattr(self, 'object', None):
+            object_pk = self.kwargs.get(self.pk_url_kwarg)
+            if object_pk:
+                self.object = Direction.get(direction_id=object_pk)
 
         return self.object
 
@@ -155,10 +156,55 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        if self.kwargs.get(self.pk_url_kwarg):
-            direction_id, description = Direction.edit(direction_id=self.kwargs[self.pk_url_kwarg], params=form.cleaned_data)
-        else:
+        obj_id = self.kwargs.get(self.pk_url_kwarg)
+        worker, _ = models.Worker.objects.get_or_create(
+            last_name=form.cleaned_data.get('last_name'),
+            first_name=form.cleaned_data.get('first_name'),
+            middle_name=form.cleaned_data.get('middle_name'),
+            birth=form.cleaned_data.get('birth'),
+            gender=form.cleaned_data.get('gender'),
+        )
+        direction_dict = {
+            'worker': worker,
+            'insurance_policy': form.cleaned_data.get('insurance_number'),
+            'org_id': form.cleaned_data.get('org'),
+            'post': form.cleaned_data.get('post'),
+            'shop': form.cleaned_data.get('shop'),
+            'exam_type': form.cleaned_data.get('exam_type'),
+            'pay_method': form.cleaned_data.get('pay_method')
+        }
+
+        if not obj_id:
             direction_id, description = Direction.create(params=form.cleaned_data)
+            models.Direction.objects.create(
+                mis_id=direction_id,
+                **direction_dict
+            )
+        else:
+            direction_id, description = Direction.edit(
+                direction_id=obj_id,
+                params=form.cleaned_data
+            )
+            models.Direction.objects.filter(mis_id=direction_id).update(
+                **direction_dict
+            )
+
+        list_law_items = []
+        for field_name in ('law_items_302_section_1', 'law_items_302_section_2', 'law_items_29'):
+            list_law_items.extend(form.cleaned_data.get(field_name, []))
+
+        direction_obj = models.Direction.objects.get(mis_id=direction_id)
+        list_law_items_ids = []
+        for law_item in list_law_items:
+            obj, _ = models.DirectionLawItem.objects.get_or_create(
+                direction=direction_obj,
+                law_item_mis_id=law_item,
+            )
+            list_law_items_ids.append(obj.id)
+        models.DirectionLawItem.objects\
+            .filter(direction=direction_obj)\
+            .exclude(id__in=list_law_items_ids)\
+            .delete()
 
         if direction_id:
             messages.success(self.request, description)
@@ -169,8 +215,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
                     'action': sw_logger.consts.ACTION_UPDATED
                               if is_update else sw_logger.consts.ACTION_CREATED,
                     'request': self.request,
-                    'object_id': direction_id,
-                    'object_name': 'direction', #todo: Убраь после добовления модели
+                    'object': direction_obj,
                 }
             )
         else:
@@ -216,13 +261,16 @@ class Delete(PermissionRequiredMixin, core.generic.views.DeleteView):
         ]
 
     def delete(self, *args, **kwargs):
-        success, description = Direction.delete(direction_id=self.kwargs.get(self.pk_url_kwarg))
+        pk_url_kwarg = self.kwargs.get(self.pk_url_kwarg)
+        success, description = Direction.delete(direction_id=pk_url_kwarg)
 
         if success:
             messages.success(self.request, description)
         else:
             messages.error(self.request, description)
             return self.render_to_response(self.get_context_data())
+
+        models.Direction.objects.filter(id=pk_url_kwarg).delete()
 
         return redirect(self.success_url)
 

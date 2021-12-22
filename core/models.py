@@ -7,6 +7,7 @@ from django.db import models
 from django.contrib.auth.models import User as DjangoUser
 from sw_logger.tools import get_model_by_log_name
 from core import consts
+from django.urls import reverse
 
 from mis.document import DocumentType
 from mis.org import Org
@@ -24,6 +25,7 @@ def docx_file_extension(value):
 
 class Status(djutils.models.OneValueModel):
     WORKER_LOAD_TIME = 'worker_load_time'
+    DIRECTION_LOAD_TIME = 'direction_load_time'
 
     class Meta:
         verbose_name = 'Статус'
@@ -140,6 +142,46 @@ class WorkerOrganization(models.Model):
     class Meta:
         verbose_name = 'Сотрудник организации'
         verbose_name_plural = 'Сотрудники организации'
+
+
+class Direction(models.Model):
+    LOG_NAME = 'Направление'
+    EXAM_TYPE_CHOICE = [
+        ('Предварительный', 'Предварительный'),
+        ('Периодический', 'Периодический'),
+        ('Внеочередной', 'Внеочередной')
+    ]
+
+    worker = models.ForeignKey(Worker, on_delete=models.PROTECT, verbose_name='Сотрудник', related_name='worker_directions')
+    mis_id = models.IntegerField(verbose_name='МИС id', unique=True, null=True)
+    insurance_policy = models.CharField(verbose_name='Cтраховой полис', max_length=255, blank=True)
+    org_id = models.IntegerField(verbose_name='Организация id', null=True, blank=True)
+    post = models.CharField(verbose_name='Должность', blank=True, max_length=255,)
+    shop = models.CharField(verbose_name='Подразделение', blank=True, max_length=255,)
+    exam_type = models.CharField(verbose_name='Вид осмотра', choices=EXAM_TYPE_CHOICE, max_length=255)
+    pay_method = models.IntegerField(verbose_name='Cпособ оплаты', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Направление'
+        verbose_name_plural = 'Направление'
+
+    def __str__(self):
+        return f'Направление №{self.mis_id}'
+
+    def get_detail_url(self):
+        return reverse('core:direction_edit', kwargs={'number': self.mis_id})
+
+
+class DirectionLawItem(models.Model):
+    direction = models.ForeignKey(Direction, on_delete=models.PROTECT, verbose_name='Направление',)
+    law_item_mis_id = models.CharField(verbose_name='Пункты приказа', max_length=255,)
+
+    class Meta:
+        verbose_name = 'Пункты приказа в направлении'
+        verbose_name_plural = 'Пункты приказа в направлении'
+
+    def __str__(self):
+        return f'Пункт приказа {self.direction}'
 
 
 class DirectionDocxTemplate(models.Model):
