@@ -20,8 +20,9 @@ class Migration(migrations.Migration):
                 ('post', models.CharField(blank=True, max_length=255, verbose_name='Должность')),
                 ('shop', models.CharField(blank=True, max_length=255, verbose_name='Подразделение')),
                 ('exam_type', models.CharField(choices=[('Предварительный', 'Предварительный'), ('Периодический', 'Периодический'), ('Внеочередной', 'Внеочередной')], max_length=255, verbose_name='Вид осмотра')),
-                ('pay_method', models.CharField(max_length=255, verbose_name='Cпособ оплаты')),
+                ('pay_method', models.IntegerField(blank=True, null=True, verbose_name='Cпособ оплаты')),
                 ('worker', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='worker_directions', to='core.worker', verbose_name='Сотрудник')),
+                ('mis_id', models.IntegerField(blank=True, null=True, verbose_name='МИС id'))
             ],
         ),
         migrations.CreateModel(
@@ -31,5 +32,13 @@ class Migration(migrations.Migration):
                 ('law_item_mis_id', models.CharField(max_length=255, verbose_name='Пункты приказа')),
                 ('direction', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.direction', verbose_name='Направление')),
             ],
+        ),
+        migrations.AlterModelOptions(
+            name='direction',
+            options={'verbose_name': 'Направление', 'verbose_name_plural': 'Направление'},
+        ),
+        migrations.AlterModelOptions(
+            name='directionlawitem',
+            options={'verbose_name': 'Пункты приказа в направлении', 'verbose_name_plural': 'Пункты приказа в направлении'},
         ),
     ]
