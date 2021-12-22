@@ -215,8 +215,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
                     'action': sw_logger.consts.ACTION_UPDATED
                               if is_update else sw_logger.consts.ACTION_CREATED,
                     'request': self.request,
-                    'object_id': direction_id,
-                    'object_name': 'direction', #todo: Убраь после добовления модели
+                    'object': direction_obj,
                 }
             )
         else:

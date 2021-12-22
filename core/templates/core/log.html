@@ -44,7 +44,6 @@
 {% block table_head %}
     <th>#</th>
     <th>Объект</th>
-    <th>Вид объекта</th>
     <th>Сообщение</th>
     <th>Изменения</th>
     <th>Время</th>
@@ -62,7 +61,7 @@
         ">
             <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
             <td>
-                {% with object.get_model_object as log_object %}
+                {% with object.get_model_object|default:' ' as log_object %}
                     {%if log_object.get_detail_url %}
                         <a href="{{ log_object.get_detail_url }}?next={{ request.get_full_path|urlencode }}">{{ log_object }}</a>
                     {%else %}
@@ -70,7 +69,6 @@
                     {% endif %}
                 {% endwith %}
             </td>
-            <td>{{ object.object_name }}</td>
             <td>{{ object.message }}</td>
             <td>
                 {% for key, value in object.get_changes.items %}

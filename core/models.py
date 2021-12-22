@@ -7,6 +7,7 @@ from django.db import models
 from django.contrib.auth.models import User as DjangoUser
 from sw_logger.tools import get_model_by_log_name
 from core import consts
+from django.urls import reverse
 
 from mis.document import DocumentType
 from mis.org import Org
@@ -144,6 +145,7 @@ class WorkerOrganization(models.Model):
 
 
 class Direction(models.Model):
+    LOG_NAME = 'Направление'
     EXAM_TYPE_CHOICE = [
         ('Предварительный', 'Предварительный'),
         ('Периодический', 'Периодический'),
@@ -165,6 +167,9 @@ class Direction(models.Model):
 
     def __str__(self):
         return f'Направление №{self.mis_id}'
+
+    def get_detail_url(self):
+        return reverse('core:direction_edit', kwargs={'number': self.mis_id})
 
 
 class DirectionLawItem(models.Model):
