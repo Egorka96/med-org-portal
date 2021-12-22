@@ -68,9 +68,8 @@ class Command(BaseCommand):
 
         except HTTPError as ex:
             # залогируем ошибку в сентри и поспим минуту, чтобы команда не пыталась рестартовать на месте
-
             logger.critical(
-                f'Ошибка загрузки справочников из МИС - {str(ex)[:150]}',
+                f'Ошибка загрузка направлений - {str(ex)[:150]}',
                 exc_info=True,
                 extra={'action': sw_logger.consts.ACTION_OTHER}
             )
@@ -86,12 +85,13 @@ class Command(BaseCommand):
             'dm_from': dt_from
         }
 
-        response = mis.direction.Direction.filter(params)
+        mis_directions = mis.direction.Direction.filter(params)
 
-        for mis_direction in response:
+        for mis_direction in mis_directions:
             if options.get('verbosity'):
                 print(f'Направление: №{mis_direction.number}')
 
+            # Сохраним сотрудника направления
             worker, created = models.Worker.objects.get_or_create(
                 last_name=mis_direction.last_name,
                 first_name=mis_direction.first_name,

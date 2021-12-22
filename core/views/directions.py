@@ -156,7 +156,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        pk_url_kwarg = self.kwargs.get(self.pk_url_kwarg)
+        obj_id = self.kwargs.get(self.pk_url_kwarg)
         worker, _ = models.Worker.objects.get_or_create(
             last_name=form.cleaned_data.get('last_name'),
             first_name=form.cleaned_data.get('first_name'),
@@ -174,7 +174,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             'pay_method': form.cleaned_data.get('pay_method')
         }
 
-        if not pk_url_kwarg:
+        if not obj_id:
             direction_id, description = Direction.create(params=form.cleaned_data)
             models.Direction.objects.create(
                 mis_id=direction_id,
@@ -182,7 +182,7 @@ class Edit(PermissionRequiredMixin, core.generic.views.EditView):
             )
         else:
             direction_id, description = Direction.edit(
-                direction_id=pk_url_kwarg,
+                direction_id=obj_id,
                 params=form.cleaned_data
             )
             models.Direction.objects.filter(mis_id=direction_id).update(

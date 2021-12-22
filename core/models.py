@@ -172,8 +172,8 @@ class DirectionLawItem(models.Model):
     law_item_mis_id = models.CharField(verbose_name='Пункты приказа', max_length=255,)
 
     class Meta:
-        verbose_name = 'Пункты приказа'
-        verbose_name_plural = 'Пункты приказа'
+        verbose_name = 'Пункты приказа в направлении'
+        verbose_name_plural = 'Пункты приказа в направлении'
 
     def __str__(self):
         return f'Пункт приказа {self.direction}'

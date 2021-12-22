@@ -84,20 +84,20 @@ class Direction:
         return response_json
 
     @classmethod
-    def filter(cls, params: Dict = None, user: 'core.models.DjangoUser' = None) -> List['Direction']:
-        derections = []
+    def filter(cls, params: Dict = None) -> List['Direction']:
+        directions = []
         page = 1
 
         while True:
             params['page'] = page
-            response_json = Mis().request(path='/api/pre_record/', params=params, user=user)
+            response_json = Mis().request(path='/api/pre_record/', params=params)
             for item in response_json['results']:
-                derections.append(cls.dict_to_obj(item))
+                directions.append(cls.dict_to_obj(item))
             if not response_json.get('next'):
                 break
             page += 1
 
-        return derections
+        return directions
 
     @classmethod
     def get(cls, direction_id) -> 'Direction':
