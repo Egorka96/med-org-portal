@@ -12,3 +12,6 @@ class Log(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.v
     filter_class = filters.Log
     title = 'Журнал'
     permission_required = 'core.view_log'
+
+    def get_queryset(self):
+        return super().get_queryset().order_by('-created')

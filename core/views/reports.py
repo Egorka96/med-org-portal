@@ -1,3 +1,5 @@
+import sw_logger
+import logging
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse
@@ -9,6 +11,9 @@ from core import forms
 from core.datatools.report import get_report_period
 from core.excel.reports import WorkersDoneExcel
 from mis.service_client import Mis
+
+
+logger = logging.getLogger('db')
 
 
 class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, core.generic.mixins.RestListMixin,
@@ -26,6 +31,17 @@ class WorkersDoneReport(PermissionRequiredMixin, core.generic.mixins.FormMixin, 
             ('Главная', reverse('core:index')),
             (self.title, ''),
         ]
+
+    def get(self, *args, **kwargs):
+        response = super().get(*args, **kwargs)
+        logger.info(
+            'Создание отчета по прошедшим',
+            extra={
+                'action': sw_logger.consts.ACTION_OTHER,
+                'request': self.request,
+            }
+        )
+        return response
 
     def get_workbook_maker_kwargs(self, **kwargs):
         kwargs = super().get_workbook_maker_kwargs(**kwargs)

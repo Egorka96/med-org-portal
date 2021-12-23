@@ -1,3 +1,4 @@
+import sw_logger
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.forms import SetPasswordForm
@@ -11,10 +12,25 @@ from django.views.generic import TemplateView
 import core.generic.mixins
 from core import models, forms
 from core.datatools.password import create_password
+import logging
+
+
+logger = logging.getLogger('db')
 
 
 class Login(LoginView):
     template_name = 'core/login.html'
+
+    def post(self, *args, **kwargs):
+        response = super().post(*args, **kwargs)
+        logger.info(
+            'Пользователь вошел в систему',
+            extra={
+                'action': sw_logger.consts.ACTION_OTHER,
+                'request': self.request,
+            }
+        )
+        return response
 
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)

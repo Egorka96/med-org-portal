@@ -28,10 +28,10 @@
                     </a>
                 {% endif %}
 
-                 {% if perms.auth.view_user %}
-                     <a class="btn btn-index-primary index-btn" href="{% url 'core:user' %}">
-                         <p><i class="fa fa-user"></i></p>
-                         Пользователи
+                 {% if perms.auth.view_management %}
+                     <a class="btn btn-index-primary index-btn" href="{% url 'core:management' %}">
+                         <p><i class="fa fa-cogs"></i></p>
+                         Администрирование
                     </a>
                 {% endif %}
             </div>

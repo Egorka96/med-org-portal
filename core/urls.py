@@ -7,11 +7,13 @@ from core.views import reports
 from core.views import directions
 from core.views import log
 from core.views import rest
+from core.views import admin
 
 app_name = 'core'
 
 urlpatterns = [
     path('', index.Index.as_view(), name='index'),
+    path('management/', admin.Management.as_view(), name='management'),
 
     path('user/', user.Search.as_view(), name='user'),
     path('user/add/', user.Edit.as_view(), name='user_add'),
