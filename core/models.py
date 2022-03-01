@@ -35,7 +35,7 @@ class Status(djutils.models.OneValueModel):
 
 class User(models.Model):
     django_user = models.OneToOneField(DjangoUser, related_name='core', on_delete=models.CASCADE)
-    org_ids = models.CharField('ID организаций', max_length=255, help_text='список id организаций из внешней системы')
+    org_ids = models.TextField('ID организаций', help_text='список id организаций из внешней системы')
     post = models.CharField('Должность', max_length=255, blank=True)
     need_change_password = models.BooleanField('Нужно сменить пароль', default=True)
 
