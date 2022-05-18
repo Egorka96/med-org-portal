@@ -157,6 +157,8 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
 MIS_URL = ''
 MIS_TOKEN = ''
 
+HELP_URL = ''
+
 TEMPLATES_DICT = {
     "base": 'core/base.html',
     "index": 'core/index.html',

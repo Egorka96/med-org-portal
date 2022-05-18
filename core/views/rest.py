@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from swutils.date import date_to_rus
 from swutils.string import transliterate
 
+import help.article
 from core.datatools.password import create_password
 from core import serializers, models
 from mis.law_item import LawItem
@@ -138,3 +139,13 @@ class GeneratePasswordView(APIView):
     def get(self, request):
         return Response({'password': create_password()})
 
+
+class ArticleView(APIView):
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        filter_params = copy(self.request.GET)
+
+        article_data = help.article.Article.filter(params=filter_params)
+        return Response(article_data)
