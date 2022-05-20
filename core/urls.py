@@ -7,6 +7,7 @@ from core.views import reports
 from core.views import directions
 from core.views import log
 from core.views import rest
+from help.views import article
 
 app_name = 'core'
 
@@ -36,6 +37,8 @@ urlpatterns = [
     path('rest/worker_documents/', rest.WorkerDocuments.as_view(), name='rest_worker_documents'),
     path('rest/law_items/', rest.LawItems.as_view(), name='rest_law_items'),
     path('rest/generate_password/', rest.GeneratePasswordView.as_view(), name='rest_generate_password'),
+
+    path('rest/article/', article.ArticleView.as_view(), name='rest_article'),
 
     path('password_change_required/', login.PasswordChangeRequired.as_view(), name='password_change_required'),
     path('password_forgot/', login.PasswordForgot.as_view(), name='password_forgot'),

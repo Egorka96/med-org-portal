@@ -9,29 +9,21 @@ from help.service_client import Help
 class Article:
     id: int
     name: str
-    service: int
     section: int
-    tags: [int]
-
-    short_description: str
-    text: str
     sort_priority: int
-    dc: datetime.datetime
-    dm: datetime.datetime
+
+    short_description: str = None
+    text: str = None
 
     @classmethod
     def dict_to_obj(cls, data: dict) -> 'Article':
         return cls(
             id=data['id'],
             name=data['name'],
-            service=data['service'],
             section=data['section'],
-            tags=data['tags'],
             short_description=data.get('short_description'),
             text=data.get('text'),
             sort_priority=data['sort_priority'],
-            dc=data['dc'],
-            dm=data['dm']
         )
 
     @classmethod

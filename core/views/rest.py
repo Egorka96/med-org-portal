@@ -138,14 +138,3 @@ class GeneratePasswordView(APIView):
 
     def get(self, request):
         return Response({'password': create_password()})
-
-
-class ArticleView(APIView):
-    authentication_classes = (SessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, *args, **kwargs):
-        filter_params = copy(self.request.GET)
-
-        article_data = help.article.Article.filter(params=filter_params)
-        return Response(article_data)
