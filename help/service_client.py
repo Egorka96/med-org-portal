@@ -12,8 +12,8 @@ class Help:
     def request(self, path, params=None, data=None, method='get'):
         assert method in ('get', 'post')
 
-        url = settings.MIS_URL + path
-        headers = {'Authorization': f'Token {settings.MIS_TOKEN}'}
+        url = settings.HELP_URL + path
+        headers = {'Authorization': f'Token {settings.HELP_TOKEN}'}
 
         response = requests.request(method=method, url=url, headers=headers, params=params, data=data)
         response.raise_for_status()

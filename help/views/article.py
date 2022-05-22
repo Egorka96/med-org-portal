@@ -1,3 +1,4 @@
+import json
 from copy import copy
 
 
@@ -16,5 +17,5 @@ class ArticleView(APIView):
     def get(self, request, *args, **kwargs):
         filter_params = copy(self.request.GET)
 
-        article_data = article.Article.filter(params=filter_params)
+        article_data = article.Article.filter_raw(params=filter_params)
         return Response(article_data)

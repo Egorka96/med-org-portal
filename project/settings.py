@@ -157,7 +157,8 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
 MIS_URL = ''
 MIS_TOKEN = ''
 
-HELP_URL = ''
+HELP_URL = 'http://127.0.0.1:8004'
+HELP_TOKEN = '2969ec6881cf9a68d37d9968b1291b664c7939f1'
 
 TEMPLATES_DICT = {
     "base": 'core/base.html',
