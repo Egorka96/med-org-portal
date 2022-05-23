@@ -6,11 +6,13 @@ from django.contrib.auth.views import LoginView, PasswordChangeView, logout_then
 from django.views.generic import TemplateView
 
 import core.urls
+import help.urls
 import background_tasks.urls
 from core.views.login import Login
 
 urlpatterns = [
     path('', include(core.urls, namespace='core')),
+    path('help/', include(help.urls, namespace='help')),
     path('background_tasks/', include(background_tasks.urls, namespace='background_tasks')),
     path('admin/', admin.site.urls),
 

@@ -1,5 +1,5 @@
-import json
 from copy import copy
+from dataclasses import asdict
 
 
 from rest_framework.authentication import SessionAuthentication
@@ -17,5 +17,11 @@ class ArticleView(APIView):
     def get(self, request, *args, **kwargs):
         filter_params = copy(self.request.GET)
 
-        article_data = article.Article.filter_raw(params=filter_params)
+        article_data = {}
+        articles = []
+        article_obj = article.Article.filter(params=filter_params)
+        for item in article_obj:
+            articles.append(asdict(item))
+        article_data['results'] = articles
+
         return Response(article_data)

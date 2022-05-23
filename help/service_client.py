@@ -5,10 +5,6 @@ from django.conf import settings
 class Help:
     ARTICLE_LIST_URL = '/api/article/'
 
-    def __init__(self):
-        self.url = settings.HELP_URL
-        self._status = None
-
     def request(self, path, params=None, data=None, method='get'):
         assert method in ('get', 'post')
 
