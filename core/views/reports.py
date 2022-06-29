@@ -80,6 +80,12 @@ class WorkersDoneReport(PermissionRequiredMixin, SortMixin, core.generic.mixins.
                 for o in app_orders:
                     obj['main_services'].append(o.get('main_services'))
 
+                # если у клиента несколько заявок, то постараемся взять последнее проф заключение
+                if app == 'prof':
+                    app_orders = sorted(app_orders, key=lambda o: o['date'], reverse=True)
+                    if app_orders:
+                        obj['prof_conclusion'] = app_orders[0]['prof_conclusion']
+
         return objects
 
     def get_context_data(self, **kwargs):

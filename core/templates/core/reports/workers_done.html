@@ -131,23 +131,23 @@
     </td>
     {% if perms.core.view_money %}<td class="small">{{ object.total_cost }}</td>{% endif %}
     <td class="small">
-        {% if object.prof.0.prof_conclusion.conclusion %}
+        {% if object.prof_conclusion.conclusion %}
             <span data-toggle="tooltip"
-                    {% if object.prof.0.prof_conclusion.no_contraindications %}
+                    {% if object.prof_conclusion.no_contraindications %}
                         class="badge badge-success"
-                    {% elif object.prof.0.prof_conclusion.temporary_contraindications %}
+                    {% elif object.prof_conclusion.temporary_contraindications %}
                         class="badge badge-warning"
-                    {% elif object.prof.0.prof_conclusion.permanent_contraindications %}
+                    {% elif object.prof_conclusion.permanent_contraindications %}
                         class="badge badge-danger"
                     {% else %}
                         class="badge badge-info"
                     {% endif %}
 
-                {% if object.prof.0.prof_conclusion.conclusion|length > 50 %}
-                    title="{{ object.prof.0.prof_conclusion.conclusion }}"
+                {% if object.prof_conclusion.conclusion|length > 50 %}
+                    title="{{ object.prof_conclusion.conclusion }}"
                 {% endif %}
             >
-               {{ object.prof.0.prof_conclusion.conclusion|truncatechars:50 }}
+               {{ object.prof_conclusion.conclusion|truncatechars:50 }}
             </span>
         {% endif %}
     </td>
