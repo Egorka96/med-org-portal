@@ -12,7 +12,7 @@ sw-django-logger==0.0.16
 openpyxl==3.0.7
 python-dateutil==2.8.1
 docxtpl==0.11.5
-pillow==8.3.2
+pillow==9.3.0
 python-barcode==0.13.1
 sentry-sdk==0.14.3
 celery[redis]==5.1.2
